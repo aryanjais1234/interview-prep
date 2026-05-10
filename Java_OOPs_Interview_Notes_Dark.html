@@ -60,6 +60,20 @@
     flex-direction: column;
   }
 
+  .nav-back {
+  display: block;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border2);
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+.nav-back:hover {
+  color: var(--accent);
+}
+
   nav::-webkit-scrollbar { width: 4px; }
   nav::-webkit-scrollbar-track { background: transparent; }
   nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -448,6 +462,11 @@
 
 <!-- ════════ SIDEBAR ════════ -->
 <nav>
+  <a class="nav-back" href="index.html">← Back to Hub</a>
+  <div class="nav-logo">
+    <div class="lang-badge">☕ Java · Collections</div>
+    <h2>Collections Framework<br>Interview Notes</h2>
+  </div>
   <div class="nav-logo">
     <div class="lang-badge">☕ Java · OOPs</div>
     <h2>OOPs Concepts<br>Interview Notes</h2>

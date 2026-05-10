@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Collections Framework – Complete Interview Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1f2630;
+  --border: #30363d;
+  --border2: #21262d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #bc8cff;
+  --green: #3fb950;
+  --yellow: #d29922;
+  --orange: #ffa657;
+  --pink: #ff7b72;
+  --blue: #58a6ff;
+
+  --kw: #ff7b72;
+  --ty: #ffa657;
+  --str: #a5d6ff;
+  --num: #79c0ff;
+  --cm: #8b949e;
+  --fn: #d2a8ff;
+  --an: #3fb950;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.7;
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+nav {
+  width: 280px;
+  min-width: 280px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding-bottom: 2rem;
+}
+
+nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+nav::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+.nav-back {
+  display: block;
+  padding: 1rem 1.25rem;
+  text-decoration: none;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border2);
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+.nav-back:hover {
+  color: var(--accent);
+}
+
+.nav-logo {
+  padding: 1.5rem 1.25rem;
+}
+
+.lang-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(188, 140, 255, 0.15);
+  border: 1px solid rgba(188, 140, 255, 0.35);
+  color: var(--accent);
+  font-size: 11px;
+  margin-bottom: 12px;
+}
+
+.nav-logo h2 {
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.nav-section-label {
+  padding: 1rem 1.25rem 0.5rem;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+nav a {
+  display: block;
+  text-decoration: none;
+  color: var(--muted);
+  padding: 0.55rem 1.5rem;
+  font-size: 13px;
+  border-left: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+nav a:hover {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(188, 140, 255, 0.08);
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+  padding: 3rem;
+}
+
+.page-header {
+  margin-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 2rem;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.page-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* =========================
+   SECTIONS
+========================= */
+section {
+  margin-bottom: 3rem;
+}
+
+section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border2);
+  padding-bottom: 0.75rem;
+}
+
+.num {
+  background: rgba(188, 140, 255, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(188, 140, 255, 0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+section h3 {
+  color: var(--orange);
+  margin: 1.5rem 0 0.75rem;
+}
+
+p {
+  margin-bottom: 1rem;
+  color: #d0d7de;
+}
+
+/* =========================
+   TABLES
+========================= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.2rem 0;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+th {
+  background: var(--bg3);
+  color: var(--accent);
+  padding: 0.85rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+ td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border2);
+}
+
+tr:hover td {
+  background: rgba(255,255,255,0.02);
+}
+
+/* =========================
+   CODE BLOCKS
+========================= */
+pre {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 1.2rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  position: relative;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+pre::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.kw { color: var(--kw); }
+.ty { color: var(--ty); }
+.str { color: var(--str); }
+.num { color: var(--num); }
+.cm { color: var(--cm); font-style: italic; }
+.fn { color: var(--fn); }
+.an { color: var(--an); }
+.im { color: var(--blue); }
+
+/* =========================
+   CALLOUTS
+========================= */
+.callout {
+  padding: 1rem 1.2rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+  border-left: 4px solid;
+}
+
+.callout.tip {
+  background: rgba(88,166,255,0.08);
+  border-color: var(--blue);
+}
+
+.callout.warn {
+  background: rgba(210,153,34,0.08);
+  border-color: var(--yellow);
+}
+
+.callout.key {
+  background: rgba(255,123,114,0.08);
+  border-color: var(--pink);
+}
+
+.callout.orange {
+  background: rgba(255,166,87,0.08);
+  border-color: var(--orange);
+}
+
+/* =========================
+   CARDS / GRID
+========================= */
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.compare-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+}
+
+.cc-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+}
+
+.cc-body {
+  color: #c9d1d9;
+  line-height: 1.8;
+}
+
+/* =========================
+   HIERARCHY SECTION
+========================= */
+.hierarchy {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.h-root,
+.h-l1,
+.h-l2,
+.h-l3 {
+  margin: 0.45rem 0;
+  white-space: nowrap;
+}
+
+.h-l1 { padding-left: 1rem; }
+.h-l2 { padding-left: 2rem; }
+.h-l3 { padding-left: 3rem; }
+
+.h-arrow {
+  color: var(--muted);
+}
+
+.h-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* =========================
+   Q&A CARDS
+========================= */
+
+.qa-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  transition: border-color .2s, transform .2s;
+}
+
+.qa-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.qa-q {
+  background: var(--bg3);
+  padding: .9rem 1.25rem;
+  font-family: 'Syne', sans-serif;
+  font-size: .96rem;
+  font-weight: 700;
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border2);
+}
+
+.qa-q .qn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(188, 140, 255, 0.18);
+  color: var(--accent);
+  border: 1px solid rgba(188, 140, 255, 0.35);
+  padding: 3px 7px;
+  border-radius: 4px;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.qa-body {
+  padding: 1rem 1.25rem;
+  font-size: 14px;
+  line-height: 1.7;
+  color: #d0d7de;
+}
+
+.qa-body p {
+  margin-bottom: .65rem;
+}
+
+.qa-body strong {
+  color: var(--text);
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+@media (max-width: 992px) {
+  body {
+    flex-direction: column;
+  }
+
+  nav {
+    width: 100%;
+    height: auto;
+    position: relative;
+    min-width: 100%;
+  }
+
+  main {
+    padding: 2rem 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  section h2 {
+    font-size: 1.2rem;
+  }
+
+  pre {
+    font-size: 12px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+</style>
+</head>
+<body>  
+<!-- SIDEBAR -->
+<nav>
+  <a class="nav-back" href="index.html">← Back to Hub</a>
+  <div class="nav-logo">
+    <div class="lang-badge">☕ Java · Collections</div>
+    <h2>Collections Framework<br>Interview Notes</h2>
+  </div>
+
+  <div class="nav-section-label">Foundation</div>
+  <a href="#s1">01 · What is Collection Framework</a>
+  <a href="#s2">02 · Collection Hierarchy</a>
+  <a href="#s3">03 · Iterable & Collection Interface</a>
+
+  <div class="nav-section-label">List</div>
+  <a href="#s4">04 · List Interface</a>
+  <a href="#s5">05 · ArrayList – Internal Working</a>
+  <a href="#s6">06 · Why Integer not int? Generics</a>
+  <a href="#s7">07 · LinkedList</a>
+  <a href="#s8">08 · Vector & Stack</a>
+  <a href="#s9">09 · final with List</a>
+  <a href="#s10">10 · Custom ArrayList (No Duplicates)</a>
+
+  <div class="nav-section-label">Set</div>
+  <a href="#s11">11 · Set Interface</a>
+  <a href="#s12">12 · HashSet – Internal Working</a>
+  <a href="#s13">13 · equals() & hashCode() Contract</a>
+  <a href="#s14">14 · LinkedHashSet</a>
+  <a href="#s15">15 · TreeSet</a>
+
+  <div class="nav-section-label">Queue</div>
+  <a href="#s16">16 · Queue & PriorityQueue</a>
+  <a href="#s17">17 · ArrayDeque</a>
+
+  <div class="nav-section-label">Map</div>
+  <a href="#s18">18 · Map Interface</a>
+  <a href="#s19">19 · HashMap – Internal Working</a>
+  <a href="#s20">20 · LinkedHashMap</a>
+  <a href="#s21">21 · TreeMap</a>
+  <a href="#s22">22 · Hashtable vs HashMap</a>
+
+  <div class="nav-section-label">Advanced</div>
+  <a href="#s23">23 · Comparable vs Comparator</a>
+  <a href="#s24">24 · Iterator – fail-fast vs fail-safe</a>
+  <a href="#s25">25 · ConcurrentHashMap</a>
+  <a href="#s26">26 · CopyOnWriteArrayList</a>
+  <a href="#s27">27 · Collections Utility Class</a>
+  <a href="#s28">28 · Generics & Type Erasure</a>
+  <a href="#s29">29 · Best Collection Selection Guide</a>
+
+  <div class="nav-section-label">Q &amp; A</div>
+  <a href="#qa">30 Interview Questions</a>
+  <a href="#quickref">Quick-Ref Definitions</a>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="eyebrow">Core Java · Interview Prep</div>
+    <h1>Collections Framework – Complete Interview Notes</h1>
+    <div class="tags">
+      <span class="tag">ArrayList</span><span class="tag">LinkedList</span>
+      <span class="tag">HashSet</span><span class="tag">TreeSet</span>
+      <span class="tag">HashMap</span><span class="tag">LinkedHashMap</span>
+      <span class="tag">TreeMap</span><span class="tag">Comparable</span>
+      <span class="tag">Comparator</span><span class="tag">Iterator</span>
+      <span class="tag">ConcurrentHashMap</span><span class="tag">Generics</span>
+      <span class="tag">fail-fast</span><span class="tag">fail-safe</span>
+    </div>
+  </div>
+
+  <!-- ── S1 ── -->
+  <section id="s1">
+    <h2><span class="num">01</span> What is Collection Framework?</h2>
+    <p>Java Collection Framework is a unified architecture of <strong>interfaces, classes, and algorithms</strong> designed to store, retrieve, manipulate, and communicate groups of objects dynamically.</p>
+
+    <h3>Why Was It Needed? – Array Problems</h3>
+    <div class="compare-grid">
+      <div class="compare-card" style="border-color:#ff7b7244">
+        <div class="cc-title" style="color:var(--pink)">❌ Problems with Arrays</div>
+        <div class="cc-body">
+          • <strong>Fixed size</strong> — can't grow/shrink<br>
+          • No built-in add/remove methods<br>
+          • Difficult insertion/deletion (shifting)<br>
+          • No sorting/searching support<br>
+          • Can't hold only unique elements<br>
+          • Can't use key-value pairs
+        </div>
+      </div>
+      <div class="compare-card" style="border-color:#3fb95044">
+        <div class="cc-title" style="color:var(--green)">✅ Collection Framework Solves</div>
+        <div class="cc-body">
+          • <strong>Dynamic size</strong> — grows/shrinks automatically<br>
+          • Ready-made add/remove/search methods<br>
+          • Efficient insertion/deletion<br>
+          • Built-in sorting &amp; searching<br>
+          • Set enforces uniqueness<br>
+          • Map supports key-value pairs
+        </div>
+      </div>
+    </div>
+
+    <pre class="java" data-lang="java"><span class="cm">// Arrays — fixed, painful</span>
+<span class="kw">int</span>[] arr = <span class="kw">new int</span>[<span class="num">5</span>];
+<span class="cm">// can't add 6th element — stuck!</span>
+
+<span class="cm">// Collections — dynamic, powerful</span>
+<span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+list.<span class="fn">add</span>(<span class="num">1</span>); list.<span class="fn">add</span>(<span class="num">2</span>); list.<span class="fn">add</span>(<span class="num">3</span>); <span class="cm">// grows automatically</span>
+list.<span class="fn">remove</span>(<span class="num">0</span>);                         <span class="cm">// built-in remove</span>
+<span class="ty">Collections</span>.<span class="fn">sort</span>(list);                  <span class="cm">// built-in sort</span></pre>
+  </section>
+
+  <!-- ── S2 ── -->
+  <section id="s2">
+    <h2><span class="num">02</span> Collection Hierarchy</h2>
+
+    <div class="hierarchy">
+      <div class="h-root">java.lang.Iterable</div>
+      <div class="h-l1"><span class="h-arrow">└──</span> java.util.<span style="color:var(--accent)">Collection</span> <span class="h-note">(root interface)</span></div>
+
+      <div class="h-l2"><span class="h-arrow">├──</span> <span style="color:var(--blue)">List</span> <span class="h-note">– ordered, index-based, duplicates allowed</span></div>
+      <div class="h-l3"><span class="h-arrow">├──</span> ArrayList &nbsp;&nbsp;<span class="h-note">– dynamic array</span></div>
+      <div class="h-l3"><span class="h-arrow">├──</span> LinkedList &nbsp;<span class="h-note">– doubly linked list</span></div>
+      <div class="h-l3"><span class="h-arrow">├──</span> Vector &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="h-note">– synchronized, legacy</span></div>
+      <div class="h-l3"><span class="h-arrow">└──</span> Stack &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="h-note">– LIFO, extends Vector</span></div>
+
+      <div class="h-l2"><span class="h-arrow">├──</span> <span style="color:var(--green)">Set</span> <span class="h-note">– unique elements, no index</span></div>
+      <div class="h-l3"><span class="h-arrow">├──</span> HashSet &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="h-note">– unordered, O(1)</span></div>
+      <div class="h-l3"><span class="h-arrow">├──</span> LinkedHashSet &nbsp;<span class="h-note">– insertion order</span></div>
+      <div class="h-l3"><span class="h-arrow">└──</span> TreeSet &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="h-note">– sorted, O(log n)</span></div>
+
+      <div class="h-l2"><span class="h-arrow">└──</span> <span style="color:var(--purple)">Queue</span> <span class="h-note">– FIFO ordering</span></div>
+      <div class="h-l3"><span class="h-arrow">├──</span> PriorityQueue <span class="h-note">– min-heap by default</span></div>
+      <div class="h-l3"><span class="h-arrow">└──</span> ArrayDeque &nbsp;&nbsp;<span class="h-note">– double-ended queue</span></div>
+
+      <div style="margin-top:.75rem" class="h-root">java.util.Map <span class="h-note">(separate hierarchy — NOT extends Collection)</span></div>
+      <div class="h-l2"><span class="h-arrow">├──</span> HashMap &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="h-note">– unordered, O(1), null allowed</span></div>
+      <div class="h-l2"><span class="h-arrow">├──</span> LinkedHashMap &nbsp;<span class="h-note">– insertion/access order</span></div>
+      <div class="h-l2"><span class="h-arrow">├──</span> TreeMap &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="h-note">– sorted keys, O(log n)</span></div>
+      <div class="h-l2"><span class="h-arrow">└──</span> Hashtable &nbsp;&nbsp;&nbsp;&nbsp;<span class="h-note">– synchronized, legacy, no null</span></div>
+    </div>
+
+    <div class="callout orange">📌 <strong>Key fact:</strong> <code>Map</code> does NOT extend <code>Collection</code>. It is a completely separate hierarchy. This is a very common interview trap.</div>
+  </section>
+
+  <!-- ── S3 ── -->
+  <section id="s3">
+    <h2><span class="num">03</span> Iterable &amp; Collection Interface</h2>
+
+    <h3>Iterable Interface</h3>
+    <p>The root of the entire collection hierarchy. Any class implementing <code>Iterable</code> can be used in a <strong>for-each loop</strong>.</p>
+    <pre class="java" data-lang="java"><span class="kw">public interface</span> <span class="ty">Iterable</span>&lt;<span class="ty">T</span>&gt; {
+    <span class="ty">Iterator</span>&lt;<span class="ty">T</span>&gt; <span class="fn">iterator</span>();   <span class="cm">// the only method</span>
+}</pre>
+
+    <h3>Collection Interface – Key Methods</h3>
+    <table>
+      <thead><tr><th>Method</th><th>Purpose</th><th>Returns</th></tr></thead>
+      <tbody>
+        <tr><td><code>add(E e)</code></td><td>Insert element</td><td>boolean</td></tr>
+        <tr><td><code>remove(Object o)</code></td><td>Remove element</td><td>boolean</td></tr>
+        <tr><td><code>contains(Object o)</code></td><td>Check if exists</td><td>boolean</td></tr>
+        <tr><td><code>size()</code></td><td>Number of elements</td><td>int</td></tr>
+        <tr><td><code>isEmpty()</code></td><td>Check empty</td><td>boolean</td></tr>
+        <tr><td><code>clear()</code></td><td>Remove all elements</td><td>void</td></tr>
+        <tr><td><code>addAll(Collection c)</code></td><td>Add all from another</td><td>boolean</td></tr>
+        <tr><td><code>iterator()</code></td><td>Get iterator</td><td>Iterator&lt;E&gt;</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── S4 ── -->
+  <section id="s4">
+    <h2><span class="num">04</span> List Interface</h2>
+    <p>List is an <strong>ordered collection</strong> that maintains insertion order and allows duplicate elements. Elements accessed by integer index.</p>
+
+    <table>
+      <thead><tr><th>Feature</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td>Order</td><td>✅ Maintains insertion order</td></tr>
+        <tr><td>Duplicates</td><td>✅ Allowed</td></tr>
+        <tr><td>Index access</td><td>✅ get(int index)</td></tr>
+        <tr><td>Null values</td><td>✅ Allowed (multiple nulls)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>List-specific Extra Methods</h3>
+    <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">String</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+list.<span class="fn">add</span>(<span class="num">0</span>, <span class="str">"First"</span>);   <span class="cm">// add at index</span>
+list.<span class="fn">get</span>(<span class="num">0</span>);            <span class="cm">// get by index</span>
+list.<span class="fn">set</span>(<span class="num">0</span>, <span class="str">"New"</span>);   <span class="cm">// replace at index</span>
+list.<span class="fn">indexOf</span>(<span class="str">"A"</span>);    <span class="cm">// first occurrence index</span>
+list.<span class="fn">subList</span>(<span class="num">1</span>, <span class="num">3</span>);   <span class="cm">// view from index 1 to 2</span>
+list.<span class="fn">listIterator</span>();  <span class="cm">// bidirectional iterator</span></pre>
+
+    <div class="callout tip">💡 <strong>Interview question:</strong> Which is preferred — <code>ArrayList list = new ArrayList()</code> or <code>List list = new ArrayList()</code>? Always use the interface reference for <strong>runtime polymorphism</strong> — swap implementation without changing code.</div>
+  </section>
+
+  <!-- ── S5 ── -->
+  <section id="s5">
+    <h2><span class="num">05</span> ArrayList – Deep Internal Working</h2>
+
+    <h3>Internal Structure</h3>
+    <pre class="java" data-lang="java"><span class="cm">// ArrayList internally uses an Object array</span>
+<span class="kw">transient</span> <span class="ty">Object</span>[] elementData;    <span class="cm">// backing array</span>
+<span class="kw">private int</span> size;                  <span class="cm">// actual element count</span>
+
+<span class="cm">// Default initial capacity = 10</span>
+<span class="kw">private static final int</span> DEFAULT_CAPACITY = <span class="num">10</span>;</pre>
+
+    <h3>Capacity Growth Formula</h3>
+    <pre class="java" data-lang="java"><span class="cm">// When array is full, ArrayList grows by ~1.5x</span>
+<span class="kw">int</span> newCapacity = oldCapacity + (oldCapacity &gt;&gt; <span class="num">1</span>);
+<span class="cm">// Example: 10 → 15 → 22 → 33 → 49...</span>
+
+<span class="cm">// Internally a new array is created and System.arraycopy() is called</span>
+elementData = <span class="ty">Arrays</span>.<span class="fn">copyOf</span>(elementData, newCapacity);</pre>
+
+    <h3>Complexity</h3>
+    <table>
+      <thead><tr><th>Operation</th><th>Complexity</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><code>get(index)</code></td><td><span class="complexity o1">O(1)</span></td><td>Direct array access</td></tr>
+        <tr><td><code>add(element)</code> at end</td><td><span class="complexity o1">O(1)</span> amortized</td><td>Append to array end</td></tr>
+        <tr><td><code>add(index, element)</code></td><td><span class="complexity on">O(n)</span></td><td>Elements must shift right</td></tr>
+        <tr><td><code>remove(index)</code></td><td><span class="complexity on">O(n)</span></td><td>Elements must shift left</td></tr>
+        <tr><td><code>contains()</code></td><td><span class="complexity on">O(n)</span></td><td>Linear search</td></tr>
+        <tr><td>Resize (grow)</td><td><span class="complexity on">O(n)</span></td><td>Array copy to new array</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Full Example</h3>
+    <pre class="java" data-lang="java"><span class="im">import</span> java.util.*;
+
+<span class="kw">public class</span> <span class="ty">ArrayListDemo</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="ty">List</span>&lt;<span class="ty">String</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+        list.<span class="fn">add</span>(<span class="str">"Alice"</span>);
+        list.<span class="fn">add</span>(<span class="str">"Bob"</span>);
+        list.<span class="fn">add</span>(<span class="str">"Charlie"</span>);
+        list.<span class="fn">add</span>(<span class="str">"Alice"</span>);   <span class="cm">// duplicate allowed</span>
+
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list);              <span class="cm">// [Alice, Bob, Charlie, Alice]</span>
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list.<span class="fn">get</span>(<span class="num">1</span>));       <span class="cm">// Bob</span>
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list.<span class="fn">size</span>());       <span class="cm">// 4</span>
+
+        list.<span class="fn">remove</span>(<span class="str">"Bob"</span>);
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list);              <span class="cm">// [Alice, Charlie, Alice]</span>
+
+        <span class="cm">// Sort</span>
+        <span class="ty">Collections</span>.<span class="fn">sort</span>(list);
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list);              <span class="cm">// [Alice, Alice, Charlie]</span>
+    }
+}</pre>
+
+    <div class="callout warn">⚠️ <strong>ArrayList is NOT thread-safe.</strong> For thread safety use <code>Collections.synchronizedList()</code> or <code>CopyOnWriteArrayList</code>.</div>
+  </section>
+
+  <!-- ── S6 ── -->
+  <section id="s6">
+    <h2><span class="num">06</span> Why <code>Integer</code> not <code>int</code>? – Generics, AutoBoxing &amp; Unboxing</h2>
+
+    <p>Java Generics only work with <strong>reference types (Objects)</strong>, not primitive types. This is because generics use <strong>type erasure</strong> — at runtime all generics become <code>Object</code>.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">ArrayList</span>&lt;<span class="kw">int</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();   <span class="cm">// ❌ Compilation Error!</span>
+<span class="ty">ArrayList</span>&lt;<span class="ty">Integer</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;(); <span class="cm">// ✅ Correct</span></pre>
+
+    <h3>Wrapper Classes</h3>
+    <table>
+      <thead><tr><th>Primitive</th><th>Wrapper Class</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><code>int</code></td><td><code>Integer</code></td><td><code>Integer.valueOf(10)</code></td></tr>
+        <tr><td><code>double</code></td><td><code>Double</code></td><td><code>Double.valueOf(3.14)</code></td></tr>
+        <tr><td><code>char</code></td><td><code>Character</code></td><td><code>Character.valueOf('A')</code></td></tr>
+        <tr><td><code>boolean</code></td><td><code>Boolean</code></td><td><code>Boolean.valueOf(true)</code></td></tr>
+        <tr><td><code>long</code></td><td><code>Long</code></td><td><code>Long.valueOf(100L)</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>AutoBoxing – Automatic primitive → wrapper</h3>
+    <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+list.<span class="fn">add</span>(<span class="num">10</span>);   <span class="cm">// you write int literal</span>
+<span class="cm">// Compiler converts to: list.add(Integer.valueOf(10)); — AutoBoxing</span>
+
+<span class="kw">int</span> x = list.<span class="fn">get</span>(<span class="num">0</span>);
+<span class="cm">// Compiler converts to: int x = list.get(0).intValue(); — Unboxing</span></pre>
+
+    <h3>AutoBoxing Trap – NullPointerException</h3>
+    <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+list.<span class="fn">add</span>(<span class="kw">null</span>);
+
+<span class="kw">int</span> x = list.<span class="fn">get</span>(<span class="num">0</span>);   <span class="cm">// ❌ NullPointerException!</span>
+<span class="cm">// null.intValue() → NPE during unboxing</span></pre>
+
+    <h3>Integer Cache – Tricky Interview Question</h3>
+    <pre class="java" data-lang="java"><span class="ty">Integer</span> a = <span class="num">127</span>;
+<span class="ty">Integer</span> b = <span class="num">127</span>;
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(a == b);   <span class="cm">// true  ← cached range -128 to 127</span>
+
+<span class="ty">Integer</span> c = <span class="num">128</span>;
+<span class="ty">Integer</span> d = <span class="num">128</span>;
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(c == d);   <span class="cm">// false ← outside cache, new objects</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(c.<span class="fn">equals</span>(d)); <span class="cm">// true  ← compare value</span></pre>
+
+    <div class="callout key">🔑 <strong>Rule:</strong> Always use <code>.equals()</code> to compare Integer objects, never <code>==</code>. The Integer cache only covers -128 to 127.</div>
+  </section>
+
+  <!-- ── S7 ── -->
+  <section id="s7">
+    <h2><span class="num">07</span> LinkedList – Doubly Linked List</h2>
+
+    <h3>Internal Structure</h3>
+    <pre class="java" data-lang="java"><span class="cm">// Each element is a Node</span>
+<span class="kw">private static class</span> <span class="ty">Node</span>&lt;<span class="ty">E</span>&gt; {
+    <span class="ty">E</span>       item;
+    <span class="ty">Node</span>&lt;<span class="ty">E</span>&gt; next;   <span class="cm">// pointer to next node</span>
+    <span class="ty">Node</span>&lt;<span class="ty">E</span>&gt; prev;   <span class="cm">// pointer to previous node</span>
+}
+<span class="cm">// null ← [prev|A|next] ↔ [prev|B|next] ↔ [prev|C|next] → null</span></pre>
+
+    <table>
+      <thead><tr><th>Operation</th><th>Complexity</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><code>get(index)</code></td><td><span class="complexity on">O(n)</span></td><td>Must traverse from head</td></tr>
+        <tr><td><code>add()</code> at head/tail</td><td><span class="complexity o1">O(1)</span></td><td>Pointer update only</td></tr>
+        <tr><td><code>add(index, e)</code></td><td><span class="complexity on">O(n)</span></td><td>Traverse + pointer update</td></tr>
+        <tr><td><code>remove()</code> head/tail</td><td><span class="complexity o1">O(1)</span></td><td>Pointer update only</td></tr>
+      </tbody>
+    </table>
+
+    <pre class="java" data-lang="java"><span class="ty">LinkedList</span>&lt;<span class="ty">String</span>&gt; ll = <span class="kw">new</span> <span class="ty">LinkedList</span>&lt;&gt;();
+
+ll.<span class="fn">add</span>(<span class="str">"B"</span>);
+ll.<span class="fn">addFirst</span>(<span class="str">"A"</span>);   <span class="cm">// O(1) — add to head</span>
+ll.<span class="fn">addLast</span>(<span class="str">"C"</span>);    <span class="cm">// O(1) — add to tail</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ll);           <span class="cm">// [A, B, C]</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ll.<span class="fn">getFirst</span>()); <span class="cm">// A</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ll.<span class="fn">getLast</span>());  <span class="cm">// C</span>
+
+ll.<span class="fn">removeFirst</span>();  <span class="cm">// O(1)</span>
+ll.<span class="fn">removeLast</span>();   <span class="cm">// O(1)</span></pre>
+
+    <div class="callout tip">💡 LinkedList also implements <code>Deque</code> — use it as a <strong>Stack</strong> (push/pop) or <strong>Queue</strong> (offer/poll).</div>
+
+    <h3>ArrayList vs LinkedList – Choose Wisely</h3>
+    <table>
+      <thead><tr><th></th><th>ArrayList</th><th>LinkedList</th></tr></thead>
+      <tbody>
+        <tr><td>Internal</td><td>Dynamic array</td><td>Doubly linked list</td></tr>
+        <tr><td>Random access <code>get(i)</code></td><td>✅ O(1)</td><td>❌ O(n)</td></tr>
+        <tr><td>Insert/delete (middle)</td><td>❌ O(n) – shifting</td><td>✅ O(1) after traversal</td></tr>
+        <tr><td>Memory</td><td>Less (no pointers)</td><td>More (prev/next pointers)</td></tr>
+        <tr><td>Cache friendliness</td><td>✅ Better (contiguous)</td><td>❌ Scattered</td></tr>
+        <tr><td>Use when</td><td>Frequent reads</td><td>Frequent add/remove at ends</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── S8 ── -->
+  <section id="s8">
+    <h2><span class="num">08</span> Vector &amp; Stack</h2>
+
+    <h3>Vector</h3>
+    <p>Like ArrayList but <strong>synchronized</strong> (thread-safe). Every method is synchronized → slower.</p>
+    <pre class="java" data-lang="java"><span class="ty">Vector</span>&lt;<span class="ty">Integer</span>&gt; v = <span class="kw">new</span> <span class="ty">Vector</span>&lt;&gt;();
+v.<span class="fn">add</span>(<span class="num">10</span>); v.<span class="fn">add</span>(<span class="num">20</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(v);   <span class="cm">// [10, 20]</span>
+
+<span class="cm">// Growth: doubles capacity (ArrayList grows 1.5x)</span>
+<span class="cm">// Default capacity = 10, grows to 20, 40...</span></pre>
+
+    <div class="callout warn">⚠️ Vector is a <strong>legacy class</strong>. In modern code, use <code>ArrayList</code> + explicit synchronization, or <code>CopyOnWriteArrayList</code> instead.</div>
+
+    <h3>Stack (LIFO)</h3>
+    <pre class="java" data-lang="java"><span class="ty">Stack</span>&lt;<span class="ty">Integer</span>&gt; stack = <span class="kw">new</span> <span class="ty">Stack</span>&lt;&gt;();
+
+stack.<span class="fn">push</span>(<span class="num">10</span>);   <span class="cm">// add to top</span>
+stack.<span class="fn">push</span>(<span class="num">20</span>);
+stack.<span class="fn">push</span>(<span class="num">30</span>);
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(stack.<span class="fn">peek</span>());  <span class="cm">// 30 (view top, don't remove)</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(stack.<span class="fn">pop</span>());   <span class="cm">// 30 (remove top)</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(stack.<span class="fn">pop</span>());   <span class="cm">// 20</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(stack.<span class="fn">isEmpty</span>()); <span class="cm">// false</span></pre>
+
+    <div class="callout tip">💡 Prefer <code>ArrayDeque</code> over <code>Stack</code> for stack operations — faster and not synchronized by default.</div>
+  </section>
+
+  <!-- ── S9 ── -->
+  <section id="s9">
+    <h2><span class="num">09</span> <code>final</code> with List – Tricky Interview</h2>
+
+    <div class="callout key">🔑 <strong>Declaring a List as final prevents reassignment, but does NOT make it immutable. You can still add/remove elements.</strong></div>
+
+    <pre class="java" data-lang="java"><span class="kw">final</span> <span class="ty">List</span>&lt;<span class="ty">String</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+list.<span class="fn">add</span>(<span class="str">"A"</span>);   <span class="cm">// ✅ allowed — modifying contents</span>
+list.<span class="fn">add</span>(<span class="str">"B"</span>);   <span class="cm">// ✅ allowed</span>
+list.<span class="fn">remove</span>(<span class="num">0</span>); <span class="cm">// ✅ allowed</span>
+
+<span class="cm">// list = new ArrayList&lt;&gt;(); // ❌ compile error — reassignment blocked</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list);  <span class="cm">// [B]</span></pre>
+
+    <h3>To Make a Truly Unmodifiable List</h3>
+    <pre class="java" data-lang="java"><span class="cm">// Java 9+ — immutable list</span>
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; immutable = <span class="ty">List</span>.<span class="fn">of</span>(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>);
+<span class="cm">// immutable.add("D"); // ❌ UnsupportedOperationException</span>
+
+<span class="cm">// Java 8 and below</span>
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; locked = <span class="ty">Collections</span>.<span class="fn">unmodifiableList</span>(list);
+<span class="cm">// locked.add("X");  // ❌ UnsupportedOperationException</span></pre>
+  </section>
+
+  <!-- ── S10 ── -->
+  <section id="s10">
+    <h2><span class="num">10</span> Custom ArrayList – No Duplicates Allowed</h2>
+    <p>Classic interview question: <em>"Create an ArrayList that doesn't allow duplicates."</em></p>
+
+    <pre class="java" data-lang="java"><span class="im">import</span> java.util.ArrayList;
+
+<span class="kw">public class</span> <span class="ty">CustomArrayList</span>&lt;<span class="ty">E</span>&gt; <span class="kw">extends</span> <span class="ty">ArrayList</span>&lt;<span class="ty">E</span>&gt; {
+
+    <span class="an">@Override</span>
+    <span class="kw">public boolean</span> <span class="fn">add</span>(<span class="ty">E</span> element) {
+        <span class="kw">if</span> (<span class="kw">this</span>.<span class="fn">contains</span>(element)) {
+            <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Duplicate rejected: "</span> + element);
+            <span class="kw">return false</span>;   <span class="cm">// reject duplicate</span>
+        }
+        <span class="kw">return super</span>.<span class="fn">add</span>(element);  <span class="cm">// delegate to parent</span>
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">add</span>(<span class="kw">int</span> index, <span class="ty">E</span> element) {
+        <span class="kw">if</span> (!<span class="kw">this</span>.<span class="fn">contains</span>(element)) {
+            <span class="kw">super</span>.<span class="fn">add</span>(index, element);
+        }
+    }
+}
+
+<span class="cm">// Usage</span>
+<span class="kw">public class</span> <span class="ty">Test</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="ty">CustomArrayList</span>&lt;<span class="ty">Integer</span>&gt; list = <span class="kw">new</span> <span class="ty">CustomArrayList</span>&lt;&gt;();
+        list.<span class="fn">add</span>(<span class="num">1</span>);   <span class="cm">// added</span>
+        list.<span class="fn">add</span>(<span class="num">2</span>);   <span class="cm">// added</span>
+        list.<span class="fn">add</span>(<span class="num">1</span>);   <span class="cm">// Duplicate rejected: 1</span>
+        list.<span class="fn">add</span>(<span class="num">3</span>);   <span class="cm">// added</span>
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list);  <span class="cm">// [1, 2, 3]</span>
+    }
+}</pre>
+  </section>
+
+  <!-- ── S11 ── -->
+  <section id="s11">
+    <h2><span class="num">11</span> Set Interface</h2>
+    <p>Set is a collection that <strong>does not allow duplicate elements</strong>. No index-based access.</p>
+
+    <table>
+      <thead><tr><th>Feature</th><th>HashSet</th><th>LinkedHashSet</th><th>TreeSet</th></tr></thead>
+      <tbody>
+        <tr><td>Duplicates</td><td>❌ No</td><td>❌ No</td><td>❌ No</td></tr>
+        <tr><td>Order</td><td>No guarantee</td><td>Insertion order</td><td>Sorted (natural)</td></tr>
+        <tr><td>Null</td><td>✅ 1 null</td><td>✅ 1 null</td><td>❌ No null</td></tr>
+        <tr><td>Performance</td><td>O(1)</td><td>O(1)</td><td>O(log n)</td></tr>
+        <tr><td>Internal</td><td>HashMap</td><td>HashMap + LinkedList</td><td>Red-Black Tree</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── S12 ── -->
+  <section id="s12">
+    <h2><span class="num">12</span> HashSet – Deep Internal Working</h2>
+
+    <p>HashSet internally uses a <strong>HashMap</strong> where your element is the <strong>key</strong> and a dummy constant (<code>PRESENT</code>) is the value.</p>
+
+    <pre class="java" data-lang="java"><span class="cm">// Inside HashSet source code:</span>
+<span class="kw">private transient</span> <span class="ty">HashMap</span>&lt;<span class="ty">E</span>, <span class="ty">Object</span>&gt; map;
+<span class="kw">private static final</span> <span class="ty">Object</span> PRESENT = <span class="kw">new</span> <span class="ty">Object</span>();
+
+<span class="kw">public boolean</span> <span class="fn">add</span>(<span class="ty">E</span> e) {
+    <span class="kw">return</span> map.<span class="fn">put</span>(e, PRESENT) == <span class="kw">null</span>;
+    <span class="cm">// if put returns null → new key → added</span>
+    <span class="cm">// if put returns PRESENT → duplicate → rejected</span>
+}</span></pre>
+
+    <h3>Duplicate Detection Flow</h3>
+    <pre class="flow" data-lang="flow">set.add("FB")
+    ↓
+Compute hashCode("FB") = 2236
+    ↓
+Calculate bucket index = hashCode & (capacity-1)
+    ↓
+Go to that bucket
+    ↓
+Is bucket empty?
+    YES → store directly ✅
+    NO  → equals() check on existing entries
+              equals() true?  → DUPLICATE → reject ❌
+              equals() false? → COLLISION → store in bucket chain ✅</pre>
+
+    <pre class="java" data-lang="java"><span class="ty">HashSet</span>&lt;<span class="ty">String</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="str">"Apple"</span>);
+set.<span class="fn">add</span>(<span class="str">"Banana"</span>);
+set.<span class="fn">add</span>(<span class="str">"Apple"</span>);    <span class="cm">// duplicate — rejected silently</span>
+set.<span class="fn">add</span>(<span class="kw">null</span>);       <span class="cm">// one null allowed</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set.size());   <span class="cm">// 3</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set);          <span class="cm">// order not guaranteed</span></pre>
+  </section>
+
+  <!-- ── S13 ── -->
+  <section id="s13">
+    <h2><span class="num">13</span> equals() &amp; hashCode() Contract</h2>
+
+    <div class="callout key">🔑 <strong>THE CONTRACT:</strong> If two objects are equal (<code>equals()</code> returns true), they MUST have the same <code>hashCode()</code>. Violating this breaks HashSet/HashMap.</div>
+
+    <h3>Problem — Only equals() Overridden</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Student</span> {
+    <span class="kw">int</span>    id;
+    <span class="ty">String</span> name;
+
+    <span class="ty">Student</span>(<span class="kw">int</span> id, <span class="ty">String</span> name) { <span class="kw">this</span>.id=id; <span class="kw">this</span>.name=name; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public boolean</span> <span class="fn">equals</span>(<span class="ty">Object</span> o) {
+        <span class="ty">Student</span> s = (<span class="ty">Student</span>) o;
+        <span class="kw">return this</span>.id == s.id;  <span class="cm">// same id = equal</span>
+    }
+    <span class="cm">// hashCode NOT overridden → uses Object's memory-address based hash</span>
+}
+
+<span class="ty">HashSet</span>&lt;<span class="ty">Student</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Student</span>(<span class="num">1</span>, <span class="str">"Alice"</span>));
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Student</span>(<span class="num">1</span>, <span class="str">"Alice"</span>));   <span class="cm">// should be duplicate</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set.<span class="fn">size</span>());   <span class="cm">// 2 ❌ — duplicate NOT detected!</span>
+<span class="cm">// Different hashCodes → different buckets → equals() never reached</span></pre>
+
+    <h3>Correct Implementation — Both Overridden</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Student</span> {
+    <span class="kw">int</span>    id;
+    <span class="ty">String</span> name;
+
+    <span class="ty">Student</span>(<span class="kw">int</span> id, <span class="ty">String</span> name) { <span class="kw">this</span>.id=id; <span class="kw">this</span>.name=name; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public boolean</span> <span class="fn">equals</span>(<span class="ty">Object</span> o) {
+        <span class="kw">if</span> (<span class="kw">this</span> == o) <span class="kw">return true</span>;
+        <span class="kw">if</span> (!(o <span class="kw">instanceof</span> <span class="ty">Student</span>)) <span class="kw">return false</span>;
+        <span class="ty">Student</span> s = (<span class="ty">Student</span>) o;
+        <span class="kw">return this</span>.id == s.id &amp;&amp; <span class="ty">Objects</span>.<span class="fn">equals</span>(<span class="kw">this</span>.name, s.name);
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public int</span> <span class="fn">hashCode</span>() {
+        <span class="kw">return</span> <span class="ty">Objects</span>.<span class="fn">hash</span>(id, name);   <span class="cm">// same fields as equals()</span>
+    }
+}
+
+<span class="ty">HashSet</span>&lt;<span class="ty">Student</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Student</span>(<span class="num">1</span>, <span class="str">"Alice"</span>));
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Student</span>(<span class="num">1</span>, <span class="str">"Alice"</span>));
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set.<span class="fn">size</span>());   <span class="cm">// 1 ✅ — duplicate correctly detected</span></pre>
+  </section>
+
+  <!-- ── S14 ── -->
+  <section id="s14">
+    <h2><span class="num">14</span> LinkedHashSet</h2>
+    <p>Maintains <strong>insertion order</strong> while still rejecting duplicates. Uses a <strong>HashMap + doubly linked list</strong> internally.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">LinkedHashSet</span>&lt;<span class="ty">Integer</span>&gt; lhs = <span class="kw">new</span> <span class="ty">LinkedHashSet</span>&lt;&gt;();
+lhs.<span class="fn">add</span>(<span class="num">30</span>); lhs.<span class="fn">add</span>(<span class="num">10</span>); lhs.<span class="fn">add</span>(<span class="num">20</span>); lhs.<span class="fn">add</span>(<span class="num">10</span>);
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(lhs);   <span class="cm">// [30, 10, 20] — insertion order, no duplicate</span></pre>
+
+    <div class="callout tip">💡 Use <code>LinkedHashSet</code> when you need a unique collection and also want to preserve the order elements were added.</div>
+  </section>
+
+  <!-- ── S15 ── -->
+  <section id="s15">
+    <h2><span class="num">15</span> TreeSet – Sorted Set</h2>
+    <p>TreeSet stores elements in <strong>sorted (natural) order</strong> using a <strong>Red-Black Tree</strong> internally.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">TreeSet</span>&lt;<span class="ty">Integer</span>&gt; ts = <span class="kw">new</span> <span class="ty">TreeSet</span>&lt;&gt;();
+ts.<span class="fn">add</span>(<span class="num">50</span>); ts.<span class="fn">add</span>(<span class="num">20</span>); ts.<span class="fn">add</span>(<span class="num">80</span>); ts.<span class="fn">add</span>(<span class="num">10</span>); ts.<span class="fn">add</span>(<span class="num">20</span>);
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ts);           <span class="cm">// [10, 20, 50, 80] — sorted, no dup</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ts.<span class="fn">first</span>());   <span class="cm">// 10</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ts.<span class="fn">last</span>());    <span class="cm">// 80</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ts.<span class="fn">headSet</span>(<span class="num">50</span>));  <span class="cm">// [10, 20] — elements &lt; 50</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ts.<span class="fn">tailSet</span>(<span class="num">50</span>));  <span class="cm">// [50, 80] — elements &gt;= 50</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ts.<span class="fn">floor</span>(<span class="num">25</span>));    <span class="cm">// 20 — greatest element ≤ 25</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(ts.<span class="fn">ceiling</span>(<span class="num">25</span>));  <span class="cm">// 50 — smallest element ≥ 25</span></pre>
+
+    <h3>Custom Sort in TreeSet using Comparator</h3>
+    <pre class="java" data-lang="java"><span class="cm">// Sort in descending order</span>
+<span class="ty">TreeSet</span>&lt;<span class="ty">Integer</span>&gt; desc = <span class="kw">new</span> <span class="ty">TreeSet</span>&lt;&gt;(<span class="ty">Comparator</span>.<span class="fn">reverseOrder</span>());
+desc.<span class="fn">add</span>(<span class="num">30</span>); desc.<span class="fn">add</span>(<span class="num">10</span>); desc.<span class="fn">add</span>(<span class="num">50</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(desc);   <span class="cm">// [50, 30, 10]</span>
+
+<span class="cm">// Sort Employee by name</span>
+<span class="ty">TreeSet</span>&lt;<span class="ty">Employee</span>&gt; empSet = <span class="kw">new</span> <span class="ty">TreeSet</span>&lt;&gt;(
+    (<span class="ty">Employee</span> a, <span class="ty">Employee</span> b) -&gt; a.name.<span class="fn">compareTo</span>(b.name)
+);</pre>
+
+    <div class="callout warn">⚠️ TreeSet does NOT allow <code>null</code> — throws <code>NullPointerException</code>. And elements must be <code>Comparable</code> or a <code>Comparator</code> must be provided.</div>
+  </section>
+
+  <!-- ── S16 ── -->
+  <section id="s16">
+    <h2><span class="num">16</span> Queue &amp; PriorityQueue</h2>
+    <p>Queue follows <strong>FIFO</strong> (First In, First Out). Elements are added at the tail and removed from the head.</p>
+
+    <table>
+      <thead><tr><th>Method</th><th>Throws Exception</th><th>Returns null/false (safe)</th></tr></thead>
+      <tbody>
+        <tr><td>Add</td><td><code>add(e)</code></td><td><code>offer(e)</code></td></tr>
+        <tr><td>Remove</td><td><code>remove()</code></td><td><code>poll()</code></td></tr>
+        <tr><td>Peek</td><td><code>element()</code></td><td><code>peek()</code></td></tr>
+      </tbody>
+    </table>
+
+    <h3>PriorityQueue – Min-Heap by Default</h3>
+    <pre class="java" data-lang="java"><span class="ty">PriorityQueue</span>&lt;<span class="ty">Integer</span>&gt; pq = <span class="kw">new</span> <span class="ty">PriorityQueue</span>&lt;&gt;();
+
+pq.<span class="fn">offer</span>(<span class="num">50</span>); pq.<span class="fn">offer</span>(<span class="num">10</span>); pq.<span class="fn">offer</span>(<span class="num">30</span>); pq.<span class="fn">offer</span>(<span class="num">20</span>);
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(pq.<span class="fn">peek</span>());   <span class="cm">// 10 — minimum always at head</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(pq.<span class="fn">poll</span>());   <span class="cm">// 10 — removes minimum</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(pq.<span class="fn">poll</span>());   <span class="cm">// 20</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(pq.<span class="fn">poll</span>());   <span class="cm">// 30</span>
+
+<span class="cm">// Max-Heap using reverseOrder</span>
+<span class="ty">PriorityQueue</span>&lt;<span class="ty">Integer</span>&gt; maxPQ = <span class="kw">new</span> <span class="ty">PriorityQueue</span>&lt;&gt;(<span class="ty">Collections</span>.<span class="fn">reverseOrder</span>());
+maxPQ.<span class="fn">offer</span>(<span class="num">50</span>); maxPQ.<span class="fn">offer</span>(<span class="num">10</span>); maxPQ.<span class="fn">offer</span>(<span class="num">30</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(maxPQ.<span class="fn">peek</span>());  <span class="cm">// 50 — maximum at head</span></pre>
+  </section>
+
+  <!-- ── S17 ── -->
+  <section id="s17">
+    <h2><span class="num">17</span> ArrayDeque – Double-Ended Queue</h2>
+    <p>ArrayDeque supports adding/removing from <strong>both ends</strong>. Preferred over <code>Stack</code> and <code>LinkedList</code> for stack/queue operations — faster and no synchronization overhead.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">ArrayDeque</span>&lt;<span class="ty">String</span>&gt; deque = <span class="kw">new</span> <span class="ty">ArrayDeque</span>&lt;&gt;();
+
+<span class="cm">// Use as STACK (LIFO)</span>
+deque.<span class="fn">push</span>(<span class="str">"First"</span>);
+deque.<span class="fn">push</span>(<span class="str">"Second"</span>);
+deque.<span class="fn">push</span>(<span class="str">"Third"</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(deque.<span class="fn">pop</span>());  <span class="cm">// Third (LIFO)</span>
+
+<span class="cm">// Use as QUEUE (FIFO)</span>
+deque.<span class="fn">offerLast</span>(<span class="str">"A"</span>);
+deque.<span class="fn">offerLast</span>(<span class="str">"B"</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(deque.<span class="fn">pollFirst</span>());  <span class="cm">// A (FIFO)</span></pre>
+  </section>
+
+  <!-- ── S18 ── -->
+  <section id="s18">
+    <h2><span class="num">18</span> Map Interface</h2>
+    <p>Map stores <strong>key-value pairs</strong>. Keys are unique; values can be duplicated. Map does NOT extend Collection.</p>
+
+    <table>
+      <thead><tr><th>Method</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>put(K, V)</code></td><td>Insert / update key-value pair</td></tr>
+        <tr><td><code>get(K)</code></td><td>Get value by key</td></tr>
+        <tr><td><code>remove(K)</code></td><td>Remove entry by key</td></tr>
+        <tr><td><code>containsKey(K)</code></td><td>Check if key exists</td></tr>
+        <tr><td><code>containsValue(V)</code></td><td>Check if value exists</td></tr>
+        <tr><td><code>keySet()</code></td><td>Returns Set of all keys</td></tr>
+        <tr><td><code>values()</code></td><td>Returns Collection of all values</td></tr>
+        <tr><td><code>entrySet()</code></td><td>Returns Set of key-value pairs</td></tr>
+        <tr><td><code>getOrDefault(K, V)</code></td><td>Get value or default if key absent</td></tr>
+        <tr><td><code>putIfAbsent(K, V)</code></td><td>Insert only if key not present</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── S19 ── -->
+  <section id="s19">
+    <h2><span class="num">19</span> HashMap – Deep Internal Working</h2>
+
+    <h3>Internal Structure</h3>
+    <pre class="java" data-lang="java"><span class="cm">// HashMap = Array of Buckets (Node linked list / Red-Black Tree)</span>
+<span class="kw">transient</span> <span class="ty">Node</span>&lt;<span class="ty">K</span>,<span class="ty">V</span>&gt;[] table;       <span class="cm">// the bucket array</span>
+<span class="kw">static final int</span> DEFAULT_INITIAL_CAPACITY = <span class="num">16</span>;  <span class="cm">// 2^4</span>
+<span class="kw">static final float</span> DEFAULT_LOAD_FACTOR   = <span class="num">0.75f</span>; <span class="cm">// resize at 75% full</span>
+
+<span class="cm">// Each Node stores:</span>
+<span class="kw">static class</span> <span class="ty">Node</span>&lt;<span class="ty">K</span>,<span class="ty">V</span>&gt; {
+    <span class="kw">final int</span> hash;   <span class="ty">K</span> key;   <span class="ty">V</span> value;   <span class="ty">Node</span>&lt;<span class="ty">K</span>,<span class="ty">V</span>&gt; next;
+}</pre>
+
+    <h3>put() Flow – Step by Step</h3>
+    <pre class="flow" data-lang="flow">map.put("Alice", 101)
+      ↓
+1. Compute hash = "Alice".hashCode()
+      ↓
+2. Bucket index = (n-1) & hash   (n = table length = 16)
+      ↓
+3. Is bucket empty?
+      YES → create Node, store it ✅
+      NO  → compare hash + equals()
+              Duplicate key → UPDATE value ✅
+              Collision      → CHAIN in LinkedList / Tree</pre>
+
+    <h3>Java 7 vs Java 8 Collision Handling</h3>
+    <table>
+      <thead><tr><th></th><th>Java 7</th><th>Java 8+</th></tr></thead>
+      <tbody>
+        <tr><td>Collision storage</td><td>LinkedList chaining</td><td>LinkedList (small) → Red-Black Tree (large)</td></tr>
+        <tr><td>Threshold to treeify</td><td>N/A</td><td>Bucket size &gt; 8</td></tr>
+        <tr><td>Average complexity</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Worst case</td><td>O(n)</td><td>O(log n)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Resizing / Rehashing</h3>
+    <pre class="java" data-lang="java"><span class="cm">// HashMap resizes when: size > capacity * loadFactor</span>
+<span class="cm">// Default: 16 * 0.75 = 12 → resize at 13th element</span>
+<span class="cm">// New capacity = old capacity * 2 = 32</span>
+<span class="cm">// All elements rehashed into new buckets — expensive O(n) operation</span></pre>
+
+    <h3>Complete HashMap Example</h3>
+    <pre class="java" data-lang="java"><span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; map = <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();
+
+map.<span class="fn">put</span>(<span class="str">"Alice"</span>, <span class="num">101</span>);
+map.<span class="fn">put</span>(<span class="str">"Bob"</span>,   <span class="num">102</span>);
+map.<span class="fn">put</span>(<span class="str">"Alice"</span>, <span class="num">999</span>);   <span class="cm">// updates existing key</span>
+map.<span class="fn">put</span>(<span class="kw">null</span>,    <span class="num">0</span>);      <span class="cm">// null key allowed (one)</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(map.<span class="fn">get</span>(<span class="str">"Alice"</span>));       <span class="cm">// 999</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(map.<span class="fn">getOrDefault</span>(<span class="str">"X"</span>, <span class="num">-1</span>)); <span class="cm">// -1</span>
+
+<span class="cm">// Iterate over entries</span>
+<span class="kw">for</span> (<span class="ty">Map.Entry</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; entry : map.<span class="fn">entrySet</span>()) {
+    <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(entry.<span class="fn">getKey</span>() + <span class="str">" → "</span> + entry.<span class="fn">getValue</span>());
+}</pre>
+
+    <h3>Mutable Key Problem</h3>
+    <pre class="java" data-lang="java"><span class="ty">Employee</span> e = <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>, <span class="str">"Alice"</span>);
+map.<span class="fn">put</span>(e, <span class="str">"Engineering"</span>);  <span class="cm">// stored in bucket for hashCode=1</span>
+
+e.id = <span class="num">999</span>;   <span class="cm">// mutate the key — hashCode changes!</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(map.<span class="fn">get</span>(e));   <span class="cm">// null ❌ — wrong bucket</span></pre>
+
+    <div class="callout key">🔑 <strong>Always use immutable objects as HashMap keys.</strong> String is the ideal key — immutable + cached hashCode.</div>
+  </section>
+
+  <!-- ── S20 ── -->
+  <section id="s20">
+    <h2><span class="num">20</span> LinkedHashMap</h2>
+    <p>HashMap + doubly linked list = <strong>insertion-order maintained</strong>. Also supports <strong>access-order</strong> for LRU cache.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">LinkedHashMap</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; lhm = <span class="kw">new</span> <span class="ty">LinkedHashMap</span>&lt;&gt;();
+lhm.<span class="fn">put</span>(<span class="str">"Banana"</span>, <span class="num">2</span>);
+lhm.<span class="fn">put</span>(<span class="str">"Apple"</span>,  <span class="num">1</span>);
+lhm.<span class="fn">put</span>(<span class="str">"Cherry"</span>, <span class="num">3</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(lhm);   <span class="cm">// {Banana=2, Apple=1, Cherry=3} ← insertion order</span>
+
+<span class="cm">// LRU Cache using access-order LinkedHashMap</span>
+<span class="ty">LinkedHashMap</span>&lt;<span class="ty">Integer</span>, <span class="ty">String</span>&gt; lruCache =
+    <span class="kw">new</span> <span class="ty">LinkedHashMap</span>&lt;&gt;(<span class="num">16</span>, <span class="num">0.75f</span>, <span class="kw">true</span>) {  <span class="cm">// true = accessOrder</span>
+        <span class="an">@Override</span>
+        <span class="kw">protected boolean</span> <span class="fn">removeEldestEntry</span>(<span class="ty">Map.Entry</span>&lt;<span class="ty">Integer</span>, <span class="ty">String</span>&gt; eldest) {
+            <span class="kw">return</span> size() &gt; <span class="num">3</span>;   <span class="cm">// max capacity = 3</span>
+        }
+    };</pre>
+  </section>
+
+  <!-- ── S21 ── -->
+  <section id="s21">
+    <h2><span class="num">21</span> TreeMap – Sorted Map</h2>
+    <p>TreeMap stores keys in <strong>sorted (natural) order</strong> using a Red-Black Tree. All operations are <span class="complexity ologn">O(log n)</span>.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">TreeMap</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; tm = <span class="kw">new</span> <span class="ty">TreeMap</span>&lt;&gt;();
+tm.<span class="fn">put</span>(<span class="str">"Mango"</span>,  <span class="num">3</span>);
+tm.<span class="fn">put</span>(<span class="str">"Apple"</span>,  <span class="num">1</span>);
+tm.<span class="fn">put</span>(<span class="str">"Banana"</span>, <span class="num">2</span>);
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(tm);               <span class="cm">// {Apple=1, Banana=2, Mango=3}</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(tm.<span class="fn">firstKey</span>());     <span class="cm">// Apple</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(tm.<span class="fn">lastKey</span>());      <span class="cm">// Mango</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(tm.<span class="fn">headMap</span>(<span class="str">"Mango"</span>));  <span class="cm">// {Apple=1, Banana=2}</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(tm.<span class="fn">tailMap</span>(<span class="str">"Banana"</span>)); <span class="cm">// {Banana=2, Mango=3}</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(tm.<span class="fn">floorKey</span>(<span class="str">"Cherry"</span>));  <span class="cm">// Banana</span></pre>
+
+    <div class="callout warn">⚠️ TreeMap does NOT allow <code>null</code> keys. <code>NullPointerException</code> thrown at runtime.</div>
+  </section>
+
+  <!-- ── S22 ── -->
+  <section id="s22">
+    <h2><span class="num">22</span> Hashtable vs HashMap</h2>
+
+    <table>
+      <thead><tr><th>Feature</th><th>HashMap</th><th>Hashtable</th></tr></thead>
+      <tbody>
+        <tr><td>Synchronized</td><td>❌ No</td><td>✅ Yes (every method)</td></tr>
+        <tr><td>Thread-safe</td><td>❌ No</td><td>✅ Yes</td></tr>
+        <tr><td>Null keys</td><td>✅ 1 null key allowed</td><td>❌ NullPointerException</td></tr>
+        <tr><td>Null values</td><td>✅ Multiple</td><td>❌ NullPointerException</td></tr>
+        <tr><td>Performance</td><td>✅ Faster</td><td>❌ Slower (sync overhead)</td></tr>
+        <tr><td>Iteration</td><td>Fail-fast Iterator</td><td>Fail-fast Enumerator</td></tr>
+        <tr><td>Modern use</td><td>✅ Preferred</td><td>❌ Legacy — avoid</td></tr>
+        <tr><td>Alternative</td><td>—</td><td>Use ConcurrentHashMap</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── S23 ── -->
+  <section id="s23">
+    <h2><span class="num">23</span> Comparable vs Comparator</h2>
+
+    <div class="compare-grid">
+      <div class="compare-card blue-card">
+        <div class="cc-title">Comparable — Natural Sorting</div>
+        <div class="cc-body">
+          • Defined <strong>inside the class</strong><br>
+          • Method: <code>compareTo(T o)</code><br>
+          • Single sorting sequence<br>
+          • Modifies original class<br>
+          • Package: <code>java.lang</code>
+        </div>
+      </div>
+      <div class="compare-card orange-card">
+        <div class="cc-title">Comparator — Custom Sorting</div>
+        <div class="cc-body">
+          • Defined in <strong>separate class</strong><br>
+          • Method: <code>compare(T o1, T o2)</code><br>
+          • Multiple sorting sequences<br>
+          • Does NOT modify original class<br>
+          • Package: <code>java.util</code>
+        </div>
+      </div>
+    </div>
+
+    <h3>Comparable Example – Sort by ID</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Employee</span> <span class="kw">implements</span> <span class="ty">Comparable</span>&lt;<span class="ty">Employee</span>&gt; {
+    <span class="kw">int</span>    id;
+    <span class="ty">String</span> name;
+    <span class="kw">double</span> salary;
+
+    <span class="ty">Employee</span>(<span class="kw">int</span> id, <span class="ty">String</span> name, <span class="kw">double</span> salary) {
+        <span class="kw">this</span>.id=id; <span class="kw">this</span>.name=name; <span class="kw">this</span>.salary=salary;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public int</span> <span class="fn">compareTo</span>(<span class="ty">Employee</span> other) {
+        <span class="kw">return this</span>.id - other.id;   <span class="cm">// sort by ID ascending</span>
+    }
+}
+
+<span class="ty">List</span>&lt;<span class="ty">Employee</span>&gt; list = <span class="ty">Arrays</span>.<span class="fn">asList</span>(
+    <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">3</span>, <span class="str">"Charlie"</span>, <span class="num">50000</span>),
+    <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>, <span class="str">"Alice"</span>,   <span class="num">70000</span>),
+    <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">2</span>, <span class="str">"Bob"</span>,     <span class="num">60000</span>)
+);
+<span class="ty">Collections</span>.<span class="fn">sort</span>(list);
+<span class="cm">// Output: [Alice(1), Bob(2), Charlie(3)] — sorted by ID</span></pre>
+
+    <h3>Comparator Example – Multiple Sort Strategies</h3>
+    <pre class="java" data-lang="java"><span class="cm">// Sort by name</span>
+<span class="ty">Comparator</span>&lt;<span class="ty">Employee</span>&gt; byName = (<span class="ty">Employee</span> a, <span class="ty">Employee</span> b) -&gt;
+    a.name.<span class="fn">compareTo</span>(b.name);
+
+<span class="cm">// Sort by salary descending</span>
+<span class="ty">Comparator</span>&lt;<span class="ty">Employee</span>&gt; bySalaryDesc = (<span class="ty">Employee</span> a, <span class="ty">Employee</span> b) -&gt;
+    <span class="ty">Double</span>.<span class="fn">compare</span>(b.salary, a.salary);
+
+<span class="cm">// Chain multiple comparators</span>
+<span class="ty">Comparator</span>&lt;<span class="ty">Employee</span>&gt; byNameThenSalary =
+    <span class="ty">Comparator</span>.<span class="fn">comparing</span>(e -&gt; e.name)
+              .<span class="fn">thenComparingDouble</span>(e -&gt; e.salary);
+
+list.<span class="fn">sort</span>(byName);
+list.<span class="fn">sort</span>(bySalaryDesc);
+list.<span class="fn">sort</span>(byNameThenSalary);</pre>
+  </section>
+
+  <!-- ── S24 ── -->
+  <section id="s24">
+    <h2><span class="num">24</span> Iterator – fail-fast vs fail-safe</h2>
+
+    <h3>Iterator Methods</h3>
+    <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">String</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;(<span class="ty">Arrays</span>.<span class="fn">asList</span>(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>));
+<span class="ty">Iterator</span>&lt;<span class="ty">String</span>&gt; it = list.<span class="fn">iterator</span>();
+
+<span class="kw">while</span> (it.<span class="fn">hasNext</span>()) {
+    <span class="ty">String</span> s = it.<span class="fn">next</span>();
+    <span class="kw">if</span> (s.<span class="fn">equals</span>(<span class="str">"B"</span>)) {
+        it.<span class="fn">remove</span>();   <span class="cm">// ✅ safe removal during iteration</span>
+    }
+}
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(list);   <span class="cm">// [A, C]</span></pre>
+
+    <h3>Fail-Fast – ConcurrentModificationException</h3>
+    <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">String</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;(<span class="ty">Arrays</span>.<span class="fn">asList</span>(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>));
+<span class="ty">Iterator</span>&lt;<span class="ty">String</span>&gt; it = list.<span class="fn">iterator</span>();
+
+<span class="kw">while</span> (it.<span class="fn">hasNext</span>()) {
+    <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(it.<span class="fn">next</span>());
+    list.<span class="fn">add</span>(<span class="str">"X"</span>);   <span class="cm">// ❌ modifying list directly during iteration</span>
+}
+<span class="cm">// throws: ConcurrentModificationException</span></pre>
+
+    <h3>Fail-Safe – Works on a Clone</h3>
+    <pre class="java" data-lang="java"><span class="cm">// CopyOnWriteArrayList — fail-safe</span>
+<span class="ty">CopyOnWriteArrayList</span>&lt;<span class="ty">String</span>&gt; cowList =
+    <span class="kw">new</span> <span class="ty">CopyOnWriteArrayList</span>&lt;&gt;(<span class="ty">Arrays</span>.<span class="fn">asList</span>(<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>));
+
+<span class="kw">for</span> (<span class="ty">String</span> s : cowList) {
+    cowList.<span class="fn">add</span>(<span class="str">"X"</span>);   <span class="cm">// ✅ no exception — iterator uses snapshot</span>
+    <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s);
+}
+<span class="cm">// Output: A B C  (added X visible only in next iteration)</span></pre>
+
+    <table>
+      <thead><tr><th></th><th>Fail-Fast</th><th>Fail-Safe</th></tr></thead>
+      <tbody>
+        <tr><td>Works on</td><td>Original collection</td><td>Cloned copy</td></tr>
+        <tr><td>Modification during iter</td><td>❌ ConcurrentModificationException</td><td>✅ No exception</td></tr>
+        <tr><td>Memory</td><td>Less</td><td>More (copy overhead)</td></tr>
+        <tr><td>Examples</td><td>ArrayList, HashMap, HashSet</td><td>CopyOnWriteArrayList, ConcurrentHashMap</td></tr>
+        <tr><td>When to use</td><td>Single-threaded</td><td>Multi-threaded</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── S25 ── -->
+  <section id="s25">
+    <h2><span class="num">25</span> ConcurrentHashMap</h2>
+    <p>Thread-safe HashMap with <strong>much better performance than Hashtable</strong> by locking only specific buckets instead of the whole map.</p>
+
+    <table>
+      <thead><tr><th></th><th>Hashtable</th><th>ConcurrentHashMap</th></tr></thead>
+      <tbody>
+        <tr><td>Lock scope</td><td>Entire map (one lock)</td><td>Bucket level (Java 8: CAS)</td></tr>
+        <tr><td>Read operations</td><td>Locked</td><td>✅ No lock</td></tr>
+        <tr><td>Null keys/values</td><td>❌ No</td><td>❌ No</td></tr>
+        <tr><td>Performance</td><td>Low</td><td>✅ High</td></tr>
+        <tr><td>Iterator</td><td>Fail-fast</td><td>Fail-safe (weakly consistent)</td></tr>
+      </tbody>
+    </table>
+
+    <pre class="java" data-lang="java"><span class="ty">ConcurrentHashMap</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; chm = <span class="kw">new</span> <span class="ty">ConcurrentHashMap</span>&lt;&gt;();
+
+<span class="cm">// Thread 1</span>
+chm.<span class="fn">put</span>(<span class="str">"A"</span>, <span class="num">1</span>);
+
+<span class="cm">// Thread 2 — concurrent read safe</span>
+chm.<span class="fn">get</span>(<span class="str">"A"</span>);
+
+<span class="cm">// Atomic operations</span>
+chm.<span class="fn">putIfAbsent</span>(<span class="str">"B"</span>, <span class="num">2</span>);      <span class="cm">// insert if B not present</span>
+chm.<span class="fn">computeIfAbsent</span>(<span class="str">"C"</span>, k -&gt; <span class="num">3</span>);  <span class="cm">// compute and insert</span>
+chm.<span class="fn">merge</span>(<span class="str">"A"</span>, <span class="num">10</span>, <span class="ty">Integer</span>::<span class="fn">sum</span>);  <span class="cm">// 1+10=11 atomically</span></pre>
+
+    <div class="callout rule">✅ <strong>Real-world use:</strong> Use ConcurrentHashMap in Spring Boot services where multiple threads read/write shared state — e.g., in-memory caches, frequency counters.</div>
+  </section>
+
+  <!-- ── S26 ── -->
+  <section id="s26">
+    <h2><span class="num">26</span> CopyOnWriteArrayList</h2>
+    <p>Thread-safe ArrayList where every <strong>write operation creates a fresh copy</strong> of the underlying array. Reads are fast; writes are expensive.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">CopyOnWriteArrayList</span>&lt;<span class="ty">String</span>&gt; list = <span class="kw">new</span> <span class="ty">CopyOnWriteArrayList</span>&lt;&gt;();
+list.<span class="fn">add</span>(<span class="str">"A"</span>); list.<span class="fn">add</span>(<span class="str">"B"</span>); list.<span class="fn">add</span>(<span class="str">"C"</span>);
+
+<span class="cm">// Safe iteration even with concurrent modification</span>
+<span class="kw">for</span> (<span class="ty">String</span> s : list) {
+    <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">print</span>(s + <span class="str">" "</span>);  <span class="cm">// A B C</span>
+    list.<span class="fn">add</span>(<span class="str">"X"</span>);             <span class="cm">// ✅ no exception</span>
+}
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"\nFinal: "</span> + list);   <span class="cm">// [A, B, C, X, X, X]</span></pre>
+
+    <table>
+      <thead><tr><th></th><th>ArrayList</th><th>CopyOnWriteArrayList</th></tr></thead>
+      <tbody>
+        <tr><td>Thread-safe</td><td>❌ No</td><td>✅ Yes</td></tr>
+        <tr><td>Read performance</td><td>✅ Fast</td><td>✅ Fast</td></tr>
+        <tr><td>Write performance</td><td>✅ Fast</td><td>❌ Slow (array copy)</td></tr>
+        <tr><td>Use when</td><td>Single-threaded, frequent writes</td><td>Multi-threaded, mostly reads</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── S27 ── -->
+  <section id="s27">
+    <h2><span class="num">27</span> Collections Utility Class</h2>
+    <p><code>java.util.Collections</code> is a utility class with <strong>static methods</strong> for operating on collections.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;(<span class="ty">Arrays</span>.<span class="fn">asList</span>(<span class="num">5</span>,<span class="num">3</span>,<span class="num">1</span>,<span class="num">4</span>,<span class="num">2</span>));
+
+<span class="ty">Collections</span>.<span class="fn">sort</span>(list);                    <span class="cm">// [1, 2, 3, 4, 5]</span>
+<span class="ty">Collections</span>.<span class="fn">sort</span>(list, <span class="ty">Comparator</span>.<span class="fn">reverseOrder</span>()); <span class="cm">// [5,4,3,2,1]</span>
+<span class="ty">Collections</span>.<span class="fn">reverse</span>(list);                 <span class="cm">// reverses in place</span>
+<span class="ty">Collections</span>.<span class="fn">shuffle</span>(list);                  <span class="cm">// random shuffle</span>
+<span class="ty">Collections</span>.<span class="fn">min</span>(list);                      <span class="cm">// minimum element</span>
+<span class="ty">Collections</span>.<span class="fn">max</span>(list);                      <span class="cm">// maximum element</span>
+<span class="ty">Collections</span>.<span class="fn">frequency</span>(list, <span class="num">3</span>);            <span class="cm">// count of 3</span>
+<span class="ty">Collections</span>.<span class="fn">binarySearch</span>(list, <span class="num">3</span>);         <span class="cm">// index (list must be sorted)</span>
+<span class="ty">Collections</span>.<span class="fn">fill</span>(list, <span class="num">0</span>);                 <span class="cm">// fill all with 0</span>
+<span class="ty">Collections</span>.<span class="fn">nCopies</span>(<span class="num">5</span>, <span class="str">"A"</span>);              <span class="cm">// [A, A, A, A, A]</span>
+<span class="ty">Collections</span>.<span class="fn">disjoint</span>(list1, list2);        <span class="cm">// true if no common elements</span>
+<span class="ty">Collections</span>.<span class="fn">unmodifiableList</span>(list);        <span class="cm">// read-only view</span>
+<span class="ty">Collections</span>.<span class="fn">synchronizedList</span>(list);        <span class="cm">// thread-safe wrapper</span></pre>
+  </section>
+
+  <!-- ── S28 ── -->
+  <section id="s28">
+    <h2><span class="num">28</span> Generics &amp; Type Erasure</h2>
+
+    <h3>Why Generics?</h3>
+    <pre class="java" data-lang="java"><span class="cm">// Without generics — raw type (Java 4 and below)</span>
+<span class="ty">List</span> raw = <span class="kw">new</span> <span class="ty">ArrayList</span>();
+raw.<span class="fn">add</span>(<span class="num">10</span>);
+raw.<span class="fn">add</span>(<span class="str">"Aryan"</span>);   <span class="cm">// no compile error!</span>
+<span class="kw">int</span> x = (<span class="ty">Integer</span>) raw.<span class="fn">get</span>(<span class="num">1</span>);  <span class="cm">// ❌ ClassCastException at runtime</span>
+
+<span class="cm">// With generics — type-safe</span>
+<span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; safe = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+safe.<span class="fn">add</span>(<span class="num">10</span>);
+<span class="cm">// safe.add("Aryan"); // ❌ compile error — caught early!</span>
+<span class="kw">int</span> y = safe.<span class="fn">get</span>(<span class="num">0</span>);   <span class="cm">// ✅ no cast needed</span></pre>
+
+    <h3>Type Erasure</h3>
+    <pre class="java" data-lang="java"><span class="cm">// At compile time: ArrayList&lt;Integer&gt;</span>
+<span class="cm">// At runtime JVM sees: ArrayList (raw type)</span>
+<span class="cm">// Generics are erased — only for compile-time safety</span>
+
+<span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; a = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt;  b = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(a.<span class="fn">getClass</span>() == b.<span class="fn">getClass</span>());   <span class="cm">// true!</span>
+<span class="cm">// Both are just ArrayList at runtime — type info erased</span></pre>
+
+    <h3>Wildcards</h3>
+    <pre class="java" data-lang="java"><span class="cm">// Upper bounded — accepts List&lt;Integer&gt;, List&lt;Double&gt; etc.</span>
+<span class="kw">public double</span> <span class="fn">sumList</span>(<span class="ty">List</span>&lt;? <span class="kw">extends</span> <span class="ty">Number</span>&gt; list) {
+    <span class="kw">return</span> list.<span class="fn">stream</span>().<span class="fn">mapToDouble</span>(<span class="ty">Number</span>::doubleValue).<span class="fn">sum</span>();
+}
+
+<span class="cm">// Lower bounded — accepts List&lt;Number&gt;, List&lt;Object&gt;</span>
+<span class="kw">public void</span> <span class="fn">addNumbers</span>(<span class="ty">List</span>&lt;? <span class="kw">super</span> <span class="ty">Integer</span>&gt; list) {
+    list.<span class="fn">add</span>(<span class="num">10</span>);
+}</pre>
+  </section>
+
+  <!-- ── S29 ── -->
+  <section id="s29">
+    <h2><span class="num">29</span> Best Collection Selection Guide</h2>
+
+    <div class="select-guide">
+      <div class="sg-row">
+        <div class="sg-req">Need fast random access by index</div>
+        <div class="sg-ans">ArrayList</div>
+        <div class="sg-why">O(1) get(index)</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Frequent insert/delete at head or tail</div>
+        <div class="sg-ans">LinkedList / ArrayDeque</div>
+        <div class="sg-why">O(1) add/remove at ends</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Unique elements, fast lookup</div>
+        <div class="sg-ans">HashSet</div>
+        <div class="sg-why">O(1) add/contains</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Unique + insertion order maintained</div>
+        <div class="sg-ans">LinkedHashSet</div>
+        <div class="sg-why">HashMap + linked list</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Unique elements, sorted order</div>
+        <div class="sg-ans">TreeSet</div>
+        <div class="sg-why">Red-Black Tree, O(log n)</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Key-value mapping, fast access</div>
+        <div class="sg-ans">HashMap</div>
+        <div class="sg-why">O(1) average</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Key-value + maintain insertion order</div>
+        <div class="sg-ans">LinkedHashMap</div>
+        <div class="sg-why">Predictable iteration order</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Key-value + sorted keys</div>
+        <div class="sg-ans">TreeMap</div>
+        <div class="sg-why">O(log n), range queries</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Thread-safe map (multi-threaded)</div>
+        <div class="sg-ans">ConcurrentHashMap</div>
+        <div class="sg-why">Bucket-level locking</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Thread-safe list, mostly reads</div>
+        <div class="sg-ans">CopyOnWriteArrayList</div>
+        <div class="sg-why">Snapshot iterator, no CME</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Priority-based processing</div>
+        <div class="sg-ans">PriorityQueue</div>
+        <div class="sg-why">Min-heap, O(log n) poll</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">Stack operations (LIFO)</div>
+        <div class="sg-ans">ArrayDeque</div>
+        <div class="sg-why">Faster than Stack class</div>
+      </div>
+      <div class="sg-row">
+        <div class="sg-req">LRU Cache implementation</div>
+        <div class="sg-ans">LinkedHashMap (accessOrder=true)</div>
+        <div class="sg-why">removeEldestEntry override</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════ Q&A ════ -->
+  <section id="qa">
+    <h2><span class="num">Q&A</span> Interview Questions – Complete Set</h2>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q1</span> What is the Collection Framework and why was it introduced?</div>
+      <div class="qa-body">
+        <p>Collection Framework is a unified architecture of interfaces, classes, and algorithms for storing and manipulating groups of objects dynamically. It was introduced because arrays have fixed size, no built-in methods, and cannot handle complex operations efficiently.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q2</span> Does Map extend Collection? Why not?</div>
+      <div class="qa-body">
+        <p><strong>No.</strong> Map stores key-value pairs — a fundamentally different structure from Collection which stores single elements. <code>Collection</code> interface methods like <code>add(element)</code> don't make sense for Map (<code>put(key, value)</code>). That's why Map has its own hierarchy.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q3</span> Difference between ArrayList and LinkedList — when to use which?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th></th><th>ArrayList</th><th>LinkedList</th></tr></thead>
+          <tbody>
+            <tr><td>Internal</td><td>Dynamic array</td><td>Doubly linked list</td></tr>
+            <tr><td>get(i)</td><td>O(1) ✅</td><td>O(n) ❌</td></tr>
+            <tr><td>add/remove middle</td><td>O(n) — shifting</td><td>O(1) after traversal</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Use ArrayList</strong> when frequent reads. <strong>Use LinkedList</strong> when frequent add/remove at head/tail.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q4</span> Why can't we use primitive types in Collections?</div>
+      <div class="qa-body">
+        <p>Generics use <strong>type erasure</strong> — all type parameters become <code>Object</code> at runtime. Primitives (<code>int</code>, <code>double</code>) are NOT Objects. So we use wrapper classes (<code>Integer</code>, <code>Double</code>). The compiler handles the conversion automatically via <strong>AutoBoxing/Unboxing</strong>.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q5</span> How does HashSet ensure no duplicates?</div>
+      <div class="qa-body">
+        <p>HashSet internally uses a HashMap. When you <code>add(e)</code>, it calls <code>map.put(e, PRESENT)</code>. HashMap checks:</p>
+        <ol>
+          <li>Same <code>hashCode()</code>?</li>
+          <li>If yes → check <code>equals()</code></li>
+          <li>If both match → DUPLICATE → rejected</li>
+        </ol>
+        <p>For custom objects you MUST override both <code>hashCode()</code> and <code>equals()</code>, otherwise duplicates sneak in.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q6</span> What is the Integer cache? Why does 127 == 127 return true but 128 == 128 returns false?</div>
+      <div class="qa-body">
+        <p>Java caches <code>Integer</code> objects for values <strong>-128 to 127</strong>. In this range, <code>Integer.valueOf()</code> returns the cached object. Outside this range, a new object is created each time. So <code>==</code> compares references — same cached object = true, different heap objects = false. Always use <code>.equals()</code>.</p>
+        <pre class="java" data-lang="java"><span class="ty">Integer</span> a = <span class="num">127</span>; <span class="ty">Integer</span> b = <span class="num">127</span>;
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(a == b);   <span class="cm">// true  (cached)</span>
+<span class="ty">Integer</span> c = <span class="num">128</span>; <span class="ty">Integer</span> d = <span class="num">128</span>;
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(c == d);   <span class="cm">// false (new objects)</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q7</span> What happens internally when HashMap grows? What is load factor?</div>
+      <div class="qa-body">
+        <p><strong>Load factor</strong> = threshold to trigger resizing = 0.75 by default. When <code>size > capacity × loadFactor</code> (e.g., 16 × 0.75 = 12), the map doubles capacity to 32 and <strong>rehashes</strong> all existing entries into new buckets. This is an <span class="complexity on">O(n)</span> operation.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q8</span> Difference between HashMap, LinkedHashMap, and TreeMap?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th></th><th>HashMap</th><th>LinkedHashMap</th><th>TreeMap</th></tr></thead>
+          <tbody>
+            <tr><td>Order</td><td>None</td><td>Insertion order</td><td>Sorted (natural)</td></tr>
+            <tr><td>Performance</td><td>O(1)</td><td>O(1)</td><td>O(log n)</td></tr>
+            <tr><td>Null key</td><td>✅</td><td>✅</td><td>❌</td></tr>
+            <tr><td>Use when</td><td>Just key-value</td><td>Need iteration order</td><td>Need sorted keys</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q9</span> Difference between Comparable and Comparator?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th></th><th>Comparable</th><th>Comparator</th></tr></thead>
+          <tbody>
+            <tr><td>Location</td><td>Inside class</td><td>External class / lambda</td></tr>
+            <tr><td>Method</td><td><code>compareTo(T o)</code></td><td><code>compare(T o1, T o2)</code></td></tr>
+            <tr><td>Sorting</td><td>Single (natural)</td><td>Multiple (custom)</td></tr>
+            <tr><td>Modifies class</td><td>Yes</td><td>No</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q10</span> What is fail-fast and fail-safe iterator?</div>
+      <div class="qa-body">
+        <p><strong>Fail-fast:</strong> Iterator throws <code>ConcurrentModificationException</code> if the collection is structurally modified while iterating (ArrayList, HashMap).</p>
+        <p><strong>Fail-safe:</strong> Iterator works on a snapshot/clone — no exception (ConcurrentHashMap, CopyOnWriteArrayList). But may not reflect recent changes.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q11</span> How to safely remove elements while iterating?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="cm">// ✅ Option 1: Iterator.remove()</span>
+<span class="ty">Iterator</span>&lt;<span class="ty">Integer</span>&gt; it = list.<span class="fn">iterator</span>();
+<span class="kw">while</span>(it.<span class="fn">hasNext</span>()) { <span class="kw">if</span>(it.<span class="fn">next</span>() % <span class="num">2</span> == <span class="num">0</span>) it.<span class="fn">remove</span>(); }
+
+<span class="cm">// ✅ Option 2: removeIf (Java 8)</span>
+list.<span class="fn">removeIf</span>(x -&gt; x % <span class="num">2</span> == <span class="num">0</span>);
+
+<span class="cm">// ✅ Option 3: Use CopyOnWriteArrayList</span>
+<span class="cm">// ❌ WRONG: list.remove() inside for-each → ConcurrentModificationException</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q12</span> ConcurrentHashMap vs Hashtable — what's the difference?</div>
+      <div class="qa-body">
+        <p>Hashtable <strong>locks the entire map</strong> for every operation — only one thread can read or write at a time. ConcurrentHashMap uses <strong>bucket-level locking</strong> (Java 7: segment locks; Java 8: CAS + synchronized per bucket). Reads in ConcurrentHashMap require no lock at all. Much better throughput in multi-threaded environments.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q13</span> What is the difference between Set and List?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th></th><th>List</th><th>Set</th></tr></thead>
+          <tbody>
+            <tr><td>Duplicates</td><td>✅ Allowed</td><td>❌ Not allowed</td></tr>
+            <tr><td>Index access</td><td>✅ get(int i)</td><td>❌ No index</td></tr>
+            <tr><td>Order</td><td>✅ Insertion order</td><td>Depends on implementation</td></tr>
+            <tr><td>Use when</td><td>Duplicates needed</td><td>Unique elements needed</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q14</span> Can you add to a final List? What does final mean for collections?</div>
+      <div class="qa-body">
+        <p><strong>Yes, you can add elements.</strong> <code>final</code> on a reference variable prevents <em>reassignment</em> of the reference, but does NOT make the collection immutable. The contents can still be modified. For a truly immutable list, use <code>Collections.unmodifiableList()</code> or <code>List.of()</code> (Java 9+).</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q15</span> How to implement an LRU cache using Java Collections?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">LRUCache</span>&lt;<span class="ty">K</span>, <span class="ty">V</span>&gt; <span class="kw">extends</span> <span class="ty">LinkedHashMap</span>&lt;<span class="ty">K</span>, <span class="ty">V</span>&gt; {
+    <span class="kw">private final int</span> capacity;
+
+    <span class="ty">LRUCache</span>(<span class="kw">int</span> capacity) {
+        <span class="kw">super</span>(capacity, <span class="num">0.75f</span>, <span class="kw">true</span>);  <span class="cm">// accessOrder = true</span>
+        <span class="kw">this</span>.capacity = capacity;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">protected boolean</span> <span class="fn">removeEldestEntry</span>(<span class="ty">Map.Entry</span>&lt;<span class="ty">K</span>,<span class="ty">V</span>&gt; eldest) {
+        <span class="kw">return</span> size() &gt; capacity;  <span class="cm">// evict LRU when full</span>
+    }
+}
+<span class="ty">LRUCache</span>&lt;<span class="ty">Integer</span>,<span class="ty">String</span>&gt; cache = <span class="kw">new</span> <span class="ty">LRUCache</span>&lt;&gt;(<span class="num">3</span>);
+cache.<span class="fn">put</span>(<span class="num">1</span>,<span class="str">"A"</span>); cache.<span class="fn">put</span>(<span class="num">2</span>,<span class="str">"B"</span>); cache.<span class="fn">put</span>(<span class="num">3</span>,<span class="str">"C"</span>);
+cache.<span class="fn">get</span>(<span class="num">1</span>);     <span class="cm">// access 1 → moves to end</span>
+cache.<span class="fn">put</span>(<span class="num">4</span>,<span class="str">"D"</span>); <span class="cm">// evicts LRU: key 2</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(cache);  <span class="cm">// {3=C, 1=A, 4=D}</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q16</span> Write a custom ArrayList that disallows duplicates.</div>
+      <div class="qa-body">
+        <p>Extend <code>ArrayList</code> and override the <code>add()</code> method to check <code>contains()</code> before delegating to <code>super.add()</code>. See Section 10 for full code.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q17</span> What is the difference between poll() and remove() in Queue?</div>
+      <div class="qa-body">
+        <p>Both remove the head element. But <code>remove()</code> throws <code>NoSuchElementException</code> if the queue is empty, while <code>poll()</code> returns <code>null</code> safely. Same pattern: <code>add()</code> vs <code>offer()</code>, <code>element()</code> vs <code>peek()</code>.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q18</span> What is the internal structure of TreeMap/TreeSet?</div>
+      <div class="qa-body">
+        <p>Both use a <strong>Red-Black Tree</strong> — a self-balancing binary search tree. Every operation (put, get, remove) is <span class="complexity ologn">O(log n)</span>. Elements must be <code>Comparable</code> or a <code>Comparator</code> must be provided. Does not allow <code>null</code> keys.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q19</span> What is type erasure in Java Generics?</div>
+      <div class="qa-body">
+        <p>At compile time, the compiler enforces generic type constraints. But at <strong>runtime</strong>, all type parameters are erased and replaced with <code>Object</code> (or the bound type). So <code>ArrayList&lt;Integer&gt;</code> and <code>ArrayList&lt;String&gt;</code> are the same class at runtime. This is why generics don't work with primitives and why you can't do <code>new T()</code>.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q20</span> Which collections allow null and which don't?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th>Collection</th><th>Null Allowed?</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td>ArrayList</td><td>✅ Yes</td><td>Multiple nulls</td></tr>
+            <tr><td>LinkedList</td><td>✅ Yes</td><td>Multiple nulls</td></tr>
+            <tr><td>HashSet</td><td>✅ Yes</td><td>One null</td></tr>
+            <tr><td>LinkedHashSet</td><td>✅ Yes</td><td>One null</td></tr>
+            <tr><td>TreeSet</td><td>❌ No</td><td>NullPointerException</td></tr>
+            <tr><td>HashMap</td><td>✅ Yes</td><td>One null key, many null values</td></tr>
+            <tr><td>LinkedHashMap</td><td>✅ Yes</td><td>Same as HashMap</td></tr>
+            <tr><td>TreeMap</td><td>❌ No key</td><td>NullPointerException for null key</td></tr>
+            <tr><td>Hashtable</td><td>❌ No</td><td>NPE for both key and value</td></tr>
+            <tr><td>ConcurrentHashMap</td><td>❌ No</td><td>NPE for both</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q21</span> Where did you use Collections in your project?</div>
+      <div class="qa-body">
+        <p>In a Spring Boot microservice:</p>
+        <ul>
+          <li><code>List&lt;Employee&gt;</code> — returned from JPA repository for employee data</li>
+          <li><code>HashMap&lt;String, Object&gt;</code> — dynamic API response building</li>
+          <li><code>LinkedHashMap</code> — maintaining ordered response fields</li>
+          <li><code>ConcurrentHashMap</code> — in-memory rate limiter (request count per IP)</li>
+          <li><code>HashSet&lt;String&gt;</code> — deduplicating email addresses in batch processing</li>
+          <li><code>PriorityQueue</code> — task scheduling by priority</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q22</span> List&lt;Dog&gt; vs List&lt;Animal&gt; — is one assignable to the other?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">Dog</span>&gt; dogs = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+<span class="cm">// List&lt;Animal&gt; animals = dogs;  // ❌ compile error!</span>
+<span class="cm">// This is because generics are INVARIANT</span>
+
+<span class="cm">// Use wildcard for flexibility:</span>
+<span class="ty">List</span>&lt;? <span class="kw">extends</span> <span class="ty">Animal</span>&gt; animals = dogs;  <span class="cm">// ✅ upper bound</span>
+<span class="cm">// animals.add(new Dog()); // ❌ can't add (type unknown)</span>
+animals.<span class="fn">get</span>(<span class="num">0</span>);          <span class="cm">// ✅ can read</span></pre>
+        <p>Generics are <strong>invariant</strong> — <code>List&lt;Dog&gt;</code> is NOT a subtype of <code>List&lt;Animal&gt;</code> even though <code>Dog extends Animal</code>. Use <code>? extends</code> or <code>? super</code> wildcards for flexibility.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q23</span> How to sort a List of Employee by salary descending, then by name ascending?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">Employee</span>&gt; list = <span class="fn">getEmployees</span>();
+
+<span class="cm">// Java 8 Comparator chaining</span>
+list.<span class="fn">sort</span>(
+    <span class="ty">Comparator</span>.<span class="fn">comparingDouble</span>(<span class="ty">Employee</span>::<span class="fn">getSalary</span>).<span class="fn">reversed</span>()
+              .<span class="fn">thenComparing</span>(<span class="ty">Employee</span>::<span class="fn">getName</span>)
+);</pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q24</span> What is the difference between CopyOnWriteArrayList and synchronizedList?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th></th><th>CopyOnWriteArrayList</th><th>synchronizedList</th></tr></thead>
+          <tbody>
+            <tr><td>Read locking</td><td>❌ No lock</td><td>✅ Locked</td></tr>
+            <tr><td>Write</td><td>Creates new array copy</td><td>Locks the list</td></tr>
+            <tr><td>Iterator safety</td><td>✅ No CME</td><td>❌ CME if not manually sync'd</td></tr>
+            <tr><td>Best for</td><td>Many reads, rare writes</td><td>Balanced read/write</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q25</span> How to find frequency of elements in a List?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="ty">List</span>&lt;<span class="ty">String</span>&gt; list = <span class="ty">Arrays</span>.<span class="fn">asList</span>(<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"a"</span>,<span class="str">"c"</span>,<span class="str">"a"</span>,<span class="str">"b"</span>);
+
+<span class="cm">// Method 1: Collections.frequency()</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="ty">Collections</span>.<span class="fn">frequency</span>(list, <span class="str">"a"</span>)); <span class="cm">// 3</span>
+
+<span class="cm">// Method 2: HashMap to count all</span>
+<span class="ty">Map</span>&lt;<span class="ty">String</span>,<span class="ty">Long</span>&gt; freq = list.<span class="fn">stream</span>()
+    .<span class="fn">collect</span>(<span class="ty">Collectors</span>.<span class="fn">groupingBy</span>(s -&gt; s, <span class="ty">Collectors</span>.<span class="fn">counting</span>()));
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(freq);  <span class="cm">// {a=3, b=2, c=1}</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q26</span> What is ArrayDeque and why prefer it over Stack?</div>
+      <div class="qa-body">
+        <p><code>ArrayDeque</code> is a resizable double-ended queue. Preferred over <code>Stack</code> because: (1) Stack extends Vector — synchronized overhead. (2) ArrayDeque is not synchronized — faster in single-threaded use. (3) ArrayDeque is a Deque — can be used as both stack (LIFO) and queue (FIFO).</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q27</span> How does ArrayList's default capacity grow? Can we control it?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="cm">// Default capacity = 10, grows 1.5x each time</span>
+<span class="cm">// 10 → 15 → 22 → 33 → 49...</span>
+
+<span class="cm">// Pre-set capacity if you know the size</span>
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; list = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;(<span class="num">1000</span>);   <span class="cm">// initial capacity 1000</span>
+<span class="cm">// Avoids multiple resize + array copy operations</span>
+
+<span class="cm">// Trim to actual size</span>
+((<span class="ty">ArrayList</span>&lt;<span class="ty">String</span>&gt;) list).<span class="fn">trimToSize</span>();  <span class="cm">// release unused capacity</span>
+
+<span class="cm">// Ensure capacity</span>
+((<span class="ty">ArrayList</span>&lt;<span class="ty">String</span>&gt;) list).<span class="fn">ensureCapacity</span>(<span class="num">2000</span>);</pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q28</span> What collections are from java.util.concurrent package?</div>
+      <div class="qa-body">
+        <ul>
+          <li><code>ConcurrentHashMap</code> — thread-safe map with segment/bucket locking</li>
+          <li><code>CopyOnWriteArrayList</code> — thread-safe list for read-heavy scenarios</li>
+          <li><code>CopyOnWriteArraySet</code> — thread-safe set backed by COWAL</li>
+          <li><code>BlockingQueue</code> implementations — <code>LinkedBlockingQueue</code>, <code>ArrayBlockingQueue</code></li>
+          <li><code>ConcurrentLinkedQueue</code> — non-blocking thread-safe queue</li>
+          <li><code>ConcurrentSkipListMap</code> — thread-safe sorted map</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q29</span> What is the difference between HashMap's put() and putIfAbsent()?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="ty">Map</span>&lt;<span class="ty">String</span>,<span class="ty">Integer</span>&gt; map = <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();
+map.<span class="fn">put</span>(<span class="str">"A"</span>, <span class="num">1</span>);
+
+<span class="cm">// put() — always inserts/updates</span>
+map.<span class="fn">put</span>(<span class="str">"A"</span>, <span class="num">99</span>);                <span class="cm">// value updated to 99</span>
+
+<span class="cm">// putIfAbsent() — only if key absent</span>
+map.<span class="fn">putIfAbsent</span>(<span class="str">"A"</span>, <span class="num">999</span>);          <span class="cm">// value stays 99 — key exists</span>
+map.<span class="fn">putIfAbsent</span>(<span class="str">"B"</span>, <span class="num">2</span>);            <span class="cm">// B=2 added</span>
+
+<span class="cm">// computeIfAbsent() — compute + insert if absent</span>
+map.<span class="fn">computeIfAbsent</span>(<span class="str">"C"</span>, k -&gt; k.<span class="fn">length</span>());  <span class="cm">// C=1</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q30</span> How to make a thread-safe version of ArrayList or HashMap without using Concurrent classes?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="cm">// Thread-safe List</span>
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; syncList = <span class="ty">Collections</span>.<span class="fn">synchronizedList</span>(<span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;());
+
+<span class="cm">// Thread-safe Map</span>
+<span class="ty">Map</span>&lt;<span class="ty">String</span>,<span class="ty">Integer</span>&gt; syncMap = <span class="ty">Collections</span>.<span class="fn">synchronizedMap</span>(<span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;());
+
+<span class="cm">// WARNING: Must synchronize manually during iteration!</span>
+<span class="kw">synchronized</span>(syncList) {
+    <span class="kw">for</span> (<span class="ty">String</span> s : syncList) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s);
+    }
+}
+<span class="cm">// Better: prefer ConcurrentHashMap / CopyOnWriteArrayList</span></pre>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- QUICK REF -->
+  <section id="quickref">
+    <h2><span class="num">REF</span> Quick-Reference Definitions</h2>
+    <table class="quick-ref">
+      <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td>Collection Framework</td><td>Unified architecture of interfaces/classes for storing groups of objects</td></tr>
+        <tr><td>ArrayList</td><td>Dynamic array; O(1) get, O(n) insert middle; not thread-safe</td></tr>
+        <tr><td>LinkedList</td><td>Doubly linked list; O(1) add/remove ends, O(n) random access</td></tr>
+        <tr><td>HashSet</td><td>Unique elements, unordered, backed by HashMap, O(1) operations</td></tr>
+        <tr><td>LinkedHashSet</td><td>Unique elements + insertion order maintained</td></tr>
+        <tr><td>TreeSet</td><td>Unique elements, sorted, Red-Black Tree, O(log n)</td></tr>
+        <tr><td>HashMap</td><td>Key-value pairs, unordered, O(1), allows one null key</td></tr>
+        <tr><td>LinkedHashMap</td><td>HashMap + maintains insertion/access order</td></tr>
+        <tr><td>TreeMap</td><td>Sorted keys, Red-Black Tree, O(log n), no null key</td></tr>
+        <tr><td>ConcurrentHashMap</td><td>Thread-safe HashMap with bucket-level locking</td></tr>
+        <tr><td>Comparable</td><td>Natural sorting inside class via compareTo()</td></tr>
+        <tr><td>Comparator</td><td>Custom sorting via separate class/lambda using compare()</td></tr>
+        <tr><td>fail-fast</td><td>Iterator throws CME if collection modified during iteration</td></tr>
+        <tr><td>fail-safe</td><td>Iterator uses snapshot — no CME, may not see latest changes</td></tr>
+        <tr><td>AutoBoxing</td><td>Auto primitive → wrapper conversion (int → Integer)</td></tr>
+        <tr><td>Unboxing</td><td>Auto wrapper → primitive conversion (Integer → int)</td></tr>
+        <tr><td>Type Erasure</td><td>Generic type info removed at runtime; all types become Object</td></tr>
+        <tr><td>Load Factor</td><td>Threshold (0.75) at which HashMap doubles its capacity</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="tip-box">
+    💡 <strong>Interview Tip:</strong> Always relate to project scenarios.<br>
+    <em>"In my Spring Boot project, I used ConcurrentHashMap as an in-memory rate-limiter cache across threads..."</em><br>
+    <em>"I used LinkedHashMap with access-order to implement an LRU cache for frequently accessed configs..."</em><br>
+    <em>"I override both equals() and hashCode() on all entity objects used in HashSet to ensure correct deduplication..."</em><br><br>
+    <strong>Hierarchy to remember:</strong> Iterable → Collection → List/Set/Queue → implementations. Map is separate.
+  </div>
+
+</main>
+</body>
+</html>
