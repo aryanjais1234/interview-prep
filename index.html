@@ -372,20 +372,109 @@
     border-radius: 4px;
   }
 
-  /* ── FOOTER ── */
-  footer {
-    margin-top: auto;
-    padding: 2rem 2.5rem;
-    border-top: 1px solid var(--border2);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
+  /* ── CUSTOM FOOTER ── */
+
+.custom-footer {
+  margin-top: auto;
+  padding: 2.2rem 2.5rem;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+}
+
+.footer-brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.footer-text {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.footer-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.footer-link {
+  text-decoration: none;
+  color: var(--muted);
+
+  background: var(--bg3);
+  border: 1px solid var(--border);
+
+  padding: .65rem 1rem;
+  border-radius: 10px;
+
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+
+  transition: all .2s ease;
+}
+
+.footer-link:hover {
+  transform: translateY(-2px);
+}
+
+.footer-link.linkedin:hover {
+  border-color: #0a66c2;
+  color: #58a6ff;
+  box-shadow: 0 4px 20px rgba(10,102,194,.18);
+}
+
+.footer-link.github:hover {
+  border-color: #bc8cff;
+  color: #bc8cff;
+  box-shadow: 0 4px 20px rgba(188,140,255,.18);
+}
+
+.footer-link.email:hover {
+  border-color: #3fb950;
+  color: #3fb950;
+  box-shadow: 0 4px 20px rgba(63,185,80,.18);
+}
+
+@media (max-width: 700px) {
+
+  .custom-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 2rem 1.25rem;
   }
 
-  footer span { letter-spacing: .05em; }
+  .footer-right {
+    width: 100%;
+  }
+
+  .footer-link {
+    flex: 1;
+    text-align: center;
+  }
+}
 
   /* ── ANIMATIONS ── */
   @keyframes fadeUp {
@@ -434,12 +523,8 @@
       <div class="stat-label">Interview Q&amp;As</div>
     </div>
     <div class="stat">
-      <div class="stat-num">60+</div>
+      <div class="stat-num">100+</div>
       <div class="stat-label">Code Examples</div>
-    </div>
-    <div class="stat">
-      <div class="stat-num">100%</div>
-      <div class="stat-label">Dark Mode</div>
     </div>
   </div>
 </div>
@@ -663,7 +748,7 @@
   </div>
 
   <!-- Coming Soon: Java 8 -->
-  <div class="note-card soon"
+  <!-- <div class="note-card soon"
        style="--card-accent:#d29922; --card-icon-bg:#d2992215; --card-icon-border:#d2992233;">
     <div class="card-top">
       <div class="card-icon">🚀</div>
@@ -683,14 +768,48 @@
     <div class="card-footer">
       <div class="card-meta">Not yet available</div>
     </div>
-  </div>
+  </div> -->
 
 </div>
 
 <!-- ── FOOTER ── -->
-<footer>
-  <span>☕ JavaPrep · Interview Notes Hub</span>
-  <span>Place all .html files in the same folder to navigate</span>
+<footer class="custom-footer">
+
+  <div class="footer-left">
+    <div class="footer-brand">
+      ☕ JavaPrep
+    </div>
+
+    <div class="footer-text">
+      Built with ❤️ by Aryan Jaiswal · Java Backend Developer
+    </div>
+
+    <div class="footer-sub">
+      Java • Spring Boot • Microservices • MySQL • React
+    </div>
+  </div>
+
+  <div class="footer-right">
+
+    <a href="https://www.linkedin.com/in/aryan-jaiswal-a87666180/"
+       target="_blank"
+       class="footer-link linkedin">
+      💼 LinkedIn
+    </a>
+
+    <a href="https://github.com/aryanjais1234"
+       target="_blank"
+       class="footer-link github">
+      🖥 GitHub
+    </a>
+
+    <a href="mailto:aryanjais1234@gmail.com"
+       class="footer-link email">
+      📧 Email
+    </a>
+
+  </div>
+
 </footer>
 
 <script>
