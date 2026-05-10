@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java OOPs – Complete Interview Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --bg3:       #1c2128;
+    --border:    #30363d;
+    --border2:   #21262d;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --accent:    #58a6ff;
+    --accent2:   #f78166;
+    --green:     #3fb950;
+    --yellow:    #d29922;
+    --purple:    #bc8cff;
+    --orange:    #ffa657;
+    --pink:      #ff7b72;
+    --teal:      #39d353;
+
+    --kw:   #ff7b72;
+    --ty:   #ffa657;
+    --str:  #a5d6ff;
+    --num:  #79c0ff;
+    --cm:   #8b949e;
+    --fn:   #d2a8ff;
+    --an:   #3fb950;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 0 2rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-track { background: transparent; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .nav-logo {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: .5rem;
+  }
+
+  .nav-logo .lang-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #3fb95022, #3fb95044);
+    border: 1px solid #3fb95055;
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: .6rem;
+  }
+
+  .nav-logo h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .8rem 1.25rem .3rem;
+  }
+
+  nav a {
+    display: block;
+    padding: .38rem 1.25rem .38rem 1.5rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 400;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  nav a:hover {
+    color: var(--green);
+    border-left-color: var(--green);
+    background: #3fb95010;
+  }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    padding: 3rem 4rem 6rem;
+    max-width: 900px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    animation: fadeSlide .5s ease both;
+  }
+
+  .page-header .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: .75rem;
+  }
+
+  .page-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: .75rem;
+    background: linear-gradient(135deg, var(--text) 60%, var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: .75rem;
+  }
+
+  .tag {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    transition: all .2s;
+  }
+
+  .tag:hover { border-color: var(--green); color: var(--green); }
+
+  /* ── SECTIONS ── */
+  section {
+    margin-bottom: 3.5rem;
+    animation: fadeSlide .4s ease both;
+  }
+
+  section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.1rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+  }
+
+  section h2 .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    background: #3fb95018;
+    border: 1px solid #3fb95033;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 1.4rem 0 .6rem;
+  }
+
+  p { margin-bottom: .75rem; color: var(--text); }
+  strong { color: var(--text); font-weight: 600; }
+
+  ul, ol { padding-left: 1.4rem; margin: .5rem 0 .75rem; }
+  li { margin-bottom: .35rem; }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    margin: .9rem 0;
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  pre::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: .5rem;
+    right: .75rem;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: .7;
+  }
+
+  pre.java   { border-left: 3px solid var(--green); }
+  pre.text   { border-left: 3px solid var(--muted); }
+  pre.memory { border-left: 3px solid var(--purple); background: #bc8cff08; }
+  pre.flow   { border-left: 3px solid var(--yellow); background: #d2992210; }
+
+  code { font-family: 'JetBrains Mono', monospace; font-size: .875em; }
+
+  p code, li code, td code {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--orange);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* syntax */
+  .kw  { color: var(--kw); font-weight: 500; }
+  .ty  { color: var(--ty); }
+  .str { color: var(--str); }
+  .num { color: var(--num); }
+  .cm  { color: var(--cm); font-style: italic; }
+  .fn  { color: var(--fn); }
+  .an  { color: var(--an); }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 8px;
+    padding: .85rem 1.1rem;
+    margin: 1rem 0;
+    border-left: 3px solid;
+    font-size: 14px;
+  }
+
+  .callout.warn  { background: #d2992215; border-color: var(--yellow); color: #e3b341; }
+  .callout.tip   { background: #58a6ff12; border-color: var(--accent);  color: var(--accent); }
+  .callout.rule  { background: #3fb95012; border-color: var(--green);   color: var(--green); }
+  .callout.key   { background: #ff7b7210; border-color: var(--pink);    color: #ff9b96; }
+  .callout strong { color: inherit; }
+
+  /* ── PILLARS GRID ── */
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1.2rem 0;
+  }
+
+  .pillar-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.2rem;
+    transition: border-color .2s, transform .2s;
+  }
+
+  .pillar-card:hover { border-color: var(--green); transform: translateY(-2px); }
+
+  .pillar-card .pillar-icon {
+    font-size: 1.5rem;
+    margin-bottom: .4rem;
+  }
+
+  .pillar-card .pillar-name {
+    font-family: 'Syne', sans-serif;
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--green);
+    margin-bottom: .25rem;
+  }
+
+  .pillar-card .pillar-def {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── TABLES ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 13.5px;
+  }
+
+  th {
+    background: var(--bg3);
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .6rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: .55rem 1rem;
+    border-bottom: 1px solid var(--border2);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg3); }
+
+  /* ── Q&A CARDS ── */
+  .qa-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+
+  .qa-card:hover { border-color: var(--green); }
+
+  .qa-q {
+    background: var(--bg3);
+    padding: .85rem 1.25rem;
+    font-family: 'Syne', sans-serif;
+    font-size: .95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+  }
+
+  .qa-q .qn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    background: #3fb95022;
+    color: var(--green);
+    border: 1px solid #3fb95044;
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .qa-body {
+    padding: 1rem 1.25rem;
+    font-size: 14px;
+  }
+
+  /* ── QUICK-REF TABLE ── */
+  .quick-ref td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--purple);
+    white-space: nowrap;
+  }
+
+  /* ── TIP BOX ── */
+  .tip-box {
+    background: linear-gradient(135deg, #161b22, #1c2128);
+    border: 1px solid #3fb95044;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-top: 3rem;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .tip-box strong { color: var(--green); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  section:nth-child(2)  { animation-delay: .05s; }
+  section:nth-child(3)  { animation-delay: .10s; }
+  section:nth-child(4)  { animation-delay: .15s; }
+  section:nth-child(5)  { animation-delay: .20s; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 780px) {
+    nav { display: none; }
+    main { padding: 2rem 1.5rem 4rem; }
+    .pillars { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════ SIDEBAR ════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="lang-badge">☕ Java · OOPs</div>
+    <h2>OOPs Concepts<br>Interview Notes</h2>
+  </div>
+
+  <div class="nav-section-label">Core Concepts</div>
+  <a href="#s1">01 · Four Pillars of OOPs</a>
+  <a href="#s2">02 · Encapsulation</a>
+  <a href="#s3">03 · Inheritance</a>
+  <a href="#s4">04 · Polymorphism</a>
+  <a href="#s5">05 · Abstraction</a>
+  <a href="#s6">06 · Java 7 vs Java 8 Interfaces</a>
+
+  <div class="nav-section-label">Advanced</div>
+  <a href="#s7">07 · Exception Hierarchy in Overriding</a>
+  <a href="#s8">08 · Static &amp; Private – Can't Override</a>
+  <a href="#s9">09 · Covariant Return Type</a>
+
+  <div class="nav-section-label">Q &amp; A</div>
+  <a href="#qa">10 Interview Questions</a>
+  <a href="#quickref">Quick-Ref Definitions</a>
+</nav>
+
+<!-- ════════ MAIN ════════ -->
+<main>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="eyebrow">Core Java · Interview Prep</div>
+    <h1>Java OOPs – Complete Interview Notes</h1>
+    <div class="tags">
+      <span class="tag">Encapsulation</span>
+      <span class="tag">Inheritance</span>
+      <span class="tag">Polymorphism</span>
+      <span class="tag">Abstraction</span>
+      <span class="tag">Overloading</span>
+      <span class="tag">Overriding</span>
+      <span class="tag">Java 8 Interfaces</span>
+      <span class="tag">Covariant Return</span>
+      <span class="tag">Method Hiding</span>
+      <span class="tag">Runtime Polymorphism</span>
+    </div>
+  </div>
+
+  <!-- ── 1 ── -->
+  <section id="s1">
+    <h2><span class="num">01</span> The Four Pillars of OOPs</h2>
+
+    <div class="pillars">
+      <div class="pillar-card">
+        <div class="pillar-icon">🔒</div>
+        <div class="pillar-name">Encapsulation</div>
+        <div class="pillar-def">Binding data and methods into a single unit with controlled access via private fields + public getters/setters.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🧬</div>
+        <div class="pillar-name">Inheritance</div>
+        <div class="pillar-def">Reusing properties/methods of a parent class in a child class using <code>extends</code> or <code>implements</code>.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🔀</div>
+        <div class="pillar-name">Polymorphism</div>
+        <div class="pillar-def">One name, multiple behaviours — achieved through overloading (compile-time) and overriding (runtime).</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🎭</div>
+        <div class="pillar-name">Abstraction</div>
+        <div class="pillar-def">Hiding implementation details; exposing only functionality to the end user via interfaces or abstract classes.</div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Pillar</th><th>One-Line Definition</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Encapsulation</strong></td><td>Binding data and methods into a single unit with controlled access</td></tr>
+        <tr><td><strong>Inheritance</strong></td><td>Reusing properties/methods of a parent class in a child class</td></tr>
+        <tr><td><strong>Polymorphism</strong></td><td>One name, multiple behaviours (overloading + overriding)</td></tr>
+        <tr><td><strong>Abstraction</strong></td><td>Hiding implementation details; exposing only functionality</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 2 ── -->
+  <section id="s2">
+    <h2><span class="num">02</span> Encapsulation</h2>
+
+    <p><strong>Rules to achieve encapsulation:</strong></p>
+    <ul>
+      <li>Declare all fields as <code>private</code></li>
+      <li>Provide <code>public</code> getter and setter methods</li>
+    </ul>
+
+    <pre class="java" data-lang="java"><span class="cm">// Entity / DTO class – classic encapsulation example</span>
+<span class="kw">public class</span> <span class="ty">Item</span> {
+
+    <span class="kw">private int</span>    id;
+    <span class="kw">private</span> <span class="ty">String</span> name;
+    <span class="kw">private</span> <span class="ty">String</span> color;
+    <span class="kw">private double</span> price;
+
+    <span class="cm">// Getters</span>
+    <span class="kw">public int</span>    <span class="fn">getId</span>()    { <span class="kw">return</span> id; }
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getName</span>()  { <span class="kw">return</span> name; }
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getColor</span>() { <span class="kw">return</span> color; }
+    <span class="kw">public double</span> <span class="fn">getPrice</span>() { <span class="kw">return</span> price; }
+
+    <span class="cm">// Setters</span>
+    <span class="kw">public void</span> <span class="fn">setId</span>(<span class="kw">int</span> id)          { <span class="kw">this</span>.id = id; }
+    <span class="kw">public void</span> <span class="fn">setName</span>(<span class="ty">String</span> name)   { <span class="kw">this</span>.name = name; }
+    <span class="kw">public void</span> <span class="fn">setColor</span>(<span class="ty">String</span> color) { <span class="kw">this</span>.color = color; }
+    <span class="kw">public void</span> <span class="fn">setPrice</span>(<span class="kw">double</span> price) { <span class="kw">this</span>.price = price; }
+}</pre>
+
+    <div class="callout tip">💡 <strong>Real-time usage:</strong> Every <code>@Entity</code> or DTO class in a Spring Boot project follows encapsulation.</div>
+  </section>
+
+  <!-- ── 3 ── -->
+  <section id="s3">
+    <h2><span class="num">03</span> Inheritance</h2>
+
+    <p><strong>Keywords:</strong></p>
+    <ul>
+      <li>Same type (class → class, interface → interface) → <code>extends</code></li>
+      <li>Different type (class → interface) → <code>implements</code></li>
+    </ul>
+
+    <pre class="java" data-lang="java"><span class="cm">// Parent interface</span>
+<span class="kw">public interface</span> <span class="ty">InventoryService</span> {
+    <span class="kw">void</span> <span class="fn">addItem</span>(<span class="ty">Item</span> item);
+    <span class="kw">void</span> <span class="fn">addItem</span>(<span class="ty">List</span>&lt;<span class="ty">Item</span>&gt; items);   <span class="cm">// overloaded</span>
+    <span class="kw">void</span> <span class="fn">removeItem</span>(<span class="ty">Item</span> item);
+    <span class="kw">void</span> <span class="fn">removeItem</span>(<span class="kw">int</span> itemId);      <span class="cm">// overloaded</span>
+}
+
+<span class="cm">// Child / Implementation class</span>
+<span class="kw">public class</span> <span class="ty">InventoryServiceImpl</span> <span class="kw">implements</span> <span class="ty">InventoryService</span> {
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">addItem</span>(<span class="ty">Item</span> item) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Adding single item: "</span> + item.<span class="fn">getName</span>());
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">addItem</span>(<span class="ty">List</span>&lt;<span class="ty">Item</span>&gt; items) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Adding "</span> + items.<span class="fn">size</span>() + <span class="str">" items"</span>);
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">removeItem</span>(<span class="ty">Item</span> item) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Removing item: "</span> + item.<span class="fn">getName</span>());
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">removeItem</span>(<span class="kw">int</span> itemId) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Removing item with ID: "</span> + itemId);
+    }
+}</pre>
+  </section>
+
+  <!-- ── 4 ── -->
+  <section id="s4">
+    <h2><span class="num">04</span> Polymorphism</h2>
+
+    <h3>4a. Method Overloading – Compile-time / Static Polymorphism</h3>
+    <p>Same method name, <strong>different parameters</strong>.</p>
+
+    <pre class="java" data-lang="java"><span class="kw">public class</span> <span class="ty">InventoryService</span> {
+
+    <span class="cm">// Search by name only</span>
+    <span class="kw">public</span> <span class="ty">Item</span> <span class="fn">searchItem</span>(<span class="ty">String</span> name) { ... }
+
+    <span class="cm">// Search by name + color</span>
+    <span class="kw">public</span> <span class="ty">Item</span> <span class="fn">searchItem</span>(<span class="ty">String</span> name, <span class="ty">String</span> color) { ... }
+
+    <span class="cm">// Search by name + color + price</span>
+    <span class="kw">public</span> <span class="ty">Item</span> <span class="fn">searchItem</span>(<span class="ty">String</span> name, <span class="ty">String</span> color, <span class="kw">double</span> price) { ... }
+
+    <span class="cm">// Remove by object</span>
+    <span class="kw">public void</span> <span class="fn">removeItem</span>(<span class="ty">Item</span> item) { ... }
+
+    <span class="cm">// Remove by ID</span>
+    <span class="kw">public void</span> <span class="fn">removeItem</span>(<span class="kw">int</span> itemId) { ... }
+}</pre>
+
+    <h3>4b. Method Overriding – Runtime / Dynamic Polymorphism</h3>
+    <p>Same signature in parent and child; child provides its own implementation.</p>
+
+    <pre class="java" data-lang="java"><span class="cm">// Interface (Parent)</span>
+<span class="kw">public interface</span> <span class="ty">InventoryService</span> {
+    <span class="kw">void</span> <span class="fn">addItem</span>(<span class="ty">Item</span> item);
+}
+
+<span class="cm">// Implementation (Child)</span>
+<span class="kw">public class</span> <span class="ty">InventoryServiceImpl</span> <span class="kw">implements</span> <span class="ty">InventoryService</span> {
+
+    <span class="an">@Override</span>                         <span class="cm">// same signature – overriding</span>
+    <span class="kw">public void</span> <span class="fn">addItem</span>(<span class="ty">Item</span> item) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Item saved: "</span> + item.<span class="fn">getName</span>());
+    }
+}</pre>
+
+    <h3>4c. Runtime Polymorphism in Real Projects</h3>
+
+    <pre class="java" data-lang="java"><span class="cm">// Controller injects the INTERFACE, not the implementation</span>
+<span class="an">@RestController</span>
+<span class="kw">public class</span> <span class="ty">InventoryController</span> {
+
+    <span class="cm">// Spring injects whichever implementation is active at runtime</span>
+    <span class="kw">private final</span> <span class="ty">InventoryService</span> inventoryService;
+
+    <span class="kw">public</span> <span class="ty">InventoryController</span>(<span class="ty">InventoryService</span> inventoryService) {
+        <span class="kw">this</span>.inventoryService = inventoryService;
+    }
+}</pre>
+
+    <div class="callout tip">💡 This is <strong>dynamic / runtime polymorphism</strong> – the actual implementation is resolved at runtime by Spring.</div>
+
+    <h3>Overloading vs Overriding – Comparison</h3>
+    <table>
+      <thead><tr><th></th><th>Overloading</th><th>Overriding</th></tr></thead>
+      <tbody>
+        <tr><td>Also called</td><td>Compile-time polymorphism</td><td>Runtime polymorphism</td></tr>
+        <tr><td>Method name</td><td>Same</td><td>Same</td></tr>
+        <tr><td>Parameters</td><td><strong>Different</strong></td><td><strong>Same</strong></td></tr>
+        <tr><td>Class</td><td>Same class</td><td>Parent–Child classes</td></tr>
+        <tr><td>Return type</td><td>Can differ</td><td>Must be same (or covariant)</td></tr>
+        <tr><td><code>@Override</code></td><td>Not used</td><td>Used</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 5 ── -->
+  <section id="s5">
+    <h2><span class="num">05</span> Abstraction</h2>
+
+    <ul>
+      <li><strong>Abstract class</strong> – partial implementation; use <code>abstract</code> keyword.</li>
+      <li><strong>Interface</strong> – 100% abstraction (before Java 8). Exposes only what the user needs.</li>
+    </ul>
+
+    <pre class="java" data-lang="java"><span class="kw">public interface</span> <span class="ty">PaymentService</span> {
+    <span class="kw">void</span> <span class="fn">doTransaction</span>(<span class="kw">double</span> amount);  <span class="cm">// abstract – must implement</span>
+}
+
+<span class="kw">public class</span> <span class="ty">GooglePay</span> <span class="kw">implements</span> <span class="ty">PaymentService</span> {
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">doTransaction</span>(<span class="kw">double</span> amount) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Google Pay: Processing ₹"</span> + amount);
+    }
+}</pre>
+
+    <h3>Abstraction vs Encapsulation</h3>
+    <table>
+      <thead><tr><th></th><th>Abstraction</th><th>Encapsulation</th></tr></thead>
+      <tbody>
+        <tr><td>Goal</td><td>Hide <strong>implementation</strong></td><td>Hide <strong>data</strong></td></tr>
+        <tr><td>Achieved via</td><td>Interface / Abstract class</td><td>Private fields + getters/setters</td></tr>
+        <tr><td>Focus</td><td><strong>What</strong> an object does</td><td><strong>How</strong> data is protected</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 6 ── -->
+  <section id="s6">
+    <h2><span class="num">06</span> Java 7 vs Java 8 Interfaces</h2>
+
+    <table>
+      <thead><tr><th>Feature</th><th>Java 7</th><th>Java 8+</th></tr></thead>
+      <tbody>
+        <tr><td>Abstract methods</td><td>✅</td><td>✅</td></tr>
+        <tr><td>Default methods</td><td>❌</td><td>✅</td></tr>
+        <tr><td>Static methods</td><td>❌</td><td>✅</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Default Method – Purpose &amp; Example</h3>
+    <p>Purpose: <strong>NOT force</strong> all implementation classes to override every method.</p>
+
+    <pre class="java" data-lang="java"><span class="kw">public interface</span> <span class="ty">Payment</span> {
+
+    <span class="kw">void</span> <span class="fn">doTransaction</span>(<span class="kw">double</span> amount);   <span class="cm">// abstract – must override</span>
+
+    <span class="cm">// Default – implementations are NOT forced to override this</span>
+    <span class="kw">default void</span> <span class="fn">addCoupon</span>(<span class="ty">String</span> code) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Default 5% cashback applied."</span>);
+    }
+
+    <span class="cm">// Static – common utility for ALL implementations</span>
+    <span class="kw">static void</span> <span class="fn">generateTransactionReport</span>(<span class="ty">String</span> txnId) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Transaction Report for: "</span> + txnId);
+    }
+}
+
+<span class="kw">public class</span> <span class="ty">GooglePay</span> <span class="kw">implements</span> <span class="ty">Payment</span> {
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">doTransaction</span>(<span class="kw">double</span> amount) { <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"GPay ₹"</span> + amount); }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">addCoupon</span>(<span class="ty">String</span> code) {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"GPay: 10% cashback for code "</span> + code);
+    }
+}
+
+<span class="kw">public class</span> <span class="ty">PhonePe</span> <span class="kw">implements</span> <span class="ty">Payment</span> {
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="fn">doTransaction</span>(<span class="kw">double</span> amount) { <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"PhonePe ₹"</span> + amount); }
+    <span class="cm">// addCoupon NOT overridden → uses default 5% cashback</span>
+}</pre>
+
+    <div class="callout rule">✅ <strong>Static method</strong> in interface = common utility shared by all implementations. No need for a separate Util class.</div>
+  </section>
+
+  <!-- ── 7 ── -->
+  <section id="s7">
+    <h2><span class="num">07</span> Exception Hierarchy in Overriding</h2>
+
+    <h3>Case 1: Parent throws → Child declaration is OPTIONAL</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Parent</span> {
+    <span class="kw">void</span> <span class="fn">m1</span>() <span class="kw">throws</span> <span class="ty">Exception</span> {   <span class="cm">// parent throws</span>
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Parent m1"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="ty">Child</span> <span class="kw">extends</span> <span class="ty">Parent</span> {
+    <span class="an">@Override</span>
+    <span class="kw">void</span> <span class="fn">m1</span>() {               <span class="cm">// No throws – perfectly valid ✅</span>
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Child m1"</span>);
+    }
+}</pre>
+
+    <h3>Case 2: Child throws → Parent MUST declare it</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Parent2</span> {
+    <span class="kw">void</span> <span class="fn">m1</span>() { }             <span class="cm">// parent does NOT throw</span>
+}
+
+<span class="kw">class</span> <span class="ty">Child2</span> <span class="kw">extends</span> <span class="ty">Parent2</span> {
+    <span class="an">@Override</span>
+    <span class="cm">// void m1() throws Exception { }  // ❌ Compilation error!</span>
+    <span class="cm">// Child CANNOT throw checked exception if parent doesn't</span>
+    <span class="kw">void</span> <span class="fn">m1</span>() { <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Child2 m1"</span>); }
+}</pre>
+
+    <div class="callout key">🔑 <strong>Rule:</strong> If <strong>parent throws</strong> → child throw is <strong>optional</strong>. If <strong>child throws</strong> → parent <strong>must</strong> declare the same (or broader) checked exception.</div>
+  </section>
+
+  <!-- ── 8 ── -->
+  <section id="s8">
+    <h2><span class="num">08</span> Static &amp; Private Methods – Cannot be Overridden</h2>
+
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Parent</span> {
+
+    <span class="kw">static void</span> <span class="fn">staticMethod</span>() {       <span class="cm">// Method hiding, NOT overriding</span>
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Parent static"</span>);
+    }
+
+    <span class="kw">private void</span> <span class="fn">privateMethod</span>() {     <span class="cm">// Not visible to child at all</span>
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Parent private"</span>);
+    }
+}
+
+<span class="kw">class</span> <span class="ty">Child</span> <span class="kw">extends</span> <span class="ty">Parent</span> {
+
+    <span class="cm">// @Override  ← compile error for static methods</span>
+    <span class="kw">static void</span> <span class="fn">staticMethod</span>() {
+        <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Child static"</span>);
+    }
+
+    <span class="cm">// privateMethod cannot even be seen here</span>
+}
+
+<span class="cm">// Calling static methods – use class name, NOT object</span>
+<span class="ty">Parent</span>.<span class="fn">staticMethod</span>();   <span class="cm">// → Parent static</span>
+<span class="ty">Child</span>.<span class="fn">staticMethod</span>();    <span class="cm">// → Child static  (method hiding)</span></pre>
+
+    <h3>Runtime Polymorphism Demo</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Parent</span> {
+    <span class="kw">void</span> <span class="fn">m1</span>() { <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Parent m1"</span>); }
+}
+<span class="kw">class</span> <span class="ty">Child</span> <span class="kw">extends</span> <span class="ty">Parent</span> {
+    <span class="an">@Override</span>
+    <span class="kw">void</span> <span class="fn">m1</span>() { <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Child m1"</span>); }
+}
+
+<span class="ty">Parent</span> p = <span class="kw">new</span> <span class="ty">Child</span>();   <span class="cm">// reference = Parent, object = Child</span>
+p.<span class="fn">m1</span>();                    <span class="cm">// Output: Child m1  ← JVM uses actual object type</span></pre>
+
+    <div class="callout tip">💡 JVM resolves overridden methods at <strong>runtime</strong> based on the actual object type, not the reference type.</div>
+  </section>
+
+  <!-- ── 9 ── -->
+  <section id="s9">
+    <h2><span class="num">09</span> Covariant Return Type in Overriding (Tricky)</h2>
+    <p>When overriding, the child method can return a <strong>subtype</strong> of the return type declared in the parent.</p>
+
+    <pre class="java" data-lang="java"><span class="kw">interface</span> <span class="ty">A</span> { }
+<span class="kw">class</span> <span class="ty">B</span> <span class="kw">implements</span> <span class="ty">A</span> { }
+
+<span class="kw">interface</span> <span class="ty">InventoryService</span> {
+    <span class="ty">A</span> <span class="fn">getData</span>();           <span class="cm">// returns parent type A</span>
+}
+
+<span class="kw">class</span> <span class="ty">InventoryServiceImpl</span> <span class="kw">implements</span> <span class="ty">InventoryService</span> {
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="ty">B</span> <span class="fn">getData</span>() {   <span class="cm">// ✅ returning child type B – valid (covariant)</span>
+        <span class="kw">return new</span> <span class="ty">B</span>();
+    }
+}</pre>
+
+    <div class="callout warn">⚠️ Interviewers use this to confuse candidates. Remember: child method CAN return a subtype of the parent's declared return type.</div>
+  </section>
+
+  <!-- ════════ Q&A ════════ -->
+  <section id="qa">
+    <h2><span class="num">Q&A</span> Interview Questions – Complete Set</h2>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q1</span> What are the 4 pillars of OOPs?</div>
+      <div class="qa-body">
+        <ol>
+          <li><strong>Encapsulation</strong> – private fields + public getters/setters</li>
+          <li><strong>Inheritance</strong> – <code>extends</code> / <code>implements</code> for code reuse</li>
+          <li><strong>Polymorphism</strong> – overloading (compile-time) + overriding (runtime)</li>
+          <li><strong>Abstraction</strong> – hide implementation, expose only interface</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q2</span> Where did you use Encapsulation in your project?</div>
+      <div class="qa-body">
+        <p>In every <code>@Entity</code> and DTO class. All fields are <code>private</code>; access is only through getters and setters, protecting data integrity.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q3</span> What is the difference between Overloading and Overriding?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th></th><th>Overloading</th><th>Overriding</th></tr></thead>
+          <tbody>
+            <tr><td>Also called</td><td>Compile-time polymorphism</td><td>Runtime polymorphism</td></tr>
+            <tr><td>Method name</td><td>Same</td><td>Same</td></tr>
+            <tr><td>Parameters</td><td><strong>Different</strong></td><td><strong>Same</strong></td></tr>
+            <tr><td>Class</td><td>Same class</td><td>Parent–Child classes</td></tr>
+            <tr><td>Return type</td><td>Can differ</td><td>Same (or covariant)</td></tr>
+            <tr><td><code>@Override</code></td><td>Not used</td><td>Used</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q4</span> Can we override static or private methods?</div>
+      <div class="qa-body">
+        <p><strong>No.</strong></p>
+        <ul>
+          <li><strong>Static methods</strong> → it becomes <strong>method hiding</strong>. The method called depends on the reference type, not the object.</li>
+          <li><strong>Private methods</strong> → not visible to child class; cannot be overridden.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q5</span> Parent p = new Child(); p.m1() — which m1() is called?</div>
+      <div class="qa-body">
+        <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Parent</span> {
+    <span class="kw">void</span> <span class="fn">m1</span>() { <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Parent m1"</span>); }
+}
+<span class="kw">class</span> <span class="ty">Child</span> <span class="kw">extends</span> <span class="ty">Parent</span> {
+    <span class="an">@Override</span>
+    <span class="kw">void</span> <span class="fn">m1</span>() { <span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Child m1"</span>); }
+}
+
+<span class="ty">Parent</span> p = <span class="kw">new</span> <span class="ty">Child</span>();
+p.<span class="fn">m1</span>();   <span class="cm">// Output: Child m1</span></pre>
+        <p>Even though reference type is <code>Parent</code>, actual object is <code>Child</code>. JVM resolves at <strong>runtime</strong> based on object type → <strong>runtime/dynamic polymorphism</strong>.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q6</span> Where did you use Runtime Polymorphism in your project?</div>
+      <div class="qa-body">
+        <p>In Spring Boot controllers, we inject the <strong>interface</strong> (<code>InventoryService</code>), not the concrete class (<code>InventoryServiceImpl</code>). At runtime, Spring resolves the actual bean — allowing multiple implementations to be swapped without changing the controller.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q7</span> What is the rule for exceptions in overriding?</div>
+      <div class="qa-body">
+        <ul>
+          <li>Parent throws → child declaration is <strong>optional</strong></li>
+          <li>Child throws checked exception → parent <strong>must</strong> also declare it</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q8</span> What is the difference between Java 7 and Java 8 interfaces?</div>
+      <div class="qa-body">
+        <ul>
+          <li><strong>Java 7:</strong> interfaces can only have abstract methods.</li>
+          <li><strong>Java 8:</strong> interfaces can also have <code>default</code> methods (with body) and <code>static</code> methods.</li>
+          <li><code>default</code> methods avoid forcing all implementing classes to override a new method.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q9</span> What is a Covariant Return Type?</div>
+      <div class="qa-body">
+        <p>When overriding, the child method can return a <strong>subtype</strong> of the return type declared in the parent.</p>
+        <pre class="java" data-lang="java"><span class="cm">// Parent returns A; child can return B (where B implements A)</span>
+<span class="kw">interface</span> <span class="ty">Service</span> { <span class="ty">A</span> <span class="fn">getData</span>(); }
+<span class="kw">class</span> <span class="ty">ServiceImpl</span> <span class="kw">implements</span> <span class="ty">Service</span> {
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="ty">B</span> <span class="fn">getData</span>() { <span class="kw">return new</span> <span class="ty">B</span>(); }  <span class="cm">// ✅ valid</span>
+}</pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q10</span> What is the difference between Abstraction and Encapsulation?</div>
+      <div class="qa-body">
+        <table>
+          <thead><tr><th></th><th>Abstraction</th><th>Encapsulation</th></tr></thead>
+          <tbody>
+            <tr><td>Goal</td><td>Hide <strong>implementation</strong></td><td>Hide <strong>data</strong></td></tr>
+            <tr><td>Achieved via</td><td>Interface / Abstract class</td><td>Private fields + getters/setters</td></tr>
+            <tr><td>Focus</td><td><strong>What</strong> an object does</td><td><strong>How</strong> data is protected</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ QUICK REF ════════ -->
+  <section id="quickref">
+    <h2><span class="num">REF</span> Quick-Reference Definitions</h2>
+    <table class="quick-ref">
+      <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td>Encapsulation</td><td>Binding data + methods; private fields, public accessors</td></tr>
+        <tr><td>Inheritance</td><td>Child reuses parent properties via extends/implements</td></tr>
+        <tr><td>Polymorphism</td><td>One name, multiple behaviours (overloading + overriding)</td></tr>
+        <tr><td>Abstraction</td><td>Hide implementation, expose only interface/contract</td></tr>
+        <tr><td>Overloading</td><td>Same method name, different parameters — compile-time</td></tr>
+        <tr><td>Overriding</td><td>Same signature in parent + child — resolved at runtime</td></tr>
+        <tr><td>Method Hiding</td><td>Static method in child with same signature as parent</td></tr>
+        <tr><td>Covariant Return</td><td>Child can return subtype of parent's declared return type</td></tr>
+        <tr><td>Default Method</td><td>Java 8 interface method with body; not forced on implementors</td></tr>
+        <tr><td>Runtime Polymorphism</td><td>JVM resolves method at runtime based on actual object type</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FOOTER TIP -->
+  <div class="tip-box">
+    💡 <strong>Interview Tip:</strong> Always relate answers to real-project scenarios.<br>
+    <em>"In my Spring Boot inventory service, I used Encapsulation in every @Entity class with private fields and getters/setters..."</em><br>
+    <em>"I used Runtime Polymorphism in the controller by injecting the InventoryService interface instead of the implementation class..."</em><br><br>
+    Interviewers value <strong>practical understanding over textbook definitions</strong>.
+  </div>
+
+</main>
+</body>
+</html>

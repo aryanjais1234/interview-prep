@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java String – Complete Interview Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --bg3:       #1c2128;
+    --border:    #30363d;
+    --border2:   #21262d;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --accent:    #58a6ff;
+    --accent2:   #f78166;
+    --green:     #3fb950;
+    --yellow:    #d29922;
+    --purple:    #bc8cff;
+    --orange:    #ffa657;
+    --pink:      #ff7b72;
+    --teal:      #39d353;
+    --tag-bg:    #1f2937;
+
+    /* syntax */
+    --kw:   #ff7b72;
+    --ty:   #ffa657;
+    --str:  #a5d6ff;
+    --num:  #79c0ff;
+    --cm:   #8b949e;
+    --fn:   #d2a8ff;
+    --op:   #e6edf3;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.75;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  nav {
+    width: 260px;
+    min-width: 260px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 0 0 2rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  nav::-webkit-scrollbar { width: 4px; }
+  nav::-webkit-scrollbar-track { background: transparent; }
+  nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .nav-logo {
+    padding: 1.5rem 1.25rem 1rem;
+    border-bottom: 1px solid var(--border2);
+    margin-bottom: .5rem;
+  }
+
+  .nav-logo .lang-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #0d6efd22, #58a6ff22);
+    border: 1px solid #58a6ff44;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-bottom: .6rem;
+  }
+
+  .nav-logo h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: .8rem 1.25rem .3rem;
+  }
+
+  nav a {
+    display: block;
+    padding: .38rem 1.25rem .38rem 1.5rem;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 400;
+    border-left: 2px solid transparent;
+    transition: all .15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: #58a6ff0a;
+  }
+
+  /* ── MAIN ── */
+  main {
+    flex: 1;
+    padding: 3rem 4rem 6rem;
+    max-width: 900px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    margin-bottom: 3.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    animation: fadeSlide .5s ease both;
+  }
+
+  .page-header .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: .75rem;
+  }
+
+  .page-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: .75rem;
+    background: linear-gradient(135deg, var(--text) 60%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: .75rem;
+  }
+
+  .tag {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    transition: all .2s;
+  }
+
+  .tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── SECTIONS ── */
+  section {
+    margin-bottom: 3.5rem;
+    animation: fadeSlide .4s ease both;
+  }
+
+  section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 1.1rem;
+    padding-bottom: .55rem;
+    border-bottom: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+  }
+
+  section h2 .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: #58a6ff18;
+    border: 1px solid #58a6ff33;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 1.4rem 0 .6rem;
+  }
+
+  p { margin-bottom: .75rem; color: var(--text); }
+
+  strong { color: var(--text); font-weight: 600; }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    margin: .9rem 0;
+    position: relative;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  pre::before {
+    content: attr(data-lang);
+    position: absolute;
+    top: .5rem;
+    right: .75rem;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: .7;
+  }
+
+  pre.java   { border-left: 3px solid var(--accent); }
+  pre.text   { border-left: 3px solid var(--muted); }
+  pre.memory { border-left: 3px solid var(--purple); background: #bc8cff08; }
+
+  code { font-family: 'JetBrains Mono', monospace; font-size: .875em; }
+
+  p code, li code, td code {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--orange);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* syntax highlight classes */
+  .kw  { color: var(--pink); font-weight: 500; }
+  .ty  { color: var(--orange); }
+  .str { color: var(--str); }
+  .num { color: var(--num); }
+  .cm  { color: var(--cm); font-style: italic; }
+  .fn  { color: var(--fn); }
+  .op  { color: var(--op); }
+  .an  { color: var(--teal); }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-radius: 8px;
+    padding: .85rem 1.1rem;
+    margin: 1rem 0;
+    border-left: 3px solid;
+    font-size: 14px;
+  }
+
+  .callout.warn  { background: #d2992215; border-color: var(--yellow); color: #e3b341; }
+  .callout.tip   { background: #58a6ff12; border-color: var(--accent);  color: var(--accent); }
+  .callout.rule  { background: #3fb95012; border-color: var(--green);   color: var(--green); }
+  .callout.key   { background: #ff7b7210; border-color: var(--pink);    color: #ff9b96; }
+
+  .callout strong { color: inherit; }
+
+  /* ── TABLES ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 13.5px;
+  }
+
+  th {
+    background: var(--bg3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .6rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: .55rem 1rem;
+    border-bottom: 1px solid var(--border2);
+    color: var(--text);
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg3); }
+
+  /* ── LISTS ── */
+  ul, ol {
+    padding-left: 1.4rem;
+    margin: .5rem 0 .75rem;
+  }
+
+  li { margin-bottom: .35rem; }
+
+  /* ── Q&A CARDS ── */
+  .qa-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    transition: border-color .2s;
+  }
+
+  .qa-card:hover { border-color: var(--accent); }
+
+  .qa-q {
+    background: var(--bg3);
+    padding: .85rem 1.25rem;
+    font-family: 'Syne', sans-serif;
+    font-size: .95rem;
+    font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    cursor: pointer;
+  }
+
+  .qa-q .qn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    background: #58a6ff22;
+    color: var(--accent);
+    border: 1px solid #58a6ff44;
+    padding: 3px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .qa-body {
+    padding: 1rem 1.25rem;
+    font-size: 14px;
+  }
+
+  /* ── QUICK-REF TABLE ── */
+  .quick-ref td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--purple);
+    white-space: nowrap;
+  }
+
+  /* ── FOOTER TIP ── */
+  .tip-box {
+    background: linear-gradient(135deg, #161b22, #1c2128);
+    border: 1px solid #58a6ff44;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin-top: 3rem;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+  }
+
+  .tip-box strong { color: var(--accent); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  section:nth-child(2)  { animation-delay: .05s; }
+  section:nth-child(3)  { animation-delay: .1s;  }
+  section:nth-child(4)  { animation-delay: .15s; }
+  section:nth-child(5)  { animation-delay: .2s;  }
+
+  /* ── SCROLLBAR ── */
+  main::-webkit-scrollbar { width: 6px; }
+  main::-webkit-scrollbar-track { background: transparent; }
+  main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 780px) {
+    nav { display: none; }
+    main { padding: 2rem 1.5rem 4rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════ SIDEBAR ════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="lang-badge">☕ Java</div>
+    <h2>String Interview<br>Complete Notes</h2>
+  </div>
+
+  <div class="nav-section-label">Core Concepts</div>
+  <a href="#s1">01 · String Constant Pool</a>
+  <a href="#s2">02 · new String() Behaviour</a>
+  <a href="#s3">03 · Object Count Trap</a>
+  <a href="#s4">04 · == vs equals()</a>
+  <a href="#s5">05 · intern() Method</a>
+  <a href="#s6">06 · String Immutability</a>
+  <a href="#s7">07 · Why Immutable? (5 Reasons)</a>
+  <a href="#s8">08 · toLowerCase() Tricky</a>
+  <a href="#s9">09 · Compile vs Runtime Concat</a>
+  <a href="#s10">10 · final Variable Opt.</a>
+  <a href="#s11">11 · String vs Buffer vs Builder</a>
+
+  <div class="nav-section-label">Advanced</div>
+  <a href="#s12">12 · hashCode() Formula</a>
+  <a href="#s13">13 · Collision</a>
+  <a href="#s14">14 · HashSet Internal Working</a>
+  <a href="#s15">15 · equals() + hashCode() Contract</a>
+  <a href="#s16">16 · Mutable Key Problem</a>
+  <a href="#s17">17 · HashMap Collision Handling</a>
+  <a href="#s18">18 · Custom Immutable Class</a>
+
+  <div class="nav-section-label">Q &amp; A</div>
+  <a href="#qa">17 Interview Questions</a>
+  <a href="#quickref">Quick-Ref Definitions</a>
+</nav>
+
+<!-- ════════ MAIN ════════ -->
+<main>
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="eyebrow">Core Java · Interview Prep</div>
+    <h1>Java String – Complete Interview Notes</h1>
+    <div class="tags">
+      <span class="tag">SCP</span><span class="tag">Immutability</span>
+      <span class="tag">intern()</span><span class="tag">== vs equals()</span>
+      <span class="tag">hashCode</span><span class="tag">Collision</span>
+      <span class="tag">HashMap</span><span class="tag">StringBuffer</span>
+      <span class="tag">StringBuilder</span><span class="tag">Custom Immutable</span>
+    </div>
+  </div>
+
+  <!-- ── 1 ── -->
+  <section id="s1">
+    <h2><span class="num">01</span> String Constant Pool (SCP)</h2>
+    <p><strong>What is SCP?</strong> String Constant Pool is a special memory area <strong>inside the Heap</strong> where Java stores String literals to save memory and reuse immutable String objects.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="str">"Hello"</span>;
+<span class="ty">String</span> s2 = <span class="str">"Hello"</span>;</pre>
+
+    <p><strong>What happens?</strong> Only <strong>ONE</strong> object is created in SCP. Both references point to the same object.</p>
+
+    <pre class="memory" data-lang="memory">SCP:
+[ "Hello" ]
+   ↑     ↑
+   s1    s2</pre>
+
+    <p><strong>How JVM decides:</strong></p>
+    <pre class="text" data-lang="logic">Does this literal already exist in SCP?
+   YES → reuse existing object
+   NO  → create new object</pre>
+
+    <pre class="java" data-lang="java"><span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);   <span class="cm">// true  (same SCP reference)</span></pre>
+  </section>
+
+  <!-- ── 2 ── -->
+  <section id="s2">
+    <h2><span class="num">02</span> <code>new String()</code> Behaviour</h2>
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);</pre>
+
+    <p><strong>Step 1:</strong> Literal <code>"Hello"</code> gets stored in SCP.<br>
+    <strong>Step 2:</strong> <code>new String("Hello")</code> creates a <strong>separate Heap object</strong>.</p>
+
+    <pre class="memory" data-lang="memory">SCP:  [ "Hello" ]
+Heap: [ new String("Hello") ]  ← s1 points here</pre>
+
+    <div class="callout warn">⚠️ <strong>new String()</strong> always creates a new Heap object even if the same content already exists in SCP.</div>
+
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);  <span class="cm">// 2 objects: 1 SCP + 1 Heap</span>
+<span class="ty">String</span> s2 = <span class="str">"Hello"</span>;               <span class="cm">// 0 new objects (reused from SCP)</span>
+<span class="cm">// Grand Total = 2</span></pre>
+  </section>
+
+  <!-- ── 3 ── -->
+  <section id="s3">
+    <h2><span class="num">03</span> How Many Objects? – Classic Interview Trap</h2>
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Java"</span>);  <span class="cm">// 1 Heap + 1 SCP = 2</span>
+<span class="ty">String</span> s2 = <span class="str">"Java"</span>;               <span class="cm">// "Java" already in SCP → 0 new</span>
+<span class="cm">// Total = 2</span></pre>
+
+    <table>
+      <thead><tr><th>Statement</th><th>Heap</th><th>SCP</th><th>Objects Created</th></tr></thead>
+      <tbody>
+        <tr><td><code>new String("Java")</code></td><td>✅</td><td>✅</td><td>2</td></tr>
+        <tr><td><code>"Java"</code> (second time)</td><td>❌</td><td>reused</td><td>0</td></tr>
+        <tr><td><strong>Total</strong></td><td></td><td></td><td><strong>2</strong></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 4 ── -->
+  <section id="s4">
+    <h2><span class="num">04</span> <code>==</code> vs <code>equals()</code></h2>
+    <table>
+      <thead><tr><th></th><th>==</th><th>equals()</th></tr></thead>
+      <tbody>
+        <tr><td>Compares</td><td>Reference / Memory Address</td><td>Content / Value</td></tr>
+      </tbody>
+    </table>
+
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);
+<span class="ty">String</span> s2 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);       <span class="cm">// false → different Heap objects</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">equals</span>(s2));  <span class="cm">// true  → same content</span></pre>
+  </section>
+
+  <!-- ── 5 ── -->
+  <section id="s5">
+    <h2><span class="num">05</span> <code>intern()</code> Method</h2>
+    <p><strong>Purpose:</strong> Returns the pooled reference from SCP.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);   <span class="cm">// s1 → Heap</span>
+<span class="ty">String</span> s2 = <span class="str">"Hello"</span>;               <span class="cm">// s2 → SCP</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);              <span class="cm">// false (Heap vs SCP)</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">intern</span>() == s2);     <span class="cm">// true  (both SCP now)</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">intern</span>());           <span class="cm">// "Hello"</span></pre>
+
+    <pre class="memory" data-lang="memory">s1          → Heap object
+s1.intern() → SCP object (same content)
+s2          → SCP object
+
+s1.intern() == s2 → true ✅</pre>
+
+    <p><strong>Proving SCP reuse with hashCode:</strong></p>
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Java"</span>);
+<span class="ty">String</span> s2 = <span class="str">"Java"</span>;
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">intern</span>().<span class="fn">hashCode</span>() == s2.<span class="fn">hashCode</span>()); <span class="cm">// true</span>
+<span class="cm">// Both resolve to same SCP object → same hashCode</span></pre>
+
+    <div class="callout tip">💡 <code>intern()</code> is used to <strong>get reference from SCP</strong>. Key term for interviews.</div>
+  </section>
+
+  <!-- ── 6 ── -->
+  <section id="s6">
+    <h2><span class="num">06</span> String Immutability</h2>
+    <p><strong>Immutable = once created, the value cannot be changed (unmodifiable / unchangeable).</strong></p>
+
+    <pre class="java" data-lang="java"><span class="ty">String</span> s = <span class="str">"Java"</span>;
+s.<span class="fn">concat</span>(<span class="str">"Tech"</span>);          <span class="cm">// creates a NEW object – does NOT modify s</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s);    <span class="cm">// Output: Java  (original unchanged)</span></pre>
+
+    <p><strong>What happens internally:</strong></p>
+    <pre class="memory" data-lang="memory">Before:   SCP → [ "Java" ]  ← s
+After:    SCP → [ "Java" ]  ← s (still pointing here)
+                [ "JavaTech" ]  ← new object, not assigned to s</pre>
+
+    <p><strong>Correct way to capture the result:</strong></p>
+    <pre class="java" data-lang="java">s = s.<span class="fn">concat</span>(<span class="str">"Tech"</span>);      <span class="cm">// reassign reference</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s);    <span class="cm">// JavaTech</span></pre>
+
+    <p><strong>Reference independence:</strong></p>
+    <pre class="java" data-lang="java"><span class="ty">String</span> s = <span class="str">"Hello"</span>;
+<span class="ty">String</span> a = s;
+
+s = s.<span class="fn">concat</span>(<span class="str">" World"</span>);
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s);   <span class="cm">// Hello World</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(a);   <span class="cm">// Hello  ← a still points to original</span></pre>
+
+    <div class="callout key">🔑 <strong>Key Rule: Strings never change. Only references change.</strong></div>
+  </section>
+
+  <!-- ── 7 ── -->
+  <section id="s7">
+    <h2><span class="num">07</span> Why is String Immutable? – 5 Reasons</h2>
+
+    <h3>Reason 1: Security</h3>
+    <pre class="java" data-lang="java"><span class="cm">// If String were mutable:</span>
+<span class="ty">String</span> password = <span class="str">"secret123"</span>;
+<span class="cm">// 5 references point to this password</span>
+<span class="cm">// One modifies it → ALL 5 get corrupted → Security breach!</span>
+<span class="cm">// Immutability ensures no shared reference can be altered</span></pre>
+
+    <h3>Reason 2: String Pool Possible ONLY because of Immutability</h3>
+    <pre class="java" data-lang="java"><span class="cm">// If strings were mutable, reusing from SCP would be dangerous</span>
+<span class="ty">String</span> a = <span class="str">"Java"</span>;
+<span class="ty">String</span> b = <span class="str">"Java"</span>;
+<span class="cm">// Both safely share one SCP object → memory saved ✅</span></pre>
+
+    <h3>Reason 3: Thread Safety</h3>
+    <pre class="java" data-lang="java"><span class="cm">// Immutable objects are inherently thread-safe</span>
+<span class="cm">// Multiple threads can read the same String without synchronization</span>
+<span class="cm">// No thread can modify it → no race condition</span></pre>
+
+    <h3>Reason 4: HashCode Caching → Faster HashMap</h3>
+    <pre class="java" data-lang="java"><span class="cm">// hashCode is computed ONCE at creation time and cached</span>
+<span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; map = <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();
+map.<span class="fn">put</span>(<span class="str">"Java"</span>, <span class="num">1</span>);
+map.<span class="fn">get</span>(<span class="str">"Java"</span>);   <span class="cm">// hashCode already cached → O(1) faster lookup</span></pre>
+
+    <h3>Reason 5: Class Loading Safety</h3>
+    <p>JVM uses String to load class names. If String were mutable, a class name could be altered mid-loading → security vulnerability.</p>
+  </section>
+
+  <!-- ── 8 ── -->
+  <section id="s8">
+    <h2><span class="num">08</span> <code>toLowerCase()</code> – Object Creation (Tricky)</h2>
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);
+<span class="ty">String</span> s2 = <span class="str">"hello"</span>;
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">intern</span>().<span class="fn">toLowerCase</span>().<span class="fn">hashCode</span>() == s2.<span class="fn">hashCode</span>());</pre>
+
+    <p><strong>Total Objects Created: 4</strong></p>
+    <table>
+      <thead><tr><th>Object</th><th>Location</th></tr></thead>
+      <tbody>
+        <tr><td><code>"Hello"</code> (literal)</td><td>SCP</td></tr>
+        <tr><td><code>new String("Hello")</code></td><td>Heap</td></tr>
+        <tr><td><code>"hello"</code> (literal)</td><td>SCP</td></tr>
+        <tr><td>Result of <code>toLowerCase()</code></td><td>Heap (new object)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout warn">⚠️ <code>toLowerCase()</code> does NOT automatically reuse SCP objects. Use <code>intern()</code> after to reuse SCP.</div>
+
+    <pre class="java" data-lang="java"><span class="cm">// To reuse SCP after transformation:</span>
+<span class="ty">String</span> s = s1.<span class="fn">toLowerCase</span>().<span class="fn">intern</span>();
+
+<span class="cm">// Optimization note:</span>
+<span class="str">"hello"</span>.<span class="fn">toLowerCase</span>()   <span class="cm">// may return same object (already lowercase)</span>
+<span class="str">"Hello"</span>.<span class="fn">toLowerCase</span>()   <span class="cm">// must create new object</span></pre>
+  </section>
+
+  <!-- ── 9 ── -->
+  <section id="s9">
+    <h2><span class="num">09</span> Compile-Time vs Runtime Concatenation</h2>
+
+    <h3>Compile-Time (optimized by compiler)</h3>
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="str">"Hello"</span>;
+<span class="ty">String</span> s2 = <span class="str">"Hel"</span> + <span class="str">"lo"</span>;       <span class="cm">// compiler merges → "Hello" at compile time</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);   <span class="cm">// true → same SCP object</span></pre>
+
+    <h3>Runtime (creates new Heap object)</h3>
+    <pre class="java" data-lang="java"><span class="ty">String</span> a  = <span class="str">"Hel"</span>;              <span class="cm">// non-final variable</span>
+<span class="ty">String</span> s1 = <span class="str">"Hello"</span>;
+<span class="ty">String</span> s2 = a + <span class="str">"lo"</span>;           <span class="cm">// runtime: JVM uses StringBuilder internally</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);   <span class="cm">// false → s1 in SCP, s2 in Heap</span></pre>
+
+    <p><strong>Internally, JVM converts runtime <code>+</code> to:</strong></p>
+    <pre class="java" data-lang="java"><span class="kw">new</span> <span class="ty">StringBuilder</span>().<span class="fn">append</span>(a).<span class="fn">append</span>(<span class="str">"lo"</span>).<span class="fn">toString</span>();
+<span class="cm">// → creates new Heap object</span></pre>
+  </section>
+
+  <!-- ── 10 ── -->
+  <section id="s10">
+    <h2><span class="num">10</span> <code>final</code> Variable Optimization</h2>
+    <pre class="java" data-lang="java"><span class="kw">final</span> <span class="ty">String</span> a = <span class="str">"Hel"</span>;         <span class="cm">// compile-time constant</span>
+<span class="ty">String</span> s1 = <span class="str">"Hello"</span>;
+<span class="ty">String</span> s2 = a + <span class="str">"lo"</span>;           <span class="cm">// compiler optimizes → "Hello" at compile time</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);   <span class="cm">// true → same SCP object</span></pre>
+
+    <div class="callout rule">✅ <strong>Key Rule:</strong> <code>final</code> String literals become compile-time constants. Compiler optimizes concatenation before runtime.</div>
+
+    <table>
+      <thead><tr><th>Variable type</th><th>Concatenation resolved</th><th>== result</th></tr></thead>
+      <tbody>
+        <tr><td>Non-final</td><td>Runtime (StringBuilder)</td><td><code>false</code></td></tr>
+        <tr><td><code>final</code></td><td>Compile-time</td><td><code>true</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 11 ── -->
+  <section id="s11">
+    <h2><span class="num">11</span> String vs StringBuffer vs StringBuilder</h2>
+    <table>
+      <thead><tr><th>Feature</th><th>String</th><th>StringBuffer</th><th>StringBuilder</th></tr></thead>
+      <tbody>
+        <tr><td>Mutable</td><td>❌ Immutable</td><td>✅ Mutable</td><td>✅ Mutable</td></tr>
+        <tr><td>Thread Safe</td><td>❌ No</td><td>✅ Yes (synchronized)</td><td>❌ No</td></tr>
+        <tr><td>Performance</td><td>High</td><td>Slower</td><td>Fastest</td></tr>
+        <tr><td>Use Case</td><td>Fixed values, keys</td><td>Multi-threaded env</td><td>Single-threaded (DAO)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>String (Immutable)</h3>
+    <pre class="java" data-lang="java"><span class="ty">String</span> s = <span class="str">"Java"</span>;
+s.<span class="fn">concat</span>(<span class="str">"Tech"</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s);  <span class="cm">// Java  ← unchanged</span></pre>
+
+    <h3>StringBuffer (Mutable + Thread-Safe)</h3>
+    <pre class="java" data-lang="java"><span class="ty">StringBuffer</span> sb = <span class="kw">new</span> <span class="ty">StringBuffer</span>(<span class="str">"Java"</span>);
+sb.<span class="fn">append</span>(<span class="str">"Tech"</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(sb.<span class="fn">toString</span>());  <span class="cm">// JavaTech ← changed!</span></pre>
+
+    <h3>StringBuilder (Mutable + Fastest)</h3>
+    <pre class="java" data-lang="java"><span class="ty">StringBuilder</span> sb = <span class="kw">new</span> <span class="ty">StringBuilder</span>(<span class="str">"Java"</span>);
+sb.<span class="fn">append</span>(<span class="str">"Tech"</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(sb.<span class="fn">toString</span>());  <span class="cm">// JavaTech ← changed!</span></pre>
+
+    <h3>Real-time Usage – StringBuilder in DAO Layer</h3>
+    <pre class="java" data-lang="java"><span class="kw">public</span> <span class="ty">String</span> <span class="fn">buildQuery</span>(<span class="ty">String</span> table, <span class="ty">List</span>&lt;<span class="ty">String</span>&gt; columns) {
+    <span class="ty">StringBuilder</span> query = <span class="kw">new</span> <span class="ty">StringBuilder</span>(<span class="str">"SELECT "</span>);
+    <span class="kw">for</span> (<span class="ty">String</span> col : columns) {
+        query.<span class="fn">append</span>(col).<span class="fn">append</span>(<span class="str">", "</span>);  <span class="cm">// same object modified in-place</span>
+    }
+    query.<span class="fn">append</span>(<span class="str">"FROM "</span>).<span class="fn">append</span>(table);
+    <span class="kw">return</span> query.<span class="fn">toString</span>();
+}</pre>
+
+    <h3>❌ BAD vs ✅ GOOD Pattern</h3>
+    <pre class="java" data-lang="java"><span class="cm">// ❌ BAD – new object created on every iteration</span>
+<span class="ty">String</span> query = <span class="str">""</span>;
+<span class="kw">for</span> (<span class="ty">String</span> col : columns) {
+    query += col + <span class="str">", "</span>;   <span class="cm">// wasteful!</span>
+}
+
+<span class="cm">// ✅ GOOD – single object modified in-place</span>
+<span class="ty">StringBuilder</span> query = <span class="kw">new</span> <span class="ty">StringBuilder</span>();
+<span class="kw">for</span> (<span class="ty">String</span> col : columns) {
+    query.<span class="fn">append</span>(col).<span class="fn">append</span>(<span class="str">", "</span>);
+}</pre>
+  </section>
+
+  <!-- ── 12 ── -->
+  <section id="s12">
+    <h2><span class="num">12</span> hashCode() in String</h2>
+    <p><strong>Internal formula:</strong></p>
+    <pre class="java" data-lang="java">hash = hash * <span class="num">31</span> + currentCharacter</pre>
+    <p>Why 31? It is a prime number — reduces collision probability and is efficient for bit-shifting optimization.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="str">"FB"</span>;
+<span class="ty">String</span> s2 = <span class="str">"Ea"</span>;
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">hashCode</span>());  <span class="cm">// 2236</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s2.<span class="fn">hashCode</span>());  <span class="cm">// 2236</span></pre>
+
+    <pre class="text" data-lang="calculation">"FB":  F=70,  B=66  →  70*31 + 66 = 2236
+"Ea":  E=69,  a=97  →  69*31 + 97 = 2236</pre>
+
+    <div class="callout warn">⚠️ Same hashCode does <strong>NOT</strong> mean objects are equal!</div>
+  </section>
+
+  <!-- ── 13 ── -->
+  <section id="s13">
+    <h2><span class="num">13</span> Collision</h2>
+    <p><strong>Definition:</strong> Collision occurs when two <strong>unequal</strong> objects generate the <strong>same hashCode</strong>.</p>
+
+    <pre class="java" data-lang="java"><span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"FB"</span>.<span class="fn">hashCode</span>());          <span class="cm">// 2236</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Ea"</span>.<span class="fn">hashCode</span>());          <span class="cm">// 2236</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"FB"</span>.<span class="fn">equals</span>(<span class="str">"Ea"</span>));        <span class="cm">// false → COLLISION</span></pre>
+
+    <pre class="text" data-lang="contract">The Contract:
+  Equal objects   MUST have same hashCode.       (equals true  → hashCode same)
+  Same hashCode   does NOT mean equal objects.   (hashCode same → equals may be false)</pre>
+  </section>
+
+  <!-- ── 14 ── -->
+  <section id="s14">
+    <h2><span class="num">14</span> HashSet Internal Working</h2>
+    <p>HashSet internally uses <strong>HashMap</strong>.</p>
+    <p><strong>Duplicate Check – 2 Steps:</strong></p>
+
+    <pre class="text" data-lang="flow">Step 1: Check hashCode()
+          │
+          ├── hashCode different? → Store (different bucket)
+          │
+          └── hashCode same? → Go to Step 2
+                    │
+                    ├── equals() true?  → DUPLICATE → Rejected
+                    └── equals() false? → COLLISION  → Both stored</pre>
+
+    <pre class="java" data-lang="java"><span class="ty">HashSet</span>&lt;<span class="ty">String</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="str">"FB"</span>);
+set.<span class="fn">add</span>(<span class="str">"Ea"</span>);
+<span class="cm">// Same hashCode but equals() → false → COLLISION → both stored</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set.<span class="fn">size</span>());  <span class="cm">// 2</span></pre>
+  </section>
+
+  <!-- ── 15 ── -->
+  <section id="s15">
+    <h2><span class="num">15</span> <code>equals()</code> and <code>hashCode()</code> – Override Contract</h2>
+
+    <h3>The Problem – only equals() overridden</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Employee</span> {
+    <span class="kw">int</span> id;
+    <span class="ty">Employee</span>(<span class="kw">int</span> id) { <span class="kw">this</span>.id = id; }
+
+    <span class="an">@Override</span>
+    <span class="kw">public boolean</span> <span class="fn">equals</span>(<span class="ty">Object</span> o) {
+        <span class="ty">Employee</span> e = (<span class="ty">Employee</span>) o;
+        <span class="kw">return this</span>.id == e.id;
+    }
+    <span class="cm">// hashCode NOT overridden!</span>
+}
+
+<span class="ty">HashSet</span>&lt;<span class="ty">Employee</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>));
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>));
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set.<span class="fn">size</span>());  <span class="cm">// 2 ❌ (expected 1)</span></pre>
+
+    <div class="callout rule">✅ <strong>Rule: Whenever equals() is overridden, ALWAYS override hashCode() too.</strong></div>
+
+    <h3>Correct Implementation</h3>
+    <pre class="java" data-lang="java"><span class="kw">class</span> <span class="ty">Employee</span> {
+    <span class="kw">int</span> id;
+    <span class="ty">String</span> name;
+    <span class="kw">int</span> salary;
+
+    <span class="kw">public</span> <span class="ty">Employee</span>(<span class="kw">int</span> id, <span class="ty">String</span> name, <span class="kw">int</span> salary) {
+        <span class="kw">this</span>.id = id; <span class="kw">this</span>.name = name; <span class="kw">this</span>.salary = salary;
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public boolean</span> <span class="fn">equals</span>(<span class="ty">Object</span> o) {
+        <span class="ty">Employee</span> e = (<span class="ty">Employee</span>) o;
+        <span class="kw">return</span> id == e.id &amp;&amp; <span class="ty">Objects</span>.<span class="fn">equals</span>(name, e.name);
+        <span class="cm">// salary intentionally excluded</span>
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public int</span> <span class="fn">hashCode</span>() {
+        <span class="kw">return</span> <span class="ty">Objects</span>.<span class="fn">hash</span>(id, name);  <span class="cm">// same fields as equals()</span>
+    }
+}
+
+<span class="ty">Employee</span> e1 = <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">101</span>, <span class="str">"Aryan"</span>, <span class="num">550</span>);
+<span class="ty">Employee</span> e2 = <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">101</span>, <span class="str">"Aryan"</span>, <span class="num">600</span>);  <span class="cm">// different salary</span>
+
+<span class="ty">HashSet</span>&lt;<span class="ty">Employee</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(e1); set.<span class="fn">add</span>(e2);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set.<span class="fn">size</span>());  <span class="cm">// 1 ✅ (treated as duplicate)</span></pre>
+
+    <div class="callout tip">💡 HashSet does NOT merge objects. It either stores or rejects. Salary difference is ignored here.</div>
+  </section>
+
+  <!-- ── 16 ── -->
+  <section id="s16">
+    <h2><span class="num">16</span> Mutable Key Problem in HashMap</h2>
+    <pre class="java" data-lang="java"><span class="ty">Employee</span> e = <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>);
+
+<span class="ty">HashMap</span>&lt;<span class="ty">Employee</span>, <span class="ty">String</span>&gt; map = <span class="kw">new</span> <span class="ty">HashMap</span>&lt;&gt;();
+map.<span class="fn">put</span>(e, <span class="str">"Aryan"</span>);         <span class="cm">// stored in bucket: hashCode = 1</span>
+
+e.id = <span class="num">2</span>;                    <span class="cm">// key mutated! hashCode now = 2</span>
+
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(map.<span class="fn">get</span>(e));  <span class="cm">// null ❌</span></pre>
+
+    <pre class="text" data-lang="why">put()  → bucket for hashCode 1
+e.id = 2 → hashCode now 2
+get()  → looks in bucket for hashCode 2 → not found → null</pre>
+
+    <div class="callout key">🔑 <strong>Key Rule: HashMap keys should always be immutable.</strong> This is why String is the ideal key.</div>
+  </section>
+
+  <!-- ── 17 ── -->
+  <section id="s17">
+    <h2><span class="num">17</span> HashMap Collision Handling</h2>
+    <h3>Java 7</h3>
+    <pre class="text" data-lang="java7">Uses: LinkedList chaining
+Each bucket holds a LinkedList of entries with same hashCode</pre>
+
+    <h3>Java 8+</h3>
+    <pre class="text" data-lang="java8">If bucket size > 8 entries:
+LinkedList → Red-Black Tree (for better performance)</pre>
+
+    <table>
+      <thead><tr><th>Scenario</th><th>Java 7</th><th>Java 8+</th></tr></thead>
+      <tbody>
+        <tr><td>Average</td><td>O(1)</td><td>O(1)</td></tr>
+        <tr><td>Worst case (all collisions)</td><td>O(n)</td><td>O(log n)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 18 ── -->
+  <section id="s18">
+    <h2><span class="num">18</span> Writing a Custom Immutable Class</h2>
+    <p><strong>Rules to follow (5):</strong></p>
+    <ol>
+      <li>Declare class as <code>final</code> → prevents subclassing</li>
+      <li>Declare all fields as <code>private</code> and <code>final</code> → no reassignment</li>
+      <li>No setter methods → write only getters</li>
+      <li>Initialize all fields via constructor only</li>
+      <li>For mutable fields (List, Date) → return a <strong>deep copy</strong> in getter</li>
+    </ol>
+
+    <pre class="java" data-lang="java"><span class="kw">public final class</span> <span class="ty">Employee</span> {   <span class="cm">// Rule 1: final class</span>
+
+    <span class="kw">private final int</span>         id;       <span class="cm">// Rule 2: private + final</span>
+    <span class="kw">private final</span> <span class="ty">String</span>      name;
+    <span class="kw">private final</span> <span class="ty">List</span>&lt;<span class="ty">String</span>&gt; skills;  <span class="cm">// mutable – needs defensive copy</span>
+
+    <span class="cm">// Rule 4: Constructor only</span>
+    <span class="kw">public</span> <span class="ty">Employee</span>(<span class="kw">int</span> id, <span class="ty">String</span> name, <span class="ty">List</span>&lt;<span class="ty">String</span>&gt; skills) {
+        <span class="kw">this</span>.id     = id;
+        <span class="kw">this</span>.name   = name;
+        <span class="kw">this</span>.skills = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;(skills);  <span class="cm">// defensive copy on input</span>
+    }
+
+    <span class="cm">// Rule 3: Only getters – no setters</span>
+    <span class="kw">public int</span>    <span class="fn">getId</span>()   { <span class="kw">return</span> id; }
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getName</span>() { <span class="kw">return</span> name; }
+
+    <span class="cm">// Rule 5: Return copy of mutable field</span>
+    <span class="kw">public</span> <span class="ty">List</span>&lt;<span class="ty">String</span>&gt; <span class="fn">getSkills</span>() {
+        <span class="kw">return new</span> <span class="ty">ArrayList</span>&lt;&gt;(skills);   <span class="cm">// defensive copy on output</span>
+    }
+}</pre>
+
+    <pre class="java" data-lang="java"><span class="cm">// Testing immutability</span>
+<span class="ty">Employee</span> emp = <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>, <span class="str">"Alice"</span>, <span class="ty">Arrays</span>.<span class="fn">asList</span>(<span class="str">"Java"</span>, <span class="str">"Spring"</span>));
+
+emp.<span class="fn">getSkills</span>().<span class="fn">add</span>(<span class="str">"Python"</span>);            <span class="cm">// modifies only the copy</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(emp.<span class="fn">getSkills</span>());      <span class="cm">// [Java, Spring] ← original safe!</span></pre>
+  </section>
+
+  <!-- ════════ Q&A ════════ -->
+  <section id="qa">
+    <h2><span class="num">Q&A</span> Interview Questions – Complete Set</h2>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q1</span> What is String Constant Pool (SCP)?</div>
+      <div class="qa-body"><p>SCP is a special memory region inside the Heap where Java stores string literals. JVM checks SCP first; if the same value exists, it reuses the reference — saving Heap memory.</p></div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q2</span> How many objects are created: new String("Java") and "Java"?</div>
+      <div class="qa-body">
+        <p><strong>2 objects total.</strong> Statement 1 → 1 Heap + 1 SCP = 2. Statement 2 → "Java" already in SCP → reused, 0 new.</p>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q3</span> What is the difference between == and equals()?</div>
+      <div class="qa-body">
+        <table><thead><tr><th></th><th>==</th><th>equals()</th></tr></thead>
+        <tbody><tr><td>Compares</td><td>Reference</td><td>Content</td></tr></tbody></table>
+        <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);
+<span class="ty">String</span> s2 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Hello"</span>);
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);       <span class="cm">// false</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">equals</span>(s2));  <span class="cm">// true</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q4</span> What is intern() and when is it used?</div>
+      <div class="qa-body">
+        <p>Returns the SCP reference of a string. If already present, that reference is returned; otherwise the string is added to SCP first.</p>
+        <pre class="java" data-lang="java"><span class="ty">String</span> s1 = <span class="kw">new</span> <span class="ty">String</span>(<span class="str">"Java"</span>);
+<span class="ty">String</span> s2 = <span class="str">"Java"</span>;
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1 == s2);           <span class="cm">// false</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(s1.<span class="fn">intern</span>() == s2);  <span class="cm">// true</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q5</span> Why is String immutable in Java? (5 reasons)</div>
+      <div class="qa-body">
+        <ol>
+          <li><strong>Security</strong> – passwords/DB URLs; immutability prevents alteration</li>
+          <li><strong>String Pool</strong> – SCP reuse is only safe because values never change</li>
+          <li><strong>Thread Safety</strong> – no synchronization needed; safe across threads</li>
+          <li><strong>HashCode Caching</strong> – computed once; ideal HashMap key</li>
+          <li><strong>Class Loading Safety</strong> – JVM uses String for class names</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q6</span> Output: String s1 = "Hel" + "lo"; String s2 = "Hello"; s1 == s2?</div>
+      <div class="qa-body"><p><strong>true</strong> – Compiler optimizes <code>"Hel" + "lo"</code> to <code>"Hello"</code> at compile time. Both use same SCP object.</p></div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q7</span> Output: String a = "Hel"; String s2 = a + "lo"; s1 == s2?</div>
+      <div class="qa-body"><p><strong>false</strong> – <code>a</code> is non-final → concatenation at runtime via StringBuilder → new Heap object.</p></div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q8</span> What if a is declared final?</div>
+      <div class="qa-body"><p><strong>true</strong> – <code>final</code> makes <code>a</code> a compile-time constant; compiler optimizes to <code>"Hello"</code> → same SCP object.</p></div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q9</span> Can two unequal objects have the same hashCode?</div>
+      <div class="qa-body">
+        <p><strong>Yes.</strong> This is called a <strong>collision</strong>.</p>
+        <pre class="java" data-lang="java"><span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"FB"</span>.<span class="fn">hashCode</span>());   <span class="cm">// 2236</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"Ea"</span>.<span class="fn">hashCode</span>());   <span class="cm">// 2236</span>
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(<span class="str">"FB"</span>.<span class="fn">equals</span>(<span class="str">"Ea"</span>)); <span class="cm">// false → collision</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q10</span> Can equal objects have different hashCodes?</div>
+      <div class="qa-body"><p><strong>No.</strong> Equal objects <strong>must</strong> have the same hashCode. The reverse is not guaranteed.</p></div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q11</span> Problem if only equals() is overridden but not hashCode()?</div>
+      <div class="qa-body">
+        <p>JVM uses default hashCode (memory address) → different buckets → <code>equals()</code> never called → duplicates not detected.</p>
+        <pre class="java" data-lang="java"><span class="ty">HashSet</span>&lt;<span class="ty">Employee</span>&gt; set = <span class="kw">new</span> <span class="ty">HashSet</span>&lt;&gt;();
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>));
+set.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>));
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(set.<span class="fn">size</span>());  <span class="cm">// 2 ❌</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q12</span> What happens when a HashMap key is mutated after insertion?</div>
+      <div class="qa-body">
+        <p>hashCode changes → <code>get()</code> looks in wrong bucket → returns <code>null</code>.</p>
+        <pre class="java" data-lang="java"><span class="ty">Employee</span> e = <span class="kw">new</span> <span class="ty">Employee</span>(<span class="num">1</span>);
+map.<span class="fn">put</span>(e, <span class="str">"Aryan"</span>);
+e.id = <span class="num">2</span>;
+<span class="ty">System</span>.<span class="fn">out</span>.<span class="fn">println</span>(map.<span class="fn">get</span>(e));  <span class="cm">// null</span></pre>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q13</span> How does HashMap handle collisions internally?</div>
+      <div class="qa-body">
+        <ul>
+          <li><strong>Java 7:</strong> LinkedList chaining → O(n) worst case</li>
+          <li><strong>Java 8+:</strong> If bucket entries &gt; 8 → Red-Black Tree → O(log n)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q14</span> Difference between StringBuffer and StringBuilder?</div>
+      <div class="qa-body">
+        <table><thead><tr><th></th><th>StringBuffer</th><th>StringBuilder</th></tr></thead>
+        <tbody>
+          <tr><td>Synchronized</td><td>✅ Yes</td><td>❌ No</td></tr>
+          <tr><td>Performance</td><td>Slower</td><td>Faster</td></tr>
+          <tr><td>Use Case</td><td>Multi-threaded</td><td>Single-threaded (DAO)</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q15</span> Where did you use StringBuilder in your project?</div>
+      <div class="qa-body"><p>In the DAO layer for building <strong>dynamic SQL queries</strong>. Each <code>append()</code> modifies the same object — no new objects created, making it memory-efficient.</p></div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q16</span> How to write a custom immutable class?</div>
+      <div class="qa-body">
+        <ol>
+          <li><code>final</code> class</li>
+          <li><code>private final</code> fields</li>
+          <li>No setters</li>
+          <li>Constructor-only initialization</li>
+          <li>Defensive copy for mutable fields</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="qa-card">
+      <div class="qa-q"><span class="qn">Q17</span> Why is String the best HashMap key?</div>
+      <div class="qa-body">
+        <ul>
+          <li><strong>Immutable</strong> → hashCode never changes after insertion</li>
+          <li><strong>HashCode cached</strong> → no recomputation → faster lookups</li>
+          <li><strong>Stable and Secure</strong></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════ QUICK REF ════════ -->
+  <section id="quickref">
+    <h2><span class="num">REF</span> Quick-Reference Definitions</h2>
+    <table class="quick-ref">
+      <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td>SCP</td><td>Special memory area inside Heap for reusing String literals</td></tr>
+        <tr><td>Immutability</td><td>Object state cannot change after creation</td></tr>
+        <tr><td>Collision</td><td>Two unequal objects generating the same hashCode</td></tr>
+        <tr><td>intern()</td><td>Returns the pooled SCP reference of a String</td></tr>
+        <tr><td>Compile-Time Concat</td><td>Concatenation optimized by compiler before execution</td></tr>
+        <tr><td>Runtime Concat</td><td>Concatenation using StringBuilder during execution</td></tr>
+        <tr><td>Method Hiding</td><td>Static method in child with same signature as parent (not overriding)</td></tr>
+        <tr><td>Defensive Copy</td><td>Returning a copy of mutable field to protect original data</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FOOTER TIP -->
+  <div class="tip-box">
+    💡 <strong>Interview Tip:</strong> Always relate answers to real-project scenarios.<br>
+    <em>"In my Spring Boot project, I used StringBuilder in the DAO layer because each append() modifies the same object..."</em><br>
+    <em>"We used String as the HashMap key because it is immutable and caches its hashCode..."</em><br><br>
+    This instantly sets you apart from candidates who give only textbook answers.
+  </div>
+
+</main>
+</body>
+</html>
