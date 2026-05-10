@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Java Exception Handling Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Syne:wght@600;700;800&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<style>
+:root{
+--bg:#0d1117;
+--bg2:#161b22;
+--bg3:#1f2630;
+--border:#30363d;
+--text:#e6edf3;
+--muted:#8b949e;
+--accent:#ff7b72;
+--green:#3fb950;
+--blue:#58a6ff;
+--yellow:#d29922;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:var(--bg);
+color:var(--text);
+font-family:'DM Sans',sans-serif;
+line-height:1.8;
+display:flex;
+}
+
+nav{
+width:280px;
+height:100vh;
+overflow-y:auto;
+position:sticky;
+top:0;
+background:var(--bg2);
+border-right:1px solid var(--border);
+padding-bottom:2rem;
+}
+
+.nav-logo{
+padding:1.5rem;
+border-bottom:1px solid var(--border);
+}
+
+.lang{
+display:inline-block;
+padding:4px 10px;
+background:#ff7b7218;
+border:1px solid #ff7b7240;
+color:var(--accent);
+border-radius:6px;
+font-size:11px;
+margin-bottom:10px;
+font-family:'JetBrains Mono',monospace;
+}
+
+.nav-logo h2{
+font-size:18px;
+line-height:1.4;
+}
+
+nav a{
+display:block;
+padding:.6rem 1.5rem;
+text-decoration:none;
+color:var(--muted);
+font-size:13px;
+border-left:2px solid transparent;
+transition:.2s;
+}
+
+nav a:hover{
+color:var(--accent);
+border-left-color:var(--accent);
+background:#ff7b7208;
+}
+
+main{
+flex:1;
+padding:3rem;
+max-width:1000px;
+margin:auto;
+}
+
+.header{
+margin-bottom:3rem;
+padding-bottom:2rem;
+border-bottom:1px solid var(--border);
+}
+
+.header h1{
+font-size:3rem;
+margin-bottom:1rem;
+}
+
+.tags{
+display:flex;
+flex-wrap:wrap;
+gap:.5rem;
+}
+
+.tag{
+padding:5px 10px;
+border-radius:6px;
+background:var(--bg3);
+border:1px solid var(--border);
+font-size:12px;
+color:var(--muted);
+}
+
+section{
+margin-bottom:3rem;
+}
+
+section h2{
+font-size:1.5rem;
+margin-bottom:1rem;
+padding-bottom:.7rem;
+border-bottom:1px solid var(--border);
+display:flex;
+gap:.8rem;
+align-items:center;
+}
+
+.num{
+background:#ff7b7218;
+color:var(--accent);
+padding:4px 9px;
+border-radius:6px;
+font-size:12px;
+font-family:'JetBrains Mono',monospace;
+}
+
+p{
+margin-bottom:1rem;
+}
+
+pre{
+background:var(--bg2);
+border:1px solid var(--border);
+border-left:4px solid var(--accent);
+border-radius:12px;
+padding:1.2rem;
+overflow-x:auto;
+margin:1rem 0;
+font-size:13px;
+line-height:1.7;
+font-family:'JetBrains Mono',monospace;
+}
+
+.callout{
+padding:1rem 1.2rem;
+border-radius:10px;
+margin:1rem 0;
+border-left:4px solid var(--blue);
+background:#58a6ff12;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:1rem;
+}
+
+th{
+background:var(--bg3);
+color:var(--accent);
+padding:.9rem;
+text-align:left;
+}
+
+td{
+padding:.9rem;
+border-bottom:1px solid var(--border);
+}
+
+.qa-card{
+background:var(--bg2);
+border:1px solid var(--border);
+border-radius:12px;
+margin-bottom:1.2rem;
+overflow:hidden;
+}
+
+.qa-q{
+padding:1rem 1.2rem;
+background:var(--bg3);
+font-weight:700;
+border-bottom:1px solid var(--border);
+}
+
+.qa-body{
+padding:1rem 1.2rem;
+}
+
+.tip-box{
+margin-top:2rem;
+padding:1.4rem;
+border-radius:12px;
+background:linear-gradient(135deg,#161b22,#1f2630);
+border:1px solid #ff7b7240;
+}
+
+@media(max-width:900px){
+body{
+flex-direction:column;
+}
+
+nav{
+width:100%;
+height:auto;
+position:relative;
+}
+
+main{
+padding:2rem 1.2rem;
+}
+}
+
+.qa-q{
+display:flex;
+align-items:flex-start;
+gap:.8rem;
+}
+
+.qn{
+font-family:'JetBrains Mono',monospace;
+font-size:10px;
+font-weight:700;
+background:#ff7b7218;
+color:var(--accent);
+border:1px solid #ff7b7240;
+padding:3px 8px;
+border-radius:5px;
+white-space:nowrap;
+margin-top:2px;
+}
+</style>
+</head>
+<body>
+<nav>
+<a class="nav-back" href="index.html">← Back to Hub</a>
+<div class="nav-logo">
+<div class="lang">☕ Java</div>
+<h2>Exception Handling<br/>Interview Notes</h2>
+</div>
+<a href="#s1">01 · What is Exception?</a>
+<a href="#s2">02 · Exception Hierarchy</a>
+<a href="#s3">03 · Checked vs Unchecked</a>
+<a href="#s4">04 · try-catch-finally</a>
+<a href="#s5">05 · throw vs throws</a>
+<a href="#s6">06 · Custom Exception</a>
+<a href="#s7">07 · try-with-resources</a>
+<a href="#s8">08 · Important Interview Questions</a>
+<a href="#s9">09 · Quick Revision</a>
+</nav>
+<main>
+<div class="header">
+<h1>Java Exception Handling</h1>
+<div class="tags">
+<span class="tag">Checked Exception</span>
+<span class="tag">Unchecked Exception</span>
+<span class="tag">try-catch</span>
+<span class="tag">finally</span>
+<span class="tag">throw</span>
+<span class="tag">throws</span>
+<span class="tag">Custom Exception</span>
+<span class="tag">try-with-resources</span>
+</div>
+</div>
+<section id="s1">
+<h2><span class="num">01</span> What is Exception?</h2>
+<p>
+An Exception is an unwanted event that interrupts the normal flow of a program during execution.
+</p>
+<div class="callout">
+Strong interview point:
+Errors are generally unrecoverable while Exceptions can usually be handled.
+</div>
+<pre>
+System.out.println("Start");
+
+int a = 10 / 0;
+
+System.out.println("End");
+</pre>
+<p>
+The program crashes because ArithmeticException occurs.
+</p>
+</section>
+<section id="s2">
+<h2><span class="num">02</span> Exception Hierarchy</h2>
+<pre>
+Throwable
+ ├── Error
+ │    ├── OutOfMemoryError
+ │    └── StackOverflowError
+ │
+ └── Exception
+      ├── IOException
+      ├── SQLException
+      ├── RuntimeException
+      │     ├── NullPointerException
+      │     ├── ArithmeticException
+      │     ├── ArrayIndexOutOfBoundsException
+      │     └── NumberFormatException
+</pre>
+<table>
+<tr>
+<th>Type</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>Error</td>
+<td>Serious issue, generally not recoverable</td>
+</tr>
+<tr>
+<td>Checked Exception</td>
+<td>Checked at compile time</td>
+</tr>
+<tr>
+<td>Unchecked Exception</td>
+<td>Occurs at runtime</td>
+</tr>
+</table>
+</section>
+<section id="s3">
+<h2><span class="num">03</span> Checked vs Unchecked Exception</h2>
+<table>
+<tr>
+<th>Checked Exception</th>
+<th>Unchecked Exception</th>
+</tr>
+<tr>
+<td>Checked at compile time</td>
+<td>Occurs at runtime</td>
+</tr>
+<tr>
+<td>Must handle using try-catch or throws</td>
+<td>Handling optional</td>
+</tr>
+<tr>
+<td>IOException</td>
+<td>NullPointerException</td>
+</tr>
+<tr>
+<td>SQLException</td>
+<td>ArithmeticException</td>
+</tr>
+</table>
+<pre>
+FileReader fr = new FileReader("abc.txt");
+</pre>
+<p>
+This gives compile time error because FileNotFoundException is checked.
+</p>
+</section>
+<section id="s4">
+<h2><span class="num">04</span> try-catch-finally</h2>
+<pre>
+try {
+    int a = 10 / 0;
+}
+catch (ArithmeticException e) {
+    System.out.println("Cannot divide by zero");
+}
+finally {
+    System.out.println("finally always executes");
+}
+</pre>
+<div class="callout">
+finally block executes whether exception occurs or not.
+Used for cleanup like closing DB connection/files.
+</div>
+<h3>Multiple Catch</h3>
+<pre>
+try {
+    String s = null;
+    System.out.println(s.length());
+}
+catch (ArithmeticException e) {
+    System.out.println("Arithmetic");
+}
+catch (NullPointerException e) {
+    System.out.println("Null");
+}
+</pre>
+</section>
+<section id="s5">
+<h2><span class="num">05</span> throw vs throws</h2>
+<table>
+<tr>
+<th>throw</th>
+<th>throws</th>
+</tr>
+<tr>
+<td>Used to explicitly throw exception</td>
+<td>Used to declare exception</td>
+</tr>
+<tr>
+<td>Used inside method</td>
+<td>Used in method signature</td>
+</tr>
+</table>
+<pre>
+public void validate(int age) {
+
+    if(age &lt; 18){
+        throw new ArithmeticException("Not eligible");
+    }
+}
+</pre>
+<pre>
+public void readFile() throws IOException {
+
+}
+</pre>
+</section>
+<section id="s6">
+<h2><span class="num">06</span> Custom Exception</h2>
+<pre>
+class InvalidAgeException extends Exception {
+
+    public InvalidAgeException(String msg){
+        super(msg);
+    }
+}
+</pre>
+<pre>
+public class Test {
+
+    static void checkAge(int age)
+            throws InvalidAgeException {
+
+        if(age &lt; 18){
+            throw new InvalidAgeException(
+                "Age must be 18+"
+            );
+        }
+
+        System.out.println("Eligible");
+    }
+}
+</pre>
+<div class="callout">
+Custom exceptions are heavily asked in Spring Boot and banking project interviews.
+</div>
+</section>
+<section id="s7">
+<h2><span class="num">07</span> try-with-resources</h2>
+<p>
+Introduced in Java 7 to automatically close resources.
+</p>
+<pre>
+try(
+    BufferedReader br =
+        new BufferedReader(
+            new FileReader("abc.txt")
+        )
+){
+    System.out.println(br.readLine());
+}
+catch(IOException e){
+    e.printStackTrace();
+}
+</pre>
+<div class="callout">
+Resource must implement AutoCloseable interface.
+</div>
+</section>
+<section id="s8">
+<h2><span class="num">08</span> Important Interview Questions</h2>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q1</span>
+<span>What is the difference between Error and Exception?</span>
+</div>
+<div class="qa-body">
+    Exception can usually be handled and recovered from, whereas Error represents serious JVM/system-level problems like OutOfMemoryError and StackOverflowError.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q2</span>
+<span>Difference between Checked and Unchecked Exception?</span>
+</div>
+<div class="qa-body">
+    Checked exceptions are checked at compile time and must be handled using try-catch or throws. Unchecked exceptions occur at runtime and handling is optional.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q3</span>
+<span>What is the difference between throw and throws?</span>
+</div>
+<div class="qa-body">
+    throw is used to explicitly throw an exception object, while throws is used in method signatures to declare possible exceptions.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q4</span>
+<span>Can finally block skip execution?</span>
+</div>
+<div class="qa-body">
+    Yes. finally may not execute in cases like System.exit(), JVM crash, or power failure.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q5</span>
+<span>Can we write try block without catch block?</span>
+</div>
+<div class="qa-body">
+    Yes, but it must be followed by finally block. try alone is invalid.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q6</span>
+<span>Can we have multiple catch blocks?</span>
+</div>
+<div class="qa-body">
+    Yes. Multiple catch blocks are allowed, but child exceptions must come before parent exceptions otherwise compile-time error occurs.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q7</span>
+<span>Why child exception catch must come before parent exception?</span>
+</div>
+<div class="qa-body">
+    Because parent catch block can already handle child exceptions, making child catch unreachable.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q8</span>
+<span>What happens if exception occurs and no catch block handles it?</span>
+</div>
+<div class="qa-body">
+    JVM's default exception handler terminates the program and prints stack trace.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q9</span>
+<span>What is stack trace?</span>
+</div>
+<div class="qa-body">
+    Stack trace shows exception type, message, and sequence of method calls where exception occurred.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q10</span>
+<span>Difference between final, finally and finalize?</span>
+</div>
+<div class="qa-body">
+    final is keyword, finally is block used in exception handling, and finalize() is method called by garbage collector before object destruction.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q11</span>
+<span>Can we catch Error?</span>
+</div>
+<div class="qa-body">
+    Technically yes, but generally not recommended because Errors indicate critical JVM issues.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q12</span>
+<span>What is custom exception?</span>
+</div>
+<div class="qa-body">
+    User-defined exception created by extending Exception or RuntimeException classes for business-specific validation.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q13</span>
+<span>Why checked exceptions exist in Java?</span>
+</div>
+<div class="qa-body">
+    To force developers to handle recoverable situations like file handling or database connectivity.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q14</span>
+<span>What is try-with-resources?</span>
+</div>
+<div class="qa-body">
+    Introduced in Java 7 to automatically close resources that implement AutoCloseable interface.
+  </div>
+</div>
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q15</span>
+<span>Can constructor throw exception?</span>
+</div>
+<div class="qa-body">
+    Yes. Constructors can throw exceptions using throws keyword and object creation fails if exception occurs.
+  </div>
+</div>
+</section>
+<section id="s9">
+<h2><span class="num">09</span> Quick Revision</h2>
+<table>
+<tr>
+<th>Keyword</th>
+<th>Purpose</th>
+</tr>
+<tr>
+<td>try</td>
+<td>Wrap risky code</td>
+</tr>
+<tr>
+<td>catch</td>
+<td>Handle exception</td>
+</tr>
+<tr>
+<td>finally</td>
+<td>Cleanup code</td>
+</tr>
+<tr>
+<td>throw</td>
+<td>Explicitly throw exception</td>
+</tr>
+<tr>
+<td>throws</td>
+<td>Declare exception</td>
+</tr>
+</table>
+<div class="tip-box">
+<h3>🔥 Interview Tips</h3>
+<ul>
+<li>Understand checked vs unchecked properly.</li>
+<li>throw vs throws is extremely common.</li>
+<li>Know exception hierarchy.</li>
+<li>Custom exception is frequently asked.</li>
+<li>finally block edge cases are important.</li>
+</ul>
+</div>
+</section>
+</main>
+</body>
+</html>

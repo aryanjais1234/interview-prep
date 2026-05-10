@@ -1,0 +1,1030 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Java Multithreading Complete Interview Notes</title>
+
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--bg:#0d1117;
+--bg2:#161b22;
+--bg3:#1f2630;
+--border:#30363d;
+--text:#e6edf3;
+--muted:#8b949e;
+--accent:#58a6ff;
+--green:#3fb950;
+--yellow:#d29922;
+--pink:#ff7b72;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+background:var(--bg);
+color:var(--text);
+font-family:'DM Sans',sans-serif;
+line-height:1.8;
+display:flex;
+}
+
+nav{
+width:290px;
+min-width:290px;
+height:100vh;
+overflow-y:auto;
+position:sticky;
+top:0;
+background:var(--bg2);
+border-right:1px solid var(--border);
+padding-bottom:2rem;
+}
+
+.nav-logo{
+padding:1.5rem;
+border-bottom:1px solid var(--border);
+}
+
+.lang{
+display:inline-block;
+padding:4px 10px;
+background:#58a6ff18;
+border:1px solid #58a6ff40;
+color:var(--accent);
+border-radius:6px;
+font-size:11px;
+margin-bottom:10px;
+font-family:'JetBrains Mono',monospace;
+}
+
+.nav-logo h2{
+font-size:18px;
+line-height:1.4;
+}
+
+nav a{
+display:block;
+padding:.55rem 1.5rem;
+text-decoration:none;
+color:var(--muted);
+font-size:12.5px;
+border-left:2px solid transparent;
+transition:.2s;
+line-height:1.5;
+}
+
+nav a:hover{
+color:var(--accent);
+border-left-color:var(--accent);
+background:#58a6ff08;
+}
+
+main{
+flex:1;
+padding:3rem;
+max-width:1100px;
+margin:auto;
+}
+
+.header{
+margin-bottom:3rem;
+padding-bottom:2rem;
+border-bottom:1px solid var(--border);
+}
+
+.header h1{
+font-size:3rem;
+margin-bottom:1rem;
+}
+
+.tags{
+display:flex;
+flex-wrap:wrap;
+gap:.5rem;
+}
+
+.tag{
+padding:5px 10px;
+border-radius:6px;
+background:var(--bg3);
+border:1px solid var(--border);
+font-size:12px;
+color:var(--muted);
+}
+
+section{
+margin-bottom:3rem;
+}
+
+section h2{
+font-size:1.5rem;
+margin-bottom:1rem;
+padding-bottom:.7rem;
+border-bottom:1px solid var(--border);
+display:flex;
+gap:.8rem;
+align-items:center;
+}
+
+.num{
+background:#58a6ff18;
+color:var(--accent);
+padding:4px 9px;
+border-radius:6px;
+font-size:12px;
+font-family:'JetBrains Mono',monospace;
+}
+
+p{margin-bottom:1rem}
+
+pre{
+background:var(--bg2);
+border:1px solid var(--border);
+border-left:4px solid var(--accent);
+border-radius:12px;
+padding:1.2rem;
+overflow-x:auto;
+margin:1rem 0;
+font-size:13px;
+line-height:1.7;
+font-family:'JetBrains Mono',monospace;
+}
+
+.callout{
+padding:1rem 1.2rem;
+border-radius:10px;
+margin:1rem 0;
+border-left:4px solid var(--accent);
+background:#58a6ff12;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:1rem;
+}
+
+th{
+background:var(--bg3);
+color:var(--accent);
+padding:.9rem;
+text-align:left;
+}
+
+td{
+padding:.9rem;
+border-bottom:1px solid var(--border);
+}
+
+.qa-card{
+background:var(--bg2);
+border:1px solid var(--border);
+border-radius:12px;
+margin-bottom:1.2rem;
+overflow:hidden;
+}
+
+.qa-q{
+padding:1rem 1.2rem;
+background:var(--bg3);
+font-weight:700;
+display:flex;
+gap:.8rem;
+align-items:flex-start;
+}
+
+.qn{
+font-family:'JetBrains Mono',monospace;
+font-size:10px;
+font-weight:700;
+background:#58a6ff18;
+color:var(--accent);
+border:1px solid #58a6ff40;
+padding:3px 8px;
+border-radius:5px;
+white-space:nowrap;
+margin-top:2px;
+}
+
+.qa-body{
+padding:1rem 1.2rem;
+}
+
+.tip-box{
+margin-top:2rem;
+padding:1.4rem;
+border-radius:12px;
+background:linear-gradient(135deg,#161b22,#1f2630);
+border:1px solid #58a6ff40;
+}
+
+@media(max-width:900px){
+body{flex-direction:column}
+nav{
+width:100%;
+height:auto;
+position:relative;
+}
+main{
+padding:2rem 1.2rem;
+}
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+<a class="nav-back" href="index.html">← Back to Hub</a>
+<div class="nav-logo">
+<div class="lang">☕ Java</div>
+<h2>Multithreading<br>Complete Notes</h2>
+</div>
+
+<a href="#s1">01 · Process vs Thread</a>
+<a href="#s2">02 · JVM Internals</a>
+<a href="#s3">03 · Thread Lifecycle</a>
+<a href="#s4">04 · Creating Thread</a>
+<a href="#s5">05 · Thread Methods</a>
+<a href="#s6">06 · Synchronization</a>
+<a href="#s7">07 · Race Condition</a>
+<a href="#s8">08 · Deadlock</a>
+<a href="#s9">09 · Inter Thread Communication</a>
+<a href="#s10">10 · volatile Keyword</a>
+<a href="#s11">11 · Executor Framework</a>
+<a href="#s12">12 · Callable & Future</a>
+<a href="#s13">13 · Thread Pool</a>
+<a href="#s14">14 · Concurrent Collections</a>
+<a href="#s15">15 · Most Asked Interview Questions</a>
+
+</nav>
+
+<main>
+
+<div class="header">
+<h1>Java Multithreading</h1>
+
+<div class="tags">
+<span class="tag">Thread</span>
+<span class="tag">Process</span>
+<span class="tag">Synchronization</span>
+<span class="tag">Deadlock</span>
+<span class="tag">volatile</span>
+<span class="tag">ExecutorService</span>
+<span class="tag">Callable</span>
+<span class="tag">Future</span>
+<span class="tag">ConcurrentHashMap</span>
+<span class="tag">Thread Pool</span>
+</div>
+</div>
+
+<section id="s1">
+<h2><span class="num">01</span> Process vs Thread</h2>
+
+<p>
+A Process is an independent program running in memory while Thread is a lightweight unit of execution inside a process.
+</p>
+
+<pre>
+Chrome Browser Process
+   ├── UI Thread
+   ├── Rendering Thread
+   ├── Network Thread
+   └── Background Worker Thread
+</pre>
+
+<table>
+<tr>
+<th>Process</th>
+<th>Thread</th>
+</tr>
+
+<tr>
+<td>Heavyweight</td>
+<td>Lightweight</td>
+</tr>
+
+<tr>
+<td>Separate memory</td>
+<td>Shared memory</td>
+</tr>
+
+<tr>
+<td>Slow context switch</td>
+<td>Fast context switch</td>
+</tr>
+
+<tr>
+<td>Independent</td>
+<td>Dependent on process</td>
+</tr>
+
+</table>
+
+<div class="callout">
+Interview Point:
+Java applications run as a single process but can contain multiple threads.
+</div>
+
+</section>
+
+<section id="s2">
+<h2><span class="num">02</span> How JVM Handles Threads Internally</h2>
+
+<p>
+When Java program starts:
+</p>
+
+<pre>
+JVM Process Starts
+    ↓
+Main Thread Created
+    ↓
+Main Method Executes
+    ↓
+JVM Also Creates:
+   • GC Thread
+   • Compiler Thread
+   • Signal Dispatcher
+   • Finalizer Thread
+</pre>
+
+<p>
+Java threads are mapped to native OS threads.
+</p>
+
+<div class="callout">
+Important:
+JDK provides APIs but actual scheduling is done by Operating System scheduler.
+</div>
+
+<h3>Context Switching</h3>
+
+<p>
+CPU switches between threads very fast creating illusion of parallelism.
+</p>
+
+</section>
+
+<section id="s3">
+<h2><span class="num">03</span> Thread Lifecycle</h2>
+
+<pre>
+NEW
+ ↓
+RUNNABLE
+ ↓
+RUNNING
+ ↓
+WAITING / BLOCKED / TIMED_WAITING
+ ↓
+TERMINATED
+</pre>
+
+<table>
+
+<tr>
+<th>State</th>
+<th>Description</th>
+</tr>
+
+<tr>
+<td>NEW</td>
+<td>Thread object created</td>
+</tr>
+
+<tr>
+<td>RUNNABLE</td>
+<td>Ready to run</td>
+</tr>
+
+<tr>
+<td>BLOCKED</td>
+<td>Waiting for monitor lock</td>
+</tr>
+
+<tr>
+<td>WAITING</td>
+<td>Waiting indefinitely</td>
+</tr>
+
+<tr>
+<td>TIMED_WAITING</td>
+<td>Waiting for specified time</td>
+</tr>
+
+<tr>
+<td>TERMINATED</td>
+<td>Execution finished</td>
+</tr>
+
+</table>
+
+</section>
+
+<section id="s4">
+<h2><span class="num">04</span> Creating Threads</h2>
+
+<h3>1. Extending Thread Class</h3>
+
+<pre>
+class MyThread extends Thread {
+
+    public void run() {
+        System.out.println(
+            Thread.currentThread().getName()
+        );
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+
+        MyThread t1 = new MyThread();
+        t1.start();
+    }
+}
+</pre>
+
+<h3>2. Implementing Runnable</h3>
+
+<pre>
+class MyTask implements Runnable {
+
+    public void run() {
+        System.out.println("Task running");
+    }
+}
+
+Thread t = new Thread(new MyTask());
+t.start();
+</pre>
+
+<div class="callout">
+Interview Point:
+Runnable is preferred because Java supports single inheritance.
+</div>
+
+<h3>3. Lambda Thread</h3>
+
+<pre>
+Thread t = new Thread(() -> {
+    System.out.println("Lambda Thread");
+});
+
+t.start();
+</pre>
+
+</section>
+
+<section id="s5">
+<h2><span class="num">05</span> Important Thread Methods</h2>
+
+<table>
+
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td>start()</td>
+<td>Starts new thread</td>
+</tr>
+
+<tr>
+<td>run()</td>
+<td>Contains task logic</td>
+</tr>
+
+<tr>
+<td>sleep()</td>
+<td>Pause thread</td>
+</tr>
+
+<tr>
+<td>join()</td>
+<td>Wait for another thread</td>
+</tr>
+
+<tr>
+<td>yield()</td>
+<td>Give chance to other threads</td>
+</tr>
+
+<tr>
+<td>interrupt()</td>
+<td>Interrupt thread</td>
+</tr>
+
+</table>
+
+<h3>sleep()</h3>
+
+<pre>
+Thread.sleep(2000);
+</pre>
+
+<h3>join()</h3>
+
+<pre>
+Thread t1 = new Thread(() -> {
+    for(int i=1;i<=5;i++){
+        System.out.println(i);
+    }
+});
+
+t1.start();
+
+t1.join();
+
+System.out.println("Main Ends");
+</pre>
+
+</section>
+
+<section id="s6">
+<h2><span class="num">06</span> Synchronization</h2>
+
+<p>
+Synchronization is used to avoid data inconsistency when multiple threads access shared resources.
+</p>
+
+<h3>Without Synchronization</h3>
+
+<pre>
+class Counter {
+
+    int count = 0;
+
+    public void increment() {
+        count++;
+    }
+}
+</pre>
+
+<div class="callout">
+count++ is NOT atomic.
+Internally:
+1. Read
+2. Increment
+3. Write
+</div>
+
+<h3>With Synchronization</h3>
+
+<pre>
+class Counter {
+
+    int count = 0;
+
+    public synchronized void increment() {
+        count++;
+    }
+}
+</pre>
+
+<h3>Synchronized Block</h3>
+
+<pre>
+synchronized(this) {
+    count++;
+}
+</pre>
+
+</section>
+
+<section id="s7">
+<h2><span class="num">07</span> Race Condition</h2>
+
+<p>
+Race Condition occurs when multiple threads modify shared data simultaneously leading to inconsistent results.
+</p>
+
+<pre>
+Expected Count = 2000
+Actual Count = 1734
+</pre>
+
+<div class="callout">
+Most asked interview topic.
+Race condition is solved using synchronization/locks/atomic classes.
+</div>
+
+</section>
+
+<section id="s8">
+<h2><span class="num">08</span> Deadlock</h2>
+
+<p>
+Deadlock occurs when two or more threads wait forever for each other’s locks.
+</p>
+
+<pre>
+Thread-1:
+Lock A → waiting for Lock B
+
+Thread-2:
+Lock B → waiting for Lock A
+</pre>
+
+<h3>Deadlock Example</h3>
+
+<pre>
+synchronized(lock1) {
+
+    synchronized(lock2) {
+
+    }
+}
+</pre>
+
+<div class="callout">
+Prevention:
+• Lock ordering
+• Timeout
+• Avoid nested locks
+</div>
+
+</section>
+
+<section id="s9">
+<h2><span class="num">09</span> Inter Thread Communication</h2>
+
+<table>
+
+<tr>
+<th>Method</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td>wait()</td>
+<td>Release lock and wait</td>
+</tr>
+
+<tr>
+<td>notify()</td>
+<td>Wake one thread</td>
+</tr>
+
+<tr>
+<td>notifyAll()</td>
+<td>Wake all threads</td>
+</tr>
+
+</table>
+
+<pre>
+synchronized(obj) {
+
+    obj.wait();
+
+    obj.notify();
+}
+</pre>
+
+<div class="callout">
+wait(), notify() and notifyAll() belong to Object class not Thread class.
+</div>
+
+</section>
+
+<section id="s10">
+<h2><span class="num">10</span> volatile Keyword</h2>
+
+<p>
+volatile ensures visibility of variable changes across threads.
+</p>
+
+<pre>
+class Shared {
+
+    volatile boolean flag = true;
+}
+</pre>
+
+<div class="callout">
+volatile solves visibility issue but NOT atomicity issue.
+</div>
+
+</section>
+
+<section id="s11">
+<h2><span class="num">11</span> Executor Framework</h2>
+
+<p>
+Introduced to manage threads efficiently instead of manually creating threads.
+</p>
+
+<pre>
+ExecutorService service =
+    Executors.newFixedThreadPool(3);
+
+service.submit(() -> {
+    System.out.println(
+        Thread.currentThread().getName()
+    );
+});
+
+service.shutdown();
+</pre>
+
+<div class="callout">
+ExecutorService internally manages thread pool and task queue.
+</div>
+
+</section>
+
+<section id="s12">
+<h2><span class="num">12</span> Callable & Future</h2>
+
+<h3>Runnable vs Callable</h3>
+
+<table>
+
+<tr>
+<th>Runnable</th>
+<th>Callable</th>
+</tr>
+
+<tr>
+<td>No return value</td>
+<td>Returns value</td>
+</tr>
+
+<tr>
+<td>Cannot throw checked exception</td>
+<td>Can throw checked exception</td>
+</tr>
+
+</table>
+
+<pre>
+Callable<Integer> task = () -> {
+
+    return 100;
+};
+
+Future<Integer> future =
+    service.submit(task);
+
+System.out.println(future.get());
+</pre>
+
+</section>
+
+<section id="s13">
+<h2><span class="num">13</span> Thread Pool</h2>
+
+<p>
+Thread pool reuses threads instead of creating new threads repeatedly.
+</p>
+
+<table>
+
+<tr>
+<th>Pool Type</th>
+<th>Purpose</th>
+</tr>
+
+<tr>
+<td>FixedThreadPool</td>
+<td>Fixed number of threads</td>
+</tr>
+
+<tr>
+<td>CachedThreadPool</td>
+<td>Dynamic thread creation</td>
+</tr>
+
+<tr>
+<td>SingleThreadExecutor</td>
+<td>Single worker thread</td>
+</tr>
+
+<tr>
+<td>ScheduledThreadPool</td>
+<td>Delayed/periodic tasks</td>
+</tr>
+
+</table>
+
+</section>
+
+<section id="s14">
+<h2><span class="num">14</span> Concurrent Collections</h2>
+
+<table>
+
+<tr>
+<th>Collection</th>
+<th>Feature</th>
+</tr>
+
+<tr>
+<td>ConcurrentHashMap</td>
+<td>Thread-safe HashMap</td>
+</tr>
+
+<tr>
+<td>CopyOnWriteArrayList</td>
+<td>Safe for read-heavy apps</td>
+</tr>
+
+<tr>
+<td>BlockingQueue</td>
+<td>Producer-consumer</td>
+</tr>
+
+</table>
+
+<h3>ConcurrentHashMap</h3>
+
+<pre>
+ConcurrentHashMap<Integer,String> map =
+    new ConcurrentHashMap<>();
+</pre>
+
+<div class="callout">
+ConcurrentHashMap uses segment/bucket-level locking instead of locking whole map.
+</div>
+
+</section>
+
+<section id="s15">
+<h2><span class="num">15</span> Most Asked Interview Questions</h2>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q1</span>
+<span>Difference between process and thread?</span>
+</div>
+<div class="qa-body">
+Process has separate memory space while threads share same process memory.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q2</span>
+<span>Difference between start() and run()?</span>
+</div>
+<div class="qa-body">
+start() creates new thread while run() behaves like normal method call.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q3</span>
+<span>Why Runnable preferred over Thread?</span>
+</div>
+<div class="qa-body">
+Because Java supports single inheritance and Runnable provides better separation of task and thread.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q4</span>
+<span>What is synchronization?</span>
+</div>
+<div class="qa-body">
+Mechanism to control access to shared resources by multiple threads.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q5</span>
+<span>What is race condition?</span>
+</div>
+<div class="qa-body">
+When multiple threads update shared data simultaneously causing inconsistent results.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q6</span>
+<span>What is deadlock?</span>
+</div>
+<div class="qa-body">
+Situation where threads wait forever for each other's locks.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q7</span>
+<span>Difference between wait() and sleep()?</span>
+</div>
+<div class="qa-body">
+wait() releases lock while sleep() does not release lock.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q8</span>
+<span>Why wait(), notify() are inside Object class?</span>
+</div>
+<div class="qa-body">
+Because locks belong to objects and not threads.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q9</span>
+<span>What is volatile keyword?</span>
+</div>
+<div class="qa-body">
+volatile guarantees visibility of latest variable value across threads.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q10</span>
+<span>Difference between synchronized and volatile?</span>
+</div>
+<div class="qa-body">
+synchronized provides atomicity + visibility while volatile provides only visibility.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q11</span>
+<span>What is Thread Pool?</span>
+</div>
+<div class="qa-body">
+Collection of reusable worker threads managed by Executor Framework.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q12</span>
+<span>Difference between Runnable and Callable?</span>
+</div>
+<div class="qa-body">
+Callable returns value and throws checked exceptions while Runnable does not.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q13</span>
+<span>What is Future?</span>
+</div>
+<div class="qa-body">
+Represents result of asynchronous computation.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q14</span>
+<span>What is starvation?</span>
+</div>
+<div class="qa-body">
+When low priority thread never gets CPU time.
+</div>
+</div>
+
+<div class="qa-card">
+<div class="qa-q">
+<span class="qn">Q15</span>
+<span>What is livelock?</span>
+</div>
+<div class="qa-body">
+Threads keep responding to each other but make no progress.
+</div>
+</div>
+
+<div class="tip-box">
+
+<h3>🔥 Interview Tips</h3>
+
+<ul>
+<li>Synchronization, Deadlock and volatile are extremely important.</li>
+<li>wait vs sleep is one of the most asked questions.</li>
+<li>ExecutorService is heavily asked in Spring Boot interviews.</li>
+<li>Understand JVM + OS interaction properly.</li>
+<li>ConcurrentHashMap internal working is important.</li>
+</ul>
+
+</div>
+
+</section>
+
+</main>
+</body>
+</html>
