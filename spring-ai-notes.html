@@ -1,0 +1,3987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spring AI — Full Course Notes</title>
+<style>
+:root{
+  --bg:#0d1117; --bg2:#161b22; --bg3:#1c2128; --line:#2d333b;
+  --tx:#e6edf3; --tx2:#9198a1; --tx3:#6e7681;
+  --ac:#6cb96c; --ac2:#58a6ff; --warn:#e3b341; --red:#f85149; --pur:#d2a8ff; --org:#ffa657;
+  --mono:'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font:16px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}
+a{color:var(--ac2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---------- layout ---------- */
+#wrap{display:flex;min-height:100vh}
+#side{width:310px;flex:0 0 310px;background:var(--bg2);border-right:1px solid var(--line);
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding:0 0 60px}
+#side h2{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--tx3);
+  margin:22px 20px 10px;font-weight:600}
+#brand{padding:22px 20px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg2);z-index:5}
+#brand .t{font-size:17px;font-weight:700;letter-spacing:-.01em}
+#brand .s{font-size:12px;color:var(--tx3);margin-top:3px}
+#q{width:calc(100% - 40px);margin:12px 20px 0;padding:8px 11px;border-radius:7px;
+  border:1px solid var(--line);background:var(--bg);color:var(--tx);font-size:13px;font-family:inherit}
+#q:focus{outline:none;border-color:var(--ac)}
+#toc{list-style:none;margin:6px 0 0;padding:0}
+#toc li a{display:flex;gap:10px;padding:7px 20px;color:var(--tx2);font-size:13.5px;line-height:1.45;border-left:2px solid transparent}
+#toc li a:hover{background:var(--bg3);color:var(--tx);text-decoration:none}
+#toc li a.on{border-left-color:var(--ac);color:var(--tx);background:var(--bg3)}
+#toc .n{color:var(--tx3);font-family:var(--mono);font-size:11.5px;min-width:20px;padding-top:2px}
+#main{flex:1;min-width:0;padding:0 0 120px}
+.inner{max-width:900px;margin:0 auto;padding:0 40px}
+
+/* ---------- hero ---------- */
+#hero{border-bottom:1px solid var(--line);padding:60px 0 44px;background:
+  radial-gradient(900px 300px at 20% -10%,rgba(108,185,108,.14),transparent 60%),var(--bg)}
+#hero h1{font-size:40px;line-height:1.15;margin:0 0 12px;letter-spacing:-.025em}
+#hero p{color:var(--tx2);margin:0 0 22px;font-size:17px;max-width:640px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-size:12px;padding:4px 11px;border-radius:20px;background:var(--bg3);
+  border:1px solid var(--line);color:var(--tx2);font-family:var(--mono)}
+
+/* ---------- chapters ---------- */
+section.ch{padding:52px 0 8px;border-bottom:1px solid var(--line)}
+section.ch:last-of-type{border-bottom:none}
+.chead{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.chead .num{font-family:var(--mono);font-size:13px;color:var(--ac);
+  border:1px solid var(--ac);border-radius:6px;padding:2px 9px;flex:0 0 auto}
+.chead h2{font-size:29px;margin:0;letter-spacing:-.02em;line-height:1.25}
+.ts{font-family:var(--mono);font-size:12px;color:var(--tx3);margin:0 0 22px 0}
+h3{font-size:20px;margin:34px 0 10px;letter-spacing:-.01em}
+h4{font-size:16px;margin:24px 0 8px;color:var(--tx)}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin-bottom:6px}
+code.i{font-family:var(--mono);font-size:.86em;background:var(--bg3);padding:2px 6px;
+  border-radius:5px;border:1px solid var(--line);color:var(--org)}
+strong{color:#fff;font-weight:650}
+
+/* ---------- callouts ---------- */
+.box{border-radius:9px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);
+  background:var(--bg2);font-size:14.5px}
+.box .lbl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  display:block;margin-bottom:6px}
+.box p:last-child{margin-bottom:0}
+.box.key{border-left:3px solid var(--ac)} .box.key .lbl{color:var(--ac)}
+.box.warn{border-left:3px solid var(--warn)} .box.warn .lbl{color:var(--warn)}
+.box.vid{border-left:3px solid var(--pur)} .box.vid .lbl{color:var(--pur)}
+.box.err{border-left:3px solid var(--red)} .box.err .lbl{color:var(--red)}
+
+/* ---------- code ---------- */
+.code{margin:18px 0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#0b0f14}
+.code .bar{display:flex;justify-content:space-between;align-items:center;
+  background:var(--bg2);padding:7px 14px;border-bottom:1px solid var(--line)}
+.code .fn{font-family:var(--mono);font-size:12px;color:var(--tx2)}
+.code .cp{font-size:11px;font-family:var(--mono);background:transparent;border:1px solid var(--line);
+  color:var(--tx3);padding:3px 9px;border-radius:5px;cursor:pointer}
+.code .cp:hover{color:var(--tx);border-color:var(--tx3)}
+.code pre{margin:0;padding:15px 18px;overflow-x:auto;font-family:var(--mono);
+  font-size:13px;line-height:1.62;tab-size:2}
+.code pre::-webkit-scrollbar{height:9px}
+.code pre::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+.k{color:#ff7b72}.s{color:#a5d6ff}.c{color:var(--tx3);font-style:italic}
+.a{color:var(--warn)}.t{color:var(--pur)}.nm{color:#79c0ff}.f{color:#d2a8ff}
+
+/* ---------- table ---------- */
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14px}
+th,td{text-align:left;padding:9px 13px;border:1px solid var(--line);vertical-align:top}
+th{background:var(--bg2);font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--tx2)}
+td code.i{font-size:12px}
+
+/* ---------- flow diagram ---------- */
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:18px 0;
+  padding:16px;background:var(--bg2);border:1px solid var(--line);border-radius:9px;font-size:13px}
+.flow .n{padding:7px 13px;background:var(--bg3);border:1px solid var(--line);
+  border-radius:7px;font-family:var(--mono);font-size:12.5px}
+.flow .n.hl{border-color:var(--ac);color:var(--ac)}
+.flow .ar{color:var(--tx3)}
+
+::selection{background:rgba(108,185,108,.3)}
+#side::-webkit-scrollbar{width:9px}
+#side::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+@media(max-width:1000px){
+  #side{display:none} .inner{padding:0 22px} #hero h1{font-size:30px}
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+<nav id="side">
+  <div id="brand">
+    <a class="nav-back" href="index.html">← Back to Hub</a>
+    <div class="t">Spring AI — Full Notes</div>
+    <div class="s">Complete Course · 16 hours · 25 chapters</div>
+    <input id="q" placeholder="Filter chapters…" autocomplete="off">
+  </div>
+  <h2>Contents</h2>
+  <ul id="toc"></ul>
+</nav>
+
+<main id="main">
+
+<header id="hero">
+  <div class="inner">
+    <h1>Spring AI — Complete Course Notes</h1>
+    <p>Chapter-by-chapter notes from the full Spring AI course, with every concept explained
+       using the same examples and code the instructor used in the video.</p>
+    <div class="pills">
+      <span class="pill">Spring Boot 3.5.x</span><span class="pill">Java 21</span>
+      <span class="pill">OpenAI</span><span class="pill">Ollama</span>
+      <span class="pill">RAG</span><span class="pill">Vector Store</span>
+      <span class="pill">Tool Calling</span><span class="pill">Chat Memory</span>
+      <span class="pill">ETL</span><span class="pill">React</span>
+    </div>
+  </div>
+</header>
+
+<div class="inner" id="body">
+
+<!-- ==================== 01 ==================== -->
+<section class="ch" id="c1" data-t="What is Spring AI">
+<div class="chead"><span class="num">01</span><h2>What is Spring AI?</h2></div>
+<p class="ts">00:00 — 09:50</p>
+
+<p>Spring AI is <strong>just another Spring project / module</strong> — exactly like Spring Data, Spring Security
+or Spring Cloud. Whenever your Spring Boot application needs AI, you pull in Spring AI. That's the
+whole mental model the instructor starts with.</p>
+
+<h3>The problem it solves</h3>
+<p>Suppose you have a Spring Boot app and you want it to talk to ChatGPT-5, DeepSeek, or any other
+model. Every provider (OpenAI, Anthropic, Google, Meta) hosts its models on its own cloud and
+<strong>exposes them as REST APIs</strong>. So technically you could just fire a <code class="i">RestTemplate</code>
+call from your controller and be done.</p>
+
+<div class="flow">
+  <span class="n">Spring Boot App</span><span class="ar">→</span>
+  <span class="n">REST call</span><span class="ar">→</span>
+  <span class="n">OpenAI API</span><span class="ar">→</span>
+  <span class="n">GPT model</span><span class="ar">→</span>
+  <span class="n">response</span>
+</div>
+
+<p>The instructor's analogy: <em>"If you eat a plain dosa versus a masala dosa, there will be a
+difference."</em> A raw REST call is the plain dosa. It works, but you lose everything that makes
+building a real AI feature bearable.</p>
+
+<h3>What Spring AI actually is</h3>
+<p>Spring AI sits between your app and the model as an <strong>abstraction layer</strong>. It gives you a
+<strong>Fluent Java API</strong> — plain classes and interfaces — and behind the scenes it makes the HTTP calls,
+builds the JSON, parses the response, and handles the tokens.</p>
+
+<div class="flow">
+  <span class="n">Your Controller / Service</span><span class="ar">→</span>
+  <span class="n hl">Spring AI (abstraction)</span><span class="ar">→</span>
+  <span class="n">Any AI Model</span>
+</div>
+
+<div class="box key">
+  <span class="lbl">Key benefit</span>
+  <p>You can <strong>swap providers without changing a single line of business code</strong>. Move from OpenAI to
+  Azure to Hugging Face to Ollama by changing the <em>dependency</em> and a few <em>properties</em> —
+  because your code only ever touched the Spring AI API.</p>
+</div>
+
+<h3>What you get on top of "just calling an API"</h3>
+<ul>
+  <li><strong>Prompt management</strong> — prompts stored in external files, dynamic placeholders, role-based
+      (system / user / assistant) prompts instead of hard-coded strings.</li>
+  <li><strong>Embeddings &amp; vector stores</strong> — chunk a document, generate embeddings, push them into
+      PostgreSQL / Redis / MariaDB, all through one API.</li>
+  <li><strong>RAG</strong> — because an LLM is <em>stateless</em> and knows nothing about <em>your</em> data, you must send
+      context. Sending the whole document blows up your token bill, so RAG retrieves only the
+      meaningful bits.</li>
+  <li><strong>Chat history &amp; memory</strong> — "remember the last 20 messages", stored in memory or in a DB.</li>
+  <li><strong>Streaming</strong> — chunk-by-chunk responses, the way ChatGPT types.</li>
+  <li><strong>Ecosystem integration</strong> — works naturally with Spring Data JPA/JDBC, Spring Security,
+      Spring Cloud Config (for centrally managing AI keys).</li>
+</ul>
+
+<div class="box vid">
+  <span class="lbl">Video example</span>
+  <p>The real-world case used throughout: a <strong>customer-support chatbot</strong>. A user asks
+  <em>"What's your refund policy?"</em> — the model has no idea, so the app pulls the answer from a
+  vector DB where the company's policies are stored, and hands it to the LLM as context.</p>
+</div>
+</section>
+
+<!-- ==================== 02 ==================== -->
+<section class="ch" id="c2" data-t="Features of Spring AI">
+<div class="chead"><span class="num">02</span><h2>Features of Spring AI</h2></div>
+<p class="ts">09:50 — 20:55</p>
+
+<h3>1. Multi-model &amp; multi-provider support</h3>
+<p>Azure OpenAI, OpenAI, Hugging Face, Ollama, Amazon Bedrock, Anthropic, DeepSeek, Mistral, Google
+Vertex AI — Spring AI supports nearly every popular provider. <strong>Switching = changing configuration.</strong></p>
+
+<h3>2. Spring-friendly API</h3>
+<p>If you know Spring beans and injection, you already know how to use it. You inject a bean, call
+methods on it, chain them. The star of the show is <code class="i">ChatClient</code>.</p>
+
+<div class="box warn">
+  <span class="lbl">Important nuance</span>
+  <p>Saying "Spring gives you a <code class="i">ChatClient</code> bean" is <strong>technically incorrect</strong>. What you
+  actually get injected is <code class="i">ChatClient.Builder</code>. You then call <code class="i">.build()</code> on it
+  to get your <code class="i">ChatClient</code>. This distinction is repeated many times in the course.</p>
+</div>
+
+<div class="code" data-lang="java" data-file="Correct way to obtain a ChatClient"><script type="text/plain">
+private final ChatClient chatClient;
+
+// ChatClient.Builder is the bean Spring AI auto-configures — NOT ChatClient
+public ChatController(ChatClient.Builder builder) {
+    this.chatClient = builder.build();
+}
+</script></div>
+
+<h3>3. Prompt management</h3>
+<p>Prompts get big and dynamic. Spring AI lets you keep them in external <code class="i">.st</code> files
+(String Template) with placeholders, instead of concatenating strings in Java.</p>
+
+<div class="code" data-lang="text" data-file="resources/prompts/greeting.st"><script type="text/plain">
+Hello, my name is {name}.
+How can you greet me back nicely?
+</script></div>
+
+<p>At runtime, <code class="i">{name}</code> is replaced with whatever you pass — "Durgesh", "Sahil", anything.
+Same template, reusable forever.</p>
+
+<h3>4. Embeddings &amp; vector store support</h3>
+<p>You don't split documents into chunks yourself, you don't write insert statements. The
+<code class="i">VectorStore</code> API chunks the text, represents it as <code class="i">Document</code>s, generates embeddings and
+persists them — into PostgreSQL, Redis, MariaDB, Qdrant, Pinecone, and more.</p>
+
+<h3>5. RAG (Retrieval Augmented Generation)</h3>
+<p>Stated plainly in the video: the LLM is stateless and knows nothing about your private data.
+You <em>could</em> stuff the entire context into the prompt — but a large prompt burns tokens, costs
+money, and eventually breaks the context window. RAG stores everything in a vector DB, retrieves
+only the relevant slice, and adds <em>that</em> to the prompt.</p>
+
+<div class="flow">
+  <span class="n">Store data in Vector DB</span><span class="ar">→</span>
+  <span class="n hl">Retrieve relevant chunks</span><span class="ar">→</span>
+  <span class="n">Augment prompt</span><span class="ar">→</span>
+  <span class="n">LLM generates</span>
+</div>
+
+<h3>6. Chat history &amp; memory</h3>
+<p>Automatic. You just declare "remember the last 20 conversations" and where to keep them —
+temporary memory or a database.</p>
+
+<h3>7. Streaming responses</h3>
+<p>The model does not produce the full answer at once. It emits tokens progressively. Spring AI
+exposes that as a reactive stream so your UI can type it out live.</p>
+
+<h3>8. Spring ecosystem integration</h3>
+<p>REST APIs, Spring Security, Spring Data JPA / JDBC, Spring Cloud Config for centrally managing
+AI keys — all still yours.</p>
+</section>
+
+<!-- ==================== 03 ==================== -->
+<section class="ch" id="c3" data-t="First Project — Spring Boot + OpenAI">
+<div class="chead"><span class="num">03</span><h2>First Project — Spring Boot + OpenAI</h2></div>
+<p class="ts">20:55 — 55:56</p>
+
+<p>The use case: a client wants a chatbot inside an existing application that answers from their own
+data. Step one is simply getting Spring Boot to talk to a GPT model.</p>
+
+<h3>Step 1 — Get an OpenAI API key</h3>
+<ol>
+  <li>Go to <code class="i">platform.openai.com</code> and sign in (Google login works).</li>
+  <li>Browse <strong>Models</strong>. Every model page lists reasoning level, speed and — crucially — <strong>pricing</strong>.</li>
+  <li>Go to <strong>Settings → API Keys → Create new secret key</strong>. Name it (e.g. "My Test Key"),
+      pick the project, set permissions to <em>All</em> (or Restricted / Read-only).</li>
+  <li>Copy the key immediately and store it safely.</li>
+  <li>Go to <strong>Billing</strong> and add credit. The instructor's advice: <strong>$5–$10 is enough for the entire course.</strong></li>
+</ol>
+
+<div class="box warn">
+  <span class="lbl">Cost reality</span>
+  <p>OpenAI charges <strong>per token</strong>, split into input tokens and output tokens, and the rate differs
+  per model. Always read the pricing page for the model you pick. If you don't want to pay at all,
+  Chapter 04 shows the free local route with Ollama.</p>
+</div>
+
+<h3>Step 2 — Generate the project</h3>
+<p>On <a href="https://start.spring.io">start.spring.io</a> the instructor used:</p>
+<table>
+<tr><th>Setting</th><th>Value</th></tr>
+<tr><td>Project</td><td>Maven</td></tr>
+<tr><td>Language</td><td>Java</td></tr>
+<tr><td>Spring Boot</td><td>3.5.5 (stable — avoid SNAPSHOT/M2 versions)</td></tr>
+<tr><td>Group</td><td><code class="i">com.spring.ai</code></td></tr>
+<tr><td>Artifact</td><td><code class="i">firstproject</code></td></tr>
+<tr><td>Packaging / Java</td><td>Jar / 21</td></tr>
+<tr><td>Dependencies</td><td><strong>Spring Web</strong> + <strong>OpenAI</strong></td></tr>
+</table>
+
+<div class="box warn">
+  <span class="lbl">Dependency trap</span>
+  <p>When searching "AI" in the dependency box you'll see <em>Azure OpenAI</em> and <em>OpenAI</em>.
+  Pick plain <strong>OpenAI</strong> unless you're actually on Azure. And don't pile on extra
+  dependencies while learning.</p>
+</div>
+
+<div class="code" data-lang="xml" data-file="pom.xml — the two dependencies that matter"><script type="text/plain">
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<!-- This one line installs Spring AI + the OpenAI implementation.
+     Supports ChatGPT (text) and DALL-E (image generation). -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+</dependency>
+</script></div>
+
+<h3>Step 3 — Why the app crashes on first run</h3>
+<p>Run it before configuring anything and it fails. Reason: adding the starter to the classpath
+triggers Spring Boot <strong>auto-configuration</strong>. Spring AI tries to build its beans, discovers the
+OpenAI API key is missing, and gives up. <strong>The property must exist before the app starts.</strong></p>
+
+<div class="code" data-lang="properties" data-file="src/main/resources/application.properties"><script type="text/plain">
+spring.application.name=first-project
+server.port=8081
+
+# NEVER hard-code the key. Read it from an environment variable.
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Setting the env var in IntelliJ</span>
+  <p>Run config dropdown → <strong>Edit Configurations</strong> → if you don't see the field, click
+  <strong>Modify options</strong> → tick <strong>Environment variables</strong> → add
+  <code class="i">OPENAI_API_KEY=sk-...</code> → OK. Spring Boot resolves <code class="i">${OPENAI_API_KEY}</code> automatically.</p>
+</div>
+
+<p>Now it boots: <em>"Tomcat initialized with port 8081"</em>. One property line, and every Spring AI
+bean is configured for you.</p>
+
+<h3>Step 4 — The first controller</h3>
+<p>Target request from Postman: <code class="i">GET localhost:8081/chat?q=How can you help me?</code></p>
+
+<div class="code" data-lang="java" data-file="controller/ChatController.java"><script type="text/plain">
+package com.spring.ai.firstproject.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+public class ChatController {
+
+    private final ChatClient chatClient;
+
+    // No @Autowired needed — single constructor in modern Spring.
+    // We get the BUILDER, then build the client ourselves.
+    public ChatController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+
+    @GetMapping("/chat")
+    public ResponseEntity<String> chat(
+            @RequestParam(value = "q", required = true) String q) {
+
+        var response = chatClient
+                .prompt(q)   // give the prompt
+                .call()      // execute the call
+                .content();  // pull out the text result
+
+        return ResponseEntity.ok(response);
+    }
+}
+</script></div>
+
+<div class="box err">
+  <span class="lbl">The error you WILL hit</span>
+  <p>If you try to inject <code class="i">ChatClient</code> directly you get
+  <em>"A component required a bean of type ChatClient that could not be found."</em>
+  That bean does not exist. Inject <code class="i">ChatClient.Builder</code> and call <code class="i">.build()</code>.</p>
+</div>
+
+<h3>Step 5 — Choosing a model</h3>
+<p>By default Spring AI was answering as GPT-3.5. To change the model, copy the exact model ID from
+the OpenAI models page and set it in properties:</p>
+
+<div class="code" data-lang="properties" data-file="application.properties — model + options"><script type="text/plain">
+spring.ai.openai.chat.options.model=gpt-4.1
+spring.ai.openai.chat.options.temperature=0.2
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Two errors demonstrated live in the video</span>
+  <p><strong>1. Temperature not supported.</strong> Spring AI defaults temperature to <code class="i">0.7</code>. Some newer
+  models reject that value — <em>"Unsupported value: temperature does not support 0.7 with this model."</em>
+  Fix: set a supported temperature (e.g. <code class="i">0.2</code>) or use a different model.</p>
+  <p><strong>2. Invalid model ID.</strong> Caused by a stray <strong>space</strong> in the model name. Check your
+  property values character by character.</p>
+</div>
+
+<h3>Step 6 — Where it falls short</h3>
+<p>Ask <em>"Who is Sachin Tendulkar?"</em> → perfect answer, it's general knowledge.
+Ask <em>"What is my name?"</em> → it has no idea. <strong>No context, no memory.</strong> That single limitation
+drives the next 14 chapters: prompts, memory, and RAG.</p>
+</section>
+
+<!-- ==================== 04 ==================== -->
+<section class="ch" id="c4" data-t="Free & Local — Ollama">
+<div class="chead"><span class="num">04</span><h2>Free &amp; Local — Ollama</h2></div>
+<p class="ts">55:56 — 1:22:45</p>
+
+<p>OpenAI costs money. Ollama is software that runs <strong>open-source models on your own machine</strong>, for
+free. Same Spring AI code, different dependency and configuration.</p>
+
+<div class="box warn">
+  <span class="lbl">Trade-off</span>
+  <p>Local models eat RAM and CPU. If your machine isn't strong, performance suffers — which is
+  exactly why the instructor recommends paying $5–10 for OpenAI instead of downloading a 5 GB model
+  onto a weak laptop.</p>
+</div>
+
+<h3>Step 1 — Install Ollama &amp; pull a model</h3>
+<p>Download from <code class="i">ollama.com</code> for your OS. Then from the terminal:</p>
+
+<div class="code" data-lang="bash" data-file="terminal"><script type="text/plain">
+ollama                    # verify the CLI is installed
+ollama run codellama      # downloads (once) then starts the model
+ollama list               # show downloaded models + size + IDs
+</script></div>
+
+<p>Once it's running you can chat right in the terminal — <em>"What is a prime number?"</em>,
+<em>"Can you generate the code in Java?"</em> — completely free, no API charges, because it's running
+on your computer. Type <code class="i">/bye</code> to exit.</p>
+
+<div class="box key">
+  <span class="lbl">Model choice</span>
+  <p>Check the size before pulling. In the video: <strong>DeepSeek-R1</strong> ≈ 4.7 GB,
+  <strong>CodeLlama</strong> ≈ 3.8 GB. Spring AI's default Ollama model is <strong>Mistral</strong> —
+  if you don't have Mistral locally you <em>must</em> override the model property or you'll get a
+  "model not found" error.</p>
+</div>
+
+<h3>Step 2 — Project setup</h3>
+<div class="code" data-lang="xml" data-file="pom.xml"><script type="text/plain">
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-ollama</artifactId>
+</dependency>
+</script></div>
+
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+server.port=8081
+
+# Ollama's default port. Open it in a browser -> "Ollama is running"
+spring.ai.ollama.base-url=http://localhost:11434
+
+# Default is 'mistral' — override with what you actually pulled
+spring.ai.ollama.chat.options.model=codellama:latest
+spring.ai.ollama.chat.options.temperature=0.7
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Ollama must be running</span>
+  <p>Spring can only connect if the Ollama server is up. Sanity check: open
+  <code class="i">http://localhost:11434</code> in a browser — you should see <em>"Ollama is running"</em>.</p>
+</div>
+
+<h3>Step 3 — Identical controller code</h3>
+<p>This is the whole point of the abstraction — the controller is byte-for-byte the same as the
+OpenAI one:</p>
+
+<div class="code" data-lang="java" data-file="controller/ChatController.java (Ollama project)"><script type="text/plain">
+@RestController
+public class ChatController {
+
+    private final ChatClient chatClient;
+
+    public ChatController(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+
+    @GetMapping("/chat")
+    public ResponseEntity<String> chat(@RequestParam("q") String query) {
+        String responseContent = chatClient
+                .prompt(query)
+                .call()
+                .content();
+        return ResponseEntity.ok(responseContent);
+    }
+}
+</script></div>
+
+<h3>Useful Ollama properties (from the docs)</h3>
+<table>
+<tr><th>Property</th><th>Meaning</th><th>Default</th></tr>
+<tr><td><code class="i">spring.ai.ollama.base-url</code></td><td>Where the Ollama server runs</td><td><code class="i">http://localhost:11434</code></td></tr>
+<tr><td><code class="i">spring.ai.ollama.chat.options.model</code></td><td>Which model to use</td><td><code class="i">mistral</code></td></tr>
+<tr><td><code class="i">spring.ai.ollama.chat.options.temperature</code></td><td>Creativity / randomness</td><td>0.8</td></tr>
+<tr><td><code class="i">spring.ai.ollama.chat.options.keep_alive</code></td><td>How long the model stays loaded in RAM</td><td>5m</td></tr>
+<tr><td><code class="i">spring.ai.ollama.chat.enabled</code></td><td>Enable the Ollama chat model</td><td>true</td></tr>
+<tr><td><code class="i">spring.ai.ollama.init.pull-model-strategy</code></td><td>Auto-pull models at startup</td><td><code class="i">never</code></td></tr>
+</table>
+
+<div class="box key">
+  <span class="lbl">Auto-pull</span>
+  <p>Instead of pulling manually, set the pull strategy to <code class="i">always</code> or
+  <code class="i">when_missing</code> and Spring Boot downloads the model on startup. You can also configure
+  timeouts and max retries.</p>
+</div>
+
+<div class="box key">
+  <span class="lbl">Never memorise properties</span>
+  <p>The instructor's repeated advice: bookmark the Spring AI reference docs
+  (<em>Learn → Reference Doc → Models → Chat Models → your provider</em>). Every property, default
+  value and description is listed there.</p>
+</div>
+</section>
+
+<!-- ==================== 05 ==================== -->
+<section class="ch" id="c5" data-t="ChatClient API">
+<div class="chead"><span class="num">05</span><h2>ChatClient API</h2></div>
+<p class="ts">1:22:45 — 1:31:32</p>
+
+<p><code class="i">ChatClient</code> is described as <strong>"a helper class that makes it super easy to talk to the AI"</strong>.
+Technically it's an interface; you always work with its implementation
+(<code class="i">DefaultChatClient</code>), which Spring AI builds for you.</p>
+
+<h3>What it hides</h3>
+<ul>
+  <li>Building the raw HTTP request and choosing the base API URL</li>
+  <li>Serialising your prompt into the provider's JSON format</li>
+  <li>Parsing the JSON response back</li>
+  <li>Token handling and formatting</li>
+</ul>
+<p>You just call methods, like any normal Spring service, and get a response back.</p>
+
+<h3>Feature 1 — Fluent API</h3>
+<p>The instructor's phrase: <em>"calling it is like butter"</em> — one method, then another, then another.</p>
+
+<div class="code" data-lang="java" data-file="Fluent chaining"><script type="text/plain">
+var result = chatClient
+        .prompt("Tell me about Virat Kohli")  // build the prompt
+        .call()                                // execute
+        .content();                            // extract the text
+</script></div>
+
+<div class="box key">
+  <span class="lbl">About <code>var</code></span>
+  <p>The course uses <code class="i">var</code> (Java 10+ local type inference) throughout. You may always
+  write the explicit type instead — it changes nothing.</p>
+</div>
+
+<h3>Feature 2 — Two execution modes</h3>
+<table>
+<tr><th>Mode</th><th>Method</th><th>Behaviour</th></tr>
+<tr><td>Synchronous / blocking</td><td><code class="i">.call()</code></td><td>Wait for the whole answer</td></tr>
+<tr><td>Reactive / streaming</td><td><code class="i">.stream()</code></td><td>Receive chunks as they're generated</td></tr>
+</table>
+
+<h3>Feature 3 — Prompt building &amp; message types</h3>
+<p>A prompt is <strong>an instruction you give the AI</strong>, and a prompt is made of <strong>messages</strong>.</p>
+<table>
+<tr><th>Message type</th><th>Who produces it</th><th>Purpose</th></tr>
+<tr><td><strong>User</strong></td><td>The person</td><td>The actual question — <em>"Write a poem"</em></td></tr>
+<tr><td><strong>System</strong></td><td>You, the developer</td><td>Rules that steer behaviour — <em>"You are a helpful assistant"</em></td></tr>
+<tr><td><strong>Assistant</strong></td><td>The LLM</td><td>The reply that comes back</td></tr>
+<tr><td><strong>Tool / Function</strong></td><td>Tool calling</td><td>Not supported by every model</td></tr>
+</table>
+
+<div class="box vid">
+  <span class="lbl">Video example</span>
+  <p>User asks <em>"What is Spring Boot in Java?"</em>. Add a system message
+  <em>"You are an expert in Java"</em> and the model answers from that persona. Same question,
+  different behaviour — that is the entire job of a system message.</p>
+</div>
+
+<h3>Feature 4 — Dynamic placeholders &amp; prompt options</h3>
+<p>A prompt can carry a variable like <code class="i">{name}</code> that you fill at runtime, plus
+<strong>chat options</strong> — model name, max tokens, and <strong>temperature</strong>:</p>
+<ul>
+  <li><strong>Low temperature</strong> → predictable, factual</li>
+  <li><strong>High temperature</strong> → creative, varied</li>
+</ul>
+</section>
+
+<!-- ==================== 06 ==================== -->
+<section class="ch" id="c6" data-t="ChatModel & auto-configuration">
+<div class="chead"><span class="num">06</span><h2>ChatModel API &amp; Auto-configuration Internals</h2></div>
+<p class="ts">1:31:32 — 1:52:19</p>
+
+<p>Two levels of abstraction, and the video is emphatic about which one you touch:</p>
+
+<table>
+<tr><th></th><th>ChatClient</th><th>ChatModel</th></tr>
+<tr><td>Level</td><td><strong>Higher</strong> abstraction</td><td><strong>Lower</strong> abstraction</td></tr>
+<tr><td>Meant for</td><td><strong>Developers — you</strong></td><td>Internal use by ChatClient</td></tr>
+<tr><td>Represents</td><td>A friendly Fluent API</td><td>One specific provider</td></tr>
+<tr><td>You use it when</td><td>Always</td><td>Only for fine-grained control</td></tr>
+</table>
+
+<p><code class="i">ChatModel</code> is an interface defining a core contract: <em>give me messages, I return model
+output</em>. Every vendor ships its own implementation.</p>
+
+<table>
+<tr><th>Provider</th><th>Implementation class</th></tr>
+<tr><td>OpenAI</td><td><code class="i">OpenAiChatModel</code></td></tr>
+<tr><td>Azure OpenAI</td><td><code class="i">AzureOpenAiChatModel</code></td></tr>
+<tr><td>Ollama</td><td><code class="i">OllamaChatModel</code></td></tr>
+<tr><td>Anthropic / DeepSeek / Mistral</td><td>their own classes</td></tr>
+</table>
+
+<h3>The full request flow</h3>
+<div class="flow">
+  <span class="n">Controller</span><span class="ar">→</span>
+  <span class="n hl">ChatClient</span><span class="ar">→</span>
+  <span class="n">ChatModel (interface)</span><span class="ar">→</span>
+  <span class="n">OpenAiChatModel</span><span class="ar">→</span>
+  <span class="n">LLM</span>
+</div>
+<p>Change the dependency and <strong>only the implementation class swaps</strong>. Your controller never notices.</p>
+
+<h3>How the bean actually gets created</h3>
+<ol>
+  <li>You add <code class="i">spring-ai-starter-model-openai</code> → it lands on the classpath.</li>
+  <li>Spring Boot auto-configuration kicks in and loads <code class="i">OpenAiChatAutoConfiguration</code>.</li>
+  <li>It checks the property <code class="i">spring.ai.model.chat</code> — default value is <code class="i">openai</code>.</li>
+  <li>It binds your properties (API key, model, temperature 0.7, completions path…).</li>
+  <li>It creates a <strong>singleton <code>OpenAiChatModel</code> bean</strong>.</li>
+  <li>That bean is handed to your <code class="i">ChatClient</code> when you call <code class="i">builder.build()</code>.</li>
+</ol>
+
+<h3>Building a ChatClient from an explicit ChatModel</h3>
+<p>You normally don't need this — but it's what makes multi-provider setups (Chapter 08) possible:</p>
+
+<div class="code" data-lang="java" data-file="Manual wiring of ChatModel into ChatClient"><script type="text/plain">
+private final ChatClient chatClient;
+
+public ChatController(ChatModel chatModel) {
+    // Prove which implementation you actually got:
+    System.out.println(chatModel.getClass().getName());
+    // -> org.springframework.ai.openai.OpenAiChatModel
+
+    // ChatClient.builder(...) is a STATIC factory that takes a ChatModel
+    this.chatClient = ChatClient.builder(chatModel).build();
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">IntelliJ shortcuts used in the video</span>
+  <p><strong>Shift ×2</strong> — search everywhere (find <code class="i">ChatClient</code>, <code class="i">ChatModel</code>…).<br>
+  <strong>Ctrl/Cmd + Alt + B</strong> — jump to implementation class.<br>
+  <strong>Download Sources</strong> — so you can actually read the Spring AI code.</p>
+</div>
+</section>
+
+<!-- ==================== 07 ==================== -->
+<section class="ch" id="c7" data-t="Core AI Concepts">
+<div class="chead"><span class="num">07</span><h2>Core AI Concepts</h2></div>
+<p class="ts">1:52:19 — 2:21:55</p>
+
+<h3>Models</h3>
+<p>Tools trained on huge amounts of data that generate text, images, speech or embeddings.
+Spring AI supports text, image, audio and embedding models. The models you'll use
+(GPT, DeepSeek, Llama) are <strong>pre-trained</strong> — you query, they answer.</p>
+
+<div class="box key">
+  <span class="lbl">ChatGPT ≠ the model</span>
+  <p>An important clarification made in the video: the ChatGPT <em>website</em> is a
+  <strong>wrapper</strong> around the model. It pre-processes your input, calls tools, runs web
+  search, post-processes the reply, and manages memory. The model itself does none of that.</p>
+</div>
+
+<h3>Prompts</h3>
+<p>Everything you send to the model. In Spring AI a prompt can carry <strong>placeholders</strong> — like
+<code class="i">?</code> in a JDBC prepared statement — filled at runtime, making the prompt reusable.</p>
+
+<h3>Tokens — the concept everything else depends on</h3>
+<p>A token is <strong>the smallest piece of text an AI model understands</strong>. Before anything happens, your
+prompt is <em>tokenized</em>.</p>
+
+<div class="flow">
+  <span class="n">Prompt</span><span class="ar">→</span>
+  <span class="n">Tokens (each with an ID)</span><span class="ar">→</span>
+  <span class="n">Vectors</span><span class="ar">→</span>
+  <span class="n hl">Neural network</span><span class="ar">→</span>
+  <span class="n">Predict next token</span><span class="ar">→</span>
+  <span class="n">Output</span>
+</div>
+
+<p>A token can be a whole word, a part of a word, or punctuation. Example from the video:
+<em>"unbelievable"</em> may become one token, or split into <em>un / believe / able</em> — it depends on
+the algorithm. On the OpenAI Tokenizer demo, <em>"what is java?"</em> = <strong>4 tokens, 13 characters</strong>.</p>
+
+<div class="box key">
+  <span class="lbl">Rule of thumb</span>
+  <p>~<strong>4 characters ≈ 1 token</strong> in common English. ~75 words ≈ 100 tokens.</p>
+</div>
+
+<h4>Why tokens matter — two reasons</h4>
+<ol>
+  <li><strong>Cost.</strong> Billing is per million input tokens and per million output tokens.
+      More text → more tokens → more money. Cost is directly proportional.</li>
+  <li><strong>Limit.</strong> Every model has a <strong>context window</strong> — the max tokens it can process at
+      once. Newer models: ~400K context / 128K max output. Older ones were far smaller.
+      You cannot send more context than the window allows.</li>
+</ol>
+
+<h3>Embeddings</h3>
+<p>Embeddings turn text, images or video into <strong>vectors</strong> — arrays of numbers. Critically, these
+vectors <strong>capture meaning, not just exact words</strong>.</p>
+
+<div class="box vid">
+  <span class="lbl">The king / queen example</span>
+  <p>Think of Google Maps in 3D. <strong>"King"</strong> and <strong>"queen"</strong> land close together
+  because they're related. <strong>"King"</strong> and <strong>"car"</strong> land far apart. Closeness is what lets the
+  model predict the next token, and what lets a vector DB do similarity search.</p>
+</div>
+
+<p>Used for: <strong>semantic search</strong> (meaningful, not keyword matching) and <strong>RAG</strong>.
+Similarity is measured mathematically — cosine similarity or Euclidean distance.</p>
+
+<h3>Structured Output</h3>
+<p>By default an AI returns <strong>plain text</strong>. Even when it <em>looks</em> like JSON it's a String —
+you can see the surrounding double quotes. That's a problem inside a real program, where you need a
+Java object to validate and pass around. And the model might produce <em>invalid</em> JSON, or drop a
+field entirely.</p>
+
+<p>Spring AI's <strong>structured output converters</strong> fix this. They:</p>
+<ul>
+  <li>Inject special instructions into the prompt describing the exact keys and types you want</li>
+  <li>Validate the returned JSON</li>
+  <li>Convert it into a real Java object / DTO / POJO</li>
+  <li><strong>Retry</strong> if the output is invalid</li>
+</ul>
+
+<p><em>Ask for "a user object with name and email"</em> — plain text gives you a String;
+structured output gives you a <code class="i">User</code> object. Implementation is in Chapter 09.</p>
+</section>
+
+<!-- ==================== 08 ==================== -->
+<section class="ch" id="c8" data-t="Multiple Models in One Project">
+<div class="chead"><span class="num">08</span><h2>Multiple Models in One Project</h2></div>
+<p class="ts">2:21:55 — 2:43:18</p>
+
+<h3>Why you'd want this</h3>
+<ul>
+  <li><strong>Task specialisation</strong> — one model is best at reasoning, another at code, another is cheap.</li>
+  <li><strong>Fallback mechanism</strong> — if OpenAI goes down (Microsoft and Google go down too), switch to
+      Ollama so your project doesn't stop.</li>
+  <li><strong>Experimentation</strong> — A/B test models inside the same app.</li>
+  <li><strong>User choice</strong> — let the end user pick their model.</li>
+  <li><strong>Complementary strengths</strong> — generate with one, validate with another.</li>
+</ul>
+
+<h3>The problem</h3>
+<p>Add two provider dependencies and Spring AI creates <strong>two ChatModel beans</strong> — but only
+<strong>one ChatClient.Builder</strong>. Ambiguity → startup failure.</p>
+
+<h3>The fix — 3 steps</h3>
+<p><strong>Step 1.</strong> Turn off the auto-created builder:</p>
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+# Stop Spring AI from auto-creating ChatClient.Builder.
+# Creating chat clients is now OUR responsibility.
+spring.ai.chat.client.enabled=false
+
+# Ollama config (needed since OpenAI is the other provider)
+spring.ai.ollama.base-url=http://localhost:11434
+spring.ai.ollama.chat.options.model=codellama:latest
+spring.ai.ollama.chat.options.temperature=0.7
+</script></div>
+
+<p><strong>Step 2.</strong> Add both dependencies:</p>
+<div class="code" data-lang="xml" data-file="pom.xml"><script type="text/plain">
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-openai</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-ollama</artifactId>
+</dependency>
+</script></div>
+
+<p><strong>Step 3.</strong> Build one named <code class="i">ChatClient</code> bean per model — this is the
+<strong>best practice</strong> version the instructor refactors to:</p>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java"><script type="text/plain">
+package com.spring.ai.firstproject.config;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AiConfig {
+
+    @Bean("openAiChatClient")
+    public ChatClient openAiChatClient(OpenAiChatModel openAiChatModel) {
+        return ChatClient.builder(openAiChatModel).build();
+    }
+
+    @Bean("ollamaChatClient")
+    public ChatClient ollamaChatClient(OllamaChatModel ollamaChatModel) {
+        return ChatClient.builder(ollamaChatModel).build();
+    }
+}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Both beans are the same type</span>
+  <p>Two <code class="i">ChatClient</code> beans means injection is ambiguous. You <strong>must</strong> disambiguate with
+  <code class="i">@Qualifier</code>, and the qualifier string must match the bean name exactly.</p>
+</div>
+
+<div class="code" data-lang="java" data-file="controller/ChatController.java — injecting both"><script type="text/plain">
+@RestController
+public class ChatController {
+
+    private final ChatClient openAiChatClient;
+    private final ChatClient ollamaChatClient;
+
+    public ChatController(
+            @Qualifier("openAiChatClient") ChatClient openAiChatClient,
+            @Qualifier("ollamaChatClient") ChatClient ollamaChatClient) {
+        this.openAiChatClient = openAiChatClient;
+        this.ollamaChatClient = ollamaChatClient;
+    }
+
+    @GetMapping("/chat")
+    public ResponseEntity<String> chat(@RequestParam("q") String q) {
+        // swap between the two by changing this one reference
+        String response = openAiChatClient.prompt(q).call().content();
+        return ResponseEntity.ok(response);
+    }
+}
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Error demonstrated</span>
+  <p>Switching to the Ollama client without configuring Ollama produced
+  <em>"model 'mistral' not found"</em> — because Mistral is Spring AI's Ollama default and it wasn't
+  downloaded. Setting <code class="i">spring.ai.ollama.chat.options.model=codellama:latest</code> fixed it.</p>
+</div>
+
+<div class="box key">
+  <span class="lbl">Scales to N models</span>
+  <p>Two, three, five providers — same recipe: one dependency, one ChatModel bean, one named
+  ChatClient bean each. You can also mutate a client's base URL at runtime to point OpenAI-compatible
+  providers (like Groq) somewhere else.</p>
+</div>
+</section>
+
+<!-- ==================== 09 ==================== -->
+<section class="ch" id="c9" data-t="Fluent API — Prompts, Responses, Entities">
+<div class="chead"><span class="num">09</span><h2>Fluent API — Prompts, Responses &amp; Entity Mapping</h2></div>
+<p class="ts">2:43:18 — 3:16:00</p>
+
+<p>First the code is refactored out of the controller into a proper service layer.</p>
+
+<div class="code" data-lang="java" data-file="service/ChatService.java"><script type="text/plain">
+public interface ChatService {
+    String chat(String query);
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java"><script type="text/plain">
+@Service
+public class ChatServiceImpl implements ChatService {
+
+    private final ChatClient chatClient;
+
+    public ChatServiceImpl(ChatClient.Builder builder) {
+        this.chatClient = builder.build();
+    }
+
+    @Override
+    public String chat(String query) {
+        return chatClient.prompt(query).call().content();
+    }
+}
+</script></div>
+
+<h3>Three ways to pass a prompt</h3>
+<p><code class="i">prompt()</code> is an <strong>overloaded</strong> method with three forms:</p>
+
+<div class="code" data-lang="java" data-file="1 — prompt(String)"><script type="text/plain">
+// Simplest. The string IS the prompt.
+String res = chatClient.prompt("Tell me about Virat Kohli")
+                       .call()
+                       .content();
+</script></div>
+
+<div class="code" data-lang="java" data-file="2 — prompt() with no args, then the fluent spec"><script type="text/plain">
+// Returns a ChatClientRequestSpec so you can set roles separately.
+String res = chatClient.prompt()
+        .system("As an expert in cricket")      // system message: steers behaviour
+        .user("Tell me about Virat Kohli")      // user message: the actual query
+        .call()
+        .content();
+</script></div>
+
+<div class="code" data-lang="java" data-file="3 — prompt(Prompt) with a Prompt object"><script type="text/plain">
+import org.springframework.ai.chat.prompt.Prompt;
+
+Prompt prompt = new Prompt("Tell me about Virat Kohli");
+String res = chatClient.prompt(prompt).call().content();
+</script></div>
+
+<p>A <code class="i">Prompt</code> can wrap: a plain content String, a single <code class="i">Message</code>, a
+<code class="i">List&lt;Message&gt;</code>, or messages plus <code class="i">ChatOptions</code>.</p>
+
+<h3>Getting more than just the text</h3>
+<p><code class="i">.content()</code> gives you the String. But sometimes you want <strong>metadata</strong> — token usage,
+rate limits, the model that answered. That's <code class="i">.chatResponse()</code>.</p>
+
+<div class="flow">
+  <span class="n">ChatResponse</span><span class="ar">→</span>
+  <span class="n">getResult()</span><span class="ar">→</span>
+  <span class="n">Generation</span><span class="ar">→</span>
+  <span class="n">getOutput()</span><span class="ar">→</span>
+  <span class="n">AssistantMessage</span><span class="ar">→</span>
+  <span class="n hl">getText()</span>
+</div>
+
+<div class="code" data-lang="java" data-file="Extracting text the long way + metadata"><script type="text/plain">
+ChatResponse response = chatClient.prompt(query).call().chatResponse();
+
+// same string that .content() would have given you
+String text = response.getResult()      // -> Generation
+                      .getOutput()      // -> AssistantMessage (the LLM's reply)
+                      .getText();
+
+// the extra information
+var metadata = response.getMetadata();
+System.out.println(metadata.getModel());
+System.out.println(metadata.getUsage().getPromptTokens());
+System.out.println(metadata.getUsage().getCompletionTokens());
+System.out.println(metadata.getUsage().getTotalTokens());
+System.out.println(metadata.getRateLimit());
+</script></div>
+
+<div class="box vid">
+  <span class="lbl">Real console output from the video</span>
+  <p>Prompt tokens <strong>15</strong> · Completion tokens <strong>548</strong> · Total <strong>563</strong>.
+  Rate limit: 500 requests, 499 remaining. This is exactly how you'd bill users by token usage.</p>
+</div>
+
+<div class="box key">
+  <span class="lbl">Why "generations" is a list</span>
+  <p><code class="i">ChatResponse</code> holds a <em>List</em> of <code class="i">Generation</code> — an LLM can return multiple
+  generated messages, not just one. <code class="i">getResult()</code> returns the first;
+  <code class="i">getResults()</code> returns all of them.</p>
+</div>
+
+<h3>Structured output — mapping straight to a Java object</h3>
+<p>Instead of <code class="i">.content()</code>, call <code class="i">.entity()</code>. First define the target class:</p>
+
+<div class="code" data-lang="java" data-file="entity/Tut.java"><script type="text/plain">
+package com.spring.ai.firstproject.entity;
+
+public class Tut {
+
+    private String title;
+    private String content;
+    private String createdYear;
+
+    public Tut() { }
+
+    public Tut(String title, String content, String createdYear) {
+        this.title = title;
+        this.content = content;
+        this.createdYear = createdYear;
+    }
+
+    // getters and setters ...
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="Mapping a single object"><script type="text/plain">
+// Ask "tell me about Java" and get a Tut object back — not a String.
+Tut tutorial = chatClient
+        .prompt(query)
+        .call()
+        .entity(Tut.class);
+
+return tutorial;
+</script></div>
+
+<div class="box vid">
+  <span class="lbl">Actual result</span>
+  <p>Query <em>"tell me about Java"</em> returned
+  <code class="i">title</code>: "Java Programming Language",
+  <code class="i">content</code>: "This is a high level, class based, object oriented programming language",
+  <code class="i">createdYear</code>: "1995". Query <em>"tell me about Python programming"</em> —
+  same code, correctly populated Python object. Zero extra work.</p>
+</div>
+
+<h3>Mapping to a List</h3>
+<p><code class="i">List.class</code> won't work — generics are erased. You need
+<code class="i">ParameterizedTypeReference</code>:</p>
+
+<div class="code" data-lang="java" data-file="Mapping a List of objects"><script type="text/plain">
+import org.springframework.core.ParameterizedTypeReference;
+
+@Override
+public List<Tut> chat(String query) {
+    return chatClient
+            .prompt(query)
+            .call()
+            .entity(new ParameterizedTypeReference<List<Tut>>() {});
+}
+</script></div>
+
+<p>Query <em>"list me five programming languages"</em> → an array of five objects, each with title,
+content and created year (Python 1991, Java, JavaScript, C++, Ruby). Query
+<em>"list me the top five cricketers of India"</em> → Sachin Tendulkar, Virat Kohli, MS Dhoni…</p>
+
+<div class="box key">
+  <span class="lbl">How does it work?</span>
+  <p>Behind the scenes Spring AI <strong>rewrites your prompt</strong>, appending instructions describing the
+  exact JSON shape it needs. The LLM replies in that shape, Spring AI validates and converts it.
+  You'll literally see those injected instructions in Chapter 12 when you switch on advisor logging.</p>
+</div>
+
+<p><code class="i">.entity()</code> is overloaded three ways: a <strong>Class</strong>, a
+<strong>ParameterizedTypeReference</strong>, or a custom <strong>StructuredOutputConverter</strong> for complex shapes.</p>
+</section>
+
+<!-- ==================== 10 ==================== -->
+<section class="ch" id="c10" data-t="Chat Options & Defaults">
+<div class="chead"><span class="num">10</span><h2>Chat Options &amp; Default Options</h2></div>
+<p class="ts">3:16:00 — 3:26:24</p>
+
+<p>Options control <em>how</em> the answer is generated: which model, temperature, max tokens,
+frequency penalty, and more. There are <strong>three levels</strong> at which you can set them.</p>
+
+<h3>Level 1 — Globally, in properties</h3>
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+spring.ai.openai.chat.options.model=gpt-4o-mini
+spring.ai.openai.chat.options.temperature=0.3
+spring.ai.openai.chat.options.max-tokens=200
+</script></div>
+<p>Applies to every chat client in the application.</p>
+
+<h3>Level 2 — Per prompt (query-specific)</h3>
+<p>Pass <code class="i">ChatOptions</code> alongside the message inside a <code class="i">Prompt</code>:</p>
+
+<div class="code" data-lang="java" data-file="Per-request options"><script type="text/plain">
+import org.springframework.ai.openai.OpenAiChatOptions;
+
+Prompt prompt = new Prompt(query,
+        OpenAiChatOptions.builder()
+                .model("gpt-4o-mini")
+                .temperature(0.2)
+                .maxTokens(100)
+                .build());
+
+String response = chatClient.prompt(prompt).call().content();
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Downside</span>
+  <p>It's <strong>prompt-specific</strong>. If you build prompts in ten different places you have to repeat
+  the options ten times. <code class="i">ChatOptions</code> is an interface — the implementation is
+  provider-specific (<code class="i">OpenAiChatOptions</code>, <code class="i">OllamaChatOptions</code>, …).</p>
+</div>
+
+<h3>Level 3 — Default options on the ChatClient (recommended)</h3>
+<p>Set them once when you <em>build</em> the client, and every call through that client inherits them:</p>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java — a reusable ChatClient bean"><script type="text/plain">
+@Configuration
+public class AiConfig {
+
+    @Bean
+    public ChatClient chatClient(ChatClient.Builder builder) {
+        return builder
+                .defaultOptions(OpenAiChatOptions.builder()
+                        .model("gpt-4o-mini")
+                        .temperature(0.3)
+                        .maxTokens(200)
+                        .build())
+                // a default system message applied to EVERY call
+                .defaultSystem("You are a helpful coding assistant. You are an expert in coding.")
+                .build();
+    }
+}
+</script></div>
+
+<p>Now inject the finished <code class="i">ChatClient</code> instead of the builder:</p>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java"><script type="text/plain">
+@Service
+public class ChatServiceImpl implements ChatService {
+
+    private final ChatClient chatClient;
+
+    // inject the BEAN we created, not the builder
+    public ChatServiceImpl(ChatClient chatClient) {
+        this.chatClient = chatClient;
+    }
+}
+</script></div>
+
+<h3>What else <code>defaultXxx()</code> offers</h3>
+<table>
+<tr><th>Method</th><th>Sets</th></tr>
+<tr><td><code class="i">.defaultOptions(...)</code></td><td>Model, temperature, max tokens…</td></tr>
+<tr><td><code class="i">.defaultSystem(...)</code></td><td>A system message for every call</td></tr>
+<tr><td><code class="i">.defaultAdvisors(...)</code></td><td>Interceptors — see Chapter 12</td></tr>
+<tr><td><code class="i">.defaultUser(...)</code></td><td>A default user message</td></tr>
+<tr><td><code class="i">.defaultTools(...)</code></td><td>Tools available everywhere — Chapter 22</td></tr>
+<tr><td><code class="i">.defaultToolContext(...)</code></td><td>Shared tool context</td></tr>
+</table>
+
+<div class="box vid">
+  <span class="lbl">Why defaults matter</span>
+  <p>The example given: you're building a <strong>coding assistant</strong> and use the chat client in ten
+  places. Rather than repeating <em>"You are a helpful coding assistant"</em> ten times, set it once as
+  <code class="i">.defaultSystem(...)</code> — every call is now steered the same way.</p>
+</div>
+</section>
+
+<!-- ==================== 11 ==================== -->
+<section class="ch" id="c11" data-t="Prompt Templates & Message Roles">
+<div class="chead"><span class="num">11</span><h2>Prompt Templates &amp; Message Roles</h2></div>
+<p class="ts">3:26:24 — 4:24:09</p>
+
+<h3>The four roles</h3>
+<table>
+<tr><th>Role</th><th>Who sends it</th><th>What it does</th></tr>
+<tr><td><strong>user</strong></td><td>End user</td><td>The actual query — <em>"What is a JS Promise?"</em></td></tr>
+<tr><td><strong>system</strong></td><td>Developer</td><td>Rules, behaviour, identity — <em>"You are an expert JS assistant"</em></td></tr>
+<tr><td><strong>assistant</strong></td><td>The LLM</td><td>Every reply you receive is of this role</td></tr>
+<tr><td><strong>tool / function</strong></td><td>Tool calling</td><td>Not supported by every model — check yours</td></tr>
+</table>
+
+<div class="box warn">
+  <span class="lbl">Model support varies</span>
+  <p>Almost every model supports <strong>user</strong>. GPT supports all four. Gemini and others vary.
+  Always verify which roles your chosen model accepts.</p>
+</div>
+
+<h3>Why you can't send the raw user prompt</h3>
+<p>The user types <em>"In what logic should I write a program for prime numbers?"</em> — but you're
+building a <strong>Java-only</strong> assistant, and the model happily answers in Python. So you must
+<strong>modify the prompt before sending it</strong>, adding context and constraints.</p>
+
+<div class="box warn">
+  <span class="lbl">Don't concatenate strings</span>
+  <p>You <em>can</em> do <code class="i">systemText + query + "Now reply for this question"</code> — but with several
+  variables it becomes unreadable and error-prone. That's what templates are for.</p>
+</div>
+
+<h3>Approach A — Fluent API (easiest, use this most of the time)</h3>
+
+<div class="code" data-lang="java" data-file="Fluent templating with .param()"><script type="text/plain">
+String response = chatClient.prompt()
+        .system(s -> s.text("You are a helpful coding assistant. Answer as an expert in Java."))
+        .user(u -> u.text("As an expert in coding, answer this query: {query}")
+                    .param("query", query))   // fills the {query} placeholder at runtime
+        .call()
+        .content();
+</script></div>
+
+<p>Multiple parameters — either chain <code class="i">.param()</code> calls or pass a Map:</p>
+
+<div class="code" data-lang="java" data-file="Multiple placeholders"><script type="text/plain">
+.user(u -> u.text("What is {techName}? Tell me an example of {techExample}")
+            .param("techName", "Spring")
+            .param("techExample", "Spring Boot controller example"))
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Bug fixed live</span>
+  <p><em>"Attribute techName is not defined"</em> — the placeholder name in the template and the key in
+  <code class="i">.param()</code> <strong>must match exactly</strong>, including spelling.</p>
+</div>
+
+<h3>Approach B — Step-by-step with PromptTemplate</h3>
+<p>Four explicit steps: <strong>create template → render → build message → build prompt</strong>.</p>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java — chatTemplate()"><script type="text/plain">
+@Override
+public String chatTemplate() {
+
+    // 1. create the template
+    PromptTemplate strTemplate = PromptTemplate.builder()
+            .template("What is {techName}? Tell me an example of {techExample}")
+            .build();
+
+    // 2. render it with real values -> plain String
+    String renderedMessage = strTemplate.render(
+            Map.of("techName", "Spring",
+                   "techExample", "Spring Exception"));
+
+    // 3. + 4. wrap in a Prompt and execute
+    Prompt prompt = new Prompt(renderedMessage);
+    return chatClient.prompt(prompt).call().content();
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">render() vs createMessage()</span>
+  <p><code class="i">render()</code> returns a <strong>String</strong>. <code class="i">createMessage()</code> returns a proper
+  <strong>Message</strong> object. If you're combining several role-specific messages inside one
+  <code class="i">Prompt</code>, you need <code class="i">createMessage()</code> — a Prompt cannot take multiple raw Strings.</p>
+</div>
+
+<h3>Role-specific templates</h3>
+<p>There is a <code class="i">SystemPromptTemplate</code> (and Assistant / Function variants) but
+<strong>no UserPromptTemplate</strong> — the plain <code class="i">PromptTemplate</code> <em>is</em> the user template.</p>
+
+<div class="code" data-lang="java" data-file="Combining a system and a user message"><script type="text/plain">
+SystemPromptTemplate systemTemplate = SystemPromptTemplate.builder()
+        .template("You are a helpful coding assistant. You are an expert.")
+        .build();
+Message systemMessage = systemTemplate.createMessage();
+
+PromptTemplate userTemplate = PromptTemplate.builder()
+        .template("What is {techName}? Tell me an example of {techExample}")
+        .build();
+Message userMessage = userTemplate.createMessage(
+        Map.of("techName", "Spring", "techExample", "Spring Exception"));
+
+// A Prompt accepts multiple Message objects (or a List<Message>)
+Prompt prompt = new Prompt(systemMessage, userMessage);
+return chatClient.prompt(prompt).call().content();
+</script></div>
+
+<h3>Template renderers</h3>
+<p>Rendering is done by a <code class="i">TemplateRenderer</code>. The default is
+<code class="i">StTemplateRenderer</code>, which uses the StringTemplate (ST4) library and
+<code class="i">{ }</code> delimiters. Implementations available: <code class="i">StTemplateRenderer</code> and
+<code class="i">NoOpTemplateRenderer</code>. You can supply your own if you want different delimiters —
+say angle brackets instead of curly braces.</p>
+
+<h3>Reading prompts from files</h3>
+<p>Hard-coding big prompts inside Java is bad. Put them in
+<code class="i">src/main/resources/prompts/</code> as <code class="i">.st</code> files.</p>
+
+<div class="code" data-lang="text" data-file="resources/prompts/user-message.st"><script type="text/plain">
+Provide me. Explain the concept {concept}
+</script></div>
+
+<div class="code" data-lang="text" data-file="resources/prompts/system-message.st"><script type="text/plain">
+You are a helpful coding assistant.
+Guide us for explaining coding concepts.
+Provide examples and code to make it more understandable.
+</script></div>
+
+<div class="code" data-lang="java" data-file="Loading .st files with @Value"><script type="text/plain">
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;   // NOT jakarta.annotation.Resource!
+
+@Value("classpath:/prompts/user-message.st")
+private Resource userMessage;
+
+@Value("classpath:/prompts/system-message.st")
+private Resource systemMessage;
+
+public String chat(String query) {
+    return chatClient.prompt()
+            .system(this.systemMessage)                 // Resource works directly
+            .user(u -> u.text(this.userMessage)         // template from file
+                        .param("concept", query))       // fill the placeholder
+            .call()
+            .content();
+}
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Import trap</span>
+  <p>IntelliJ will happily import <code class="i">jakarta.annotation.Resource</code>. You need
+  <code class="i">org.springframework.core.io.Resource</code>. Always check your imports here.</p>
+</div>
+
+<div class="box err">
+  <span class="lbl">Test failing with "incorrect API key"</span>
+  <p>When running JUnit tests, the run configuration is <strong>separate</strong> from your application's.
+  The <code class="i">OPENAI_API_KEY</code> environment variable must be added to the <em>test</em> run
+  configuration too, otherwise you get an invalid-API-key error.</p>
+</div>
+</section>
+
+<!-- ==================== 12 ==================== -->
+<section class="ch" id="c12" data-t="Advisors (Interceptors)">
+<div class="chead"><span class="num">12</span><h2>Advisors — Interceptors for AI Calls</h2></div>
+<p class="ts">4:24:09 — 4:44:56</p>
+
+<p>Advisors are <strong>middleware / interceptors</strong>. They sit between the ChatClient and the LLM and
+run on the way out <em>and</em> on the way back.</p>
+
+<div class="flow">
+  <span class="n">User</span><span class="ar">→</span>
+  <span class="n">ChatClient</span><span class="ar">→</span>
+  <span class="n hl">Advisors (pre)</span><span class="ar">→</span>
+  <span class="n">LLM</span><span class="ar">→</span>
+  <span class="n hl">Advisors (post)</span><span class="ar">→</span>
+  <span class="n">User</span>
+</div>
+
+<div class="box warn">
+  <span class="lbl">Golden rule</span>
+  <p>You may <strong>add to</strong> a prompt inside an advisor, but the <strong>meaning must not change</strong>.
+  Enriching a simple prompt to produce a better answer is good. Mangling it until it's meaningless
+  defeats the point.</p>
+</div>
+
+<h3>Two interfaces, and why there are two</h3>
+<table>
+<tr><th>Interface</th><th>Method to override</th><th>Used when</th></tr>
+<tr><td><code class="i">CallAdvisor</code></td><td><code class="i">adviseCall(...)</code></td><td>Blocking <code class="i">.call()</code></td></tr>
+<tr><td><code class="i">StreamAdvisor</code></td><td><code class="i">adviseStream(...)</code></td><td>Reactive <code class="i">.stream()</code></td></tr>
+</table>
+<p>Because <code class="i">ChatClient</code> works both ways, an advisor that should support both must
+implement both.</p>
+
+<h3>Built-in advisors</h3>
+<table>
+<tr><th>Advisor</th><th>Purpose</th></tr>
+<tr><td><code class="i">SimpleLoggerAdvisor</code></td><td>Logs the full request and response</td></tr>
+<tr><td><code class="i">SafeGuardAdvisor</code></td><td>Blocks the call if the input contains sensitive words</td></tr>
+<tr><td><code class="i">MessageChatMemoryAdvisor</code></td><td>Injects conversation history as role-based messages</td></tr>
+<tr><td><code class="i">PromptChatMemoryAdvisor</code></td><td>Injects history as plain text</td></tr>
+<tr><td><code class="i">VectorStoreChatMemoryAdvisor</code></td><td>Memory backed by a vector store</td></tr>
+<tr><td><code class="i">QuestionAnswerAdvisor</code></td><td>Automatic RAG — Chapter 19</td></tr>
+<tr><td><code class="i">RetrievalAugmentationAdvisor</code></td><td>Modular / advanced RAG — Chapter 20</td></tr>
+</table>
+
+<h3>Registering advisors — two scopes</h3>
+
+<div class="code" data-lang="java" data-file="Per-request advisor"><script type="text/plain">
+// Only this single call gets logged
+String res = chatClient.prompt()
+        .advisors(new SimpleLoggerAdvisor())
+        .user(query)
+        .call()
+        .content();
+</script></div>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java — global default advisors"><script type="text/plain">
+@Bean
+public ChatClient chatClient(ChatClient.Builder builder) {
+    return builder
+            .defaultAdvisors(
+                    new SimpleLoggerAdvisor(),
+                    new SafeGuardAdvisor(List.of("games"))   // block sensitive words
+            )
+            .defaultOptions(OpenAiChatOptions.builder()
+                    .model("gpt-4o-mini")
+                    .temperature(0.3)
+                    .maxTokens(200)
+                    .build())
+            .build();
+}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Logs won't appear unless you enable them</span>
+  <p><code class="i">SimpleLoggerAdvisor</code> logs at <strong>DEBUG</strong> level. You must turn it on:</p>
+</div>
+
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+logging.level.org.springframework.ai.chat.client.advisor=DEBUG
+</script></div>
+
+<h3>What the logs actually show you</h3>
+<p>This is the payoff — you finally see exactly what leaves your app:</p>
+<ul>
+  <li>The <strong>system message</strong>, fully resolved from your <code class="i">.st</code> file</li>
+  <li>The <strong>user message</strong> with placeholders already substituted</li>
+  <li><strong>Model options</strong> — model name, temperature 0.3, max tokens 200, streamUsage false</li>
+  <li>The response with <code class="i">messageType: ASSISTANT</code>, finish reason, content filters</li>
+  <li><strong>Rate limits</strong> and <strong>token usage</strong> — prompt 41, completion 200, total 241</li>
+</ul>
+
+<h3>SafeGuardAdvisor in action</h3>
+<p>Configured with the word <em>"games"</em>, sending <em>"card games"</em> never reaches the LLM. You get the
+default refusal message instead — <em>"I'm unable to respond to that due to sensitive content, could
+we rephrase and discuss…"</em>. Practical use: block a keyword list for your chatbot.</p>
+
+<div class="box key">
+  <span class="lbl">Advisor ordering</span>
+  <p>Each advisor has an <code class="i">order</code> (SimpleLoggerAdvisor is <strong>0</strong>). Higher order = higher
+  priority = runs first. If two advisors share the same order there is <strong>no guarantee</strong> which runs
+  first. Advisors chain via <code class="i">advisorChain.nextCall(request)</code> — when the chain is
+  exhausted, the request finally goes to the LLM.</p>
+</div>
+</section>
+
+<!-- ==================== 13 ==================== -->
+<section class="ch" id="c13" data-t="Custom Advisor — Token Counter">
+<div class="chead"><span class="num">13</span><h2>Custom Advisor — Token Counter</h2></div>
+<p class="ts">4:44:56 — 5:06:54</p>
+
+<p>Use case: you're building an app where users pay by token. You need to know how many tokens every
+request consumed so you can debit their balance.</p>
+
+<h3>The three token types</h3>
+<table>
+<tr><th>Token</th><th>What it counts</th></tr>
+<tr><td><strong>Prompt tokens</strong></td>
+    <td>Everything you <em>send</em>: system messages + user messages + chat history +
+        tool/function definitions + JSON mode instructions</td></tr>
+<tr><td><strong>Completion tokens</strong></td>
+    <td>Everything the model <em>generates</em>. ~150 words ≈ ~200 tokens</td></tr>
+<tr><td><strong>Total tokens</strong></td>
+    <td><code class="i">prompt + completion</code> — this is what you're billed on</td></tr>
+</table>
+
+<h3>Writing the advisor</h3>
+<p>Implement both <code class="i">CallAdvisor</code> and <code class="i">StreamAdvisor</code>, override
+<code class="i">getName()</code> and <code class="i">getOrder()</code>, then forward the request down the chain.</p>
+
+<div class="code" data-lang="java" data-file="advisors/TokenPrintAdvisor.java"><script type="text/plain">
+package com.spring.ai.firstproject.advisors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
+import org.springframework.ai.chat.client.advisor.api.*;
+import reactor.core.publisher.Flux;
+
+public class TokenPrintAdvisor implements CallAdvisor, StreamAdvisor {
+
+    private final Logger logger = LoggerFactory.getLogger(TokenPrintAdvisor.class);
+
+    @Override
+    public String getName() {
+        return this.getClass().getName();
+    }
+
+    @Override
+    public int getOrder() {
+        return 0;   // higher value = higher priority = runs earlier
+    }
+
+    // ---------- blocking path ----------
+    @Override
+    public ChatClientResponse adviseCall(ChatClientRequest chatClientRequest,
+                                         CallAdvisorChain callAdvisorChain) {
+
+        // BEFORE the request goes out: log the fully-resolved prompt
+        this.logger.info("My TokenPrintAdvisor called");
+        this.logger.info("Request prompt: {}", chatClientRequest.prompt().getContents());
+
+        // forward to the next advisor; if none left, it reaches the LLM
+        ChatClientResponse response = callAdvisorChain.nextCall(chatClientRequest);
+
+        // AFTER the response comes back
+        this.logger.info("Response received from model");
+        this.logger.info("Response text: {}",
+                response.chatResponse().getResult().getOutput().getText());
+
+        this.logger.info("Prompt tokens consumed: {}",
+                response.chatResponse().getMetadata().getUsage().getPromptTokens());
+        this.logger.info("Completion tokens consumed: {}",
+                response.chatResponse().getMetadata().getUsage().getCompletionTokens());
+        this.logger.info("Total tokens consumed: {}",
+                response.chatResponse().getMetadata().getUsage().getTotalTokens());
+
+        return response;   // pass it on so other advisors can see it
+    }
+
+    // ---------- streaming path ----------
+    @Override
+    public Flux<ChatClientResponse> adviseStream(ChatClientRequest chatClientRequest,
+                                                 StreamAdvisorChain streamAdvisorChain) {
+        // MUST forward — returning null breaks streaming (see the error box below)
+        return streamAdvisorChain.nextStream(chatClientRequest);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java — register it"><script type="text/plain">
+@Bean
+public ChatClient chatClient(ChatClient.Builder builder) {
+    return builder
+            .defaultAdvisors(
+                    new TokenPrintAdvisor(),
+                    new SafeGuardAdvisor(List.of("games"))
+            )
+            .build();
+}
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Bug from a later chapter — worth knowing now</span>
+  <p>When streaming was added, the app broke. Cause: <code class="i">adviseStream</code> had been left
+  returning <code class="i">null</code>, so nothing came back. The fix is exactly the line above —
+  always forward with <code class="i">streamAdvisorChain.nextStream(...)</code>.</p>
+</div>
+
+<div class="box vid">
+  <span class="lbl">Real output</span>
+  <p>Query <em>"Java new features"</em> → prompt tokens <strong>43</strong>, completion tokens
+  <strong>200</strong> (capped by max-tokens), total <strong>243</strong>. Input tokens are billed at
+  the input rate, output tokens at the output rate — add both to get the cost.</p>
+</div>
+
+<div class="box key">
+  <span class="lbl">Execution order observed</span>
+  <p>With SimpleLoggerAdvisor <em>and</em> TokenPrintAdvisor registered, the logger ran first on the way
+  out — and last on the way back. Advisors unwind in reverse order, like a stack.</p>
+</div>
+</section>
+
+<!-- ==================== 14 ==================== -->
+<section class="ch" id="c14" data-t="Streaming Responses">
+<div class="chead"><span class="num">14</span><h2>Streaming Responses</h2></div>
+<p class="ts">5:06:54 — 5:24:56</p>
+
+<h3>Blocking vs streaming</h3>
+<p>Blocking: the user sends a request, your app waits for the <em>entire</em> answer (maybe minutes), and
+only then responds. Both the app and the user are blocked. Demonstrated in Postman and in the
+browser — the tab just spins.</p>
+
+<div class="flow">
+  <span class="n">User</span><span class="ar">→</span>
+  <span class="n">App</span><span class="ar">→</span>
+  <span class="n">LLM (5 min…)</span><span class="ar">→</span>
+  <span class="n">full answer</span><span class="ar">→</span>
+  <span class="n">User</span>
+</div>
+
+<p>Streaming: the model emits chunks as it generates them; you forward each chunk immediately.
+That's the ChatGPT typing effect.</p>
+
+<div class="flow">
+  <span class="n">User</span><span class="ar">→</span>
+  <span class="n">App</span><span class="ar">→</span>
+  <span class="n hl">chunk · chunk · chunk</span><span class="ar">→</span>
+  <span class="n">User sees it live</span>
+</div>
+
+<h3>Controller — return a Flux</h3>
+
+<div class="code" data-lang="java" data-file="controller/ChatController.java"><script type="text/plain">
+import reactor.core.publisher.Flux;
+
+@GetMapping("/stream-chat")
+public ResponseEntity<Flux<String>> streamChat(@RequestParam("q") String query) {
+    // Flux = many values over time (Mono would be a single value)
+    return ResponseEntity.ok(chatService.streamChat(query));
+}
+</script></div>
+
+<h3>Service — swap <code>.call()</code> for <code>.stream()</code></h3>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java"><script type="text/plain">
+@Override
+public Flux<String> streamChat(String query) {
+    return chatClient.prompt()
+            .system(this.systemMessage)                 // Resource from .st file
+            .user(u -> u.text(this.userMessage)
+                        .param("concept", query))
+            .stream()        // <-- the only real change
+            .content();      // returns Flux<String> instead of String
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">What .stream() can give you</span>
+  <p><code class="i">.content()</code> → <code class="i">Flux&lt;String&gt;</code> ·
+  <code class="i">.chatResponse()</code> → <code class="i">Flux&lt;ChatResponse&gt;</code> ·
+  <code class="i">.chatClientResponse()</code> → <code class="i">Flux&lt;ChatClientResponse&gt;</code>.
+  Pick based on how much detail you need.</p>
+</div>
+
+<div class="box err">
+  <span class="lbl">The exception you'll hit</span>
+  <p>Streaming threw an error because the custom <code class="i">TokenPrintAdvisor</code> implemented
+  <code class="i">adviseStream</code> as <code class="i">return null;</code>. Any custom advisor must forward the
+  stream properly (Chapter 13). Advisors sit in <em>both</em> paths.</p>
+</div>
+
+<div class="box vid">
+  <span class="lbl">Side-by-side demo</span>
+  <p>Two URLs on port 8082: <code class="i">/chat</code> waits and dumps everything at once;
+  <code class="i">/stream-chat</code> paints text progressively. Removing the max-token cap makes the
+  difference obvious. Postman shows a "Receiving response…" indicator; the browser renders live.</p>
+</div>
+
+<p>Verdict from the video: streaming is the better default. A blocked user leaves your site.</p>
+</section>
+
+<!-- ==================== 15 ==================== -->
+<section class="ch" id="c15" data-t="Chat Memory">
+<div class="chead"><span class="num">15</span><h2>Chat Memory</h2></div>
+<p class="ts">5:24:56 — 6:09:20</p>
+
+<h3>LLMs are stateless</h3>
+<p>Request 1: <em>"My name is John"</em> → the model uses it, because it's in <em>that</em> request.
+Request 2: <em>"What's my name?"</em> → <em>"I don't know your name."</em> Every interaction is treated
+as brand new.</p>
+
+<div class="box key">
+  <span class="lbl">So how does ChatGPT remember?</span>
+  <p>It doesn't — the <strong>ChatGPT application</strong> does. It's a wrapper that stores your conversation
+  and re-sends it as context on every request. Spring AI gives you the same capability.</p>
+</div>
+
+<h3>Two APIs</h3>
+<table>
+<tr><th></th><th>ChatMemory</th><th>ChatMemoryRepository</th></tr>
+<tr><td>Answers</td><td><strong>What</strong> to store &amp; <strong>which strategy</strong></td><td><strong>Where</strong> to store it</td></tr>
+<tr><td>Examples of concerns</td><td>Last N messages, token limit, time window</td><td>Memory, database, vector store</td></tr>
+<tr><td>Type</td><td>Interface</td><td>Interface</td></tr>
+<tr><td>Default impl</td><td><code class="i">MessageWindowChatMemory</code></td><td><code class="i">InMemoryChatMemoryRepository</code></td></tr>
+</table>
+
+<p><code class="i">MessageWindowChatMemory</code> keeps a rolling window — <strong>default 20 messages</strong>. When new
+messages arrive, the oldest are evicted. It holds a reference to a repository and delegates all
+actual persistence to it.</p>
+
+<p><code class="i">InMemoryChatMemoryRepository</code> stores everything in a
+<code class="i">ConcurrentHashMap&lt;String, List&lt;Message&gt;&gt;</code> — key = <strong>conversation ID</strong>,
+value = the message list. Close the app and it's gone.</p>
+
+<div class="box warn">
+  <span class="lbl">Don't crank the window up</span>
+  <p>Every remembered message is <strong>re-sent with each request</strong>, so it lands in your prompt tokens.
+  Bigger window → bigger bill. Keep it tight.</p>
+</div>
+
+<h3>Wiring it up</h3>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java"><script type="text/plain">
+@Configuration
+public class AiConfig {
+
+    private final Logger logger = LoggerFactory.getLogger(AiConfig.class);
+
+    @Bean
+    public ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory) {
+
+        // Prove which implementation you got: MessageWindowChatMemory
+        logger.info("Chat memory implementation class: {}",
+                    chatMemory.getClass().getName());
+
+        return builder
+                .defaultAdvisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        new SimpleLoggerAdvisor(),
+                        new SafeGuardAdvisor(List.of("games"))
+                )
+                .build();
+    }
+}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Use the builder, not <code>new</code></span>
+  <p><code class="i">MessageChatMemoryAdvisor</code>'s constructor is private —
+  <code class="i">MessageChatMemoryAdvisor.builder(chatMemory).build()</code> is the only way.
+  <code class="i">ChatMemory</code> itself is auto-configured, so you can just inject it.</p>
+</div>
+
+<h3>What memory actually does to your request</h3>
+<p>Turn on <code class="i">SimpleLoggerAdvisor</code> and the mechanism is completely visible. Say
+<em>"My name is Amit"</em>, then ask <em>"What is my name?"</em>. The second request contains:</p>
+<ol>
+  <li>The <strong>system message</strong></li>
+  <li><strong>"My name is Amit"</strong> — the earlier user message, replayed automatically</li>
+  <li>The earlier <strong>assistant message</strong> (the model's previous reply)</li>
+  <li>Finally, the new user message <em>"What is my name?"</em></li>
+</ol>
+<p>Nothing magical — the whole history is simply prepended to the prompt.</p>
+
+<div class="box warn">
+  <span class="lbl">The hidden cost, measured</span>
+  <p>Asking a two-word question after some history consumed <strong>~1300 total tokens</strong> —
+  874 of them prompt tokens, purely from replayed history. Memory is convenient and expensive.
+  RAG (Chapter 18) exists partly to solve this.</p>
+</div>
+</section>
+
+<!-- ==================== 16 ==================== -->
+<section class="ch" id="c16" data-t="Multi-user Sessions (conversationId)">
+<div class="chead"><span class="num">16</span><h2>Multi-user Sessions with conversationId</h2></div>
+<p class="ts">6:09:20 — 6:28:52</p>
+
+<h3>The bug</h3>
+<p>User A says <em>"My name is Harsh"</em>. User B says <em>"My name is Ankit"</em>. User A then asks
+<em>"What is my name?"</em> → <strong>"Your name is Ankit."</strong> Everyone shares one conversation.</p>
+
+<h3>Why</h3>
+<p><code class="i">ChatMemory</code> has a <code class="i">DEFAULT_CONVERSATION_ID</code>. If you never override it, every
+message from every user goes under that <strong>single key</strong> in the ConcurrentHashMap.</p>
+
+<div class="flow">
+  <span class="n">ConcurrentHashMap</span><span class="ar">→</span>
+  <span class="n hl">key = conversationId</span><span class="ar">→</span>
+  <span class="n">value = List&lt;Message&gt;</span>
+</div>
+
+<h3>The fix — a per-user conversation ID</h3>
+<p><strong>Step 1.</strong> Accept an identifier from the client, typically a header:</p>
+
+<div class="code" data-lang="java" data-file="controller/ChatController.java"><script type="text/plain">
+@GetMapping("/chat")
+public ResponseEntity<String> chat(
+        @RequestParam("q") String q,
+        @RequestHeader("userId") String userId) {
+
+    // the userId doubles as the conversation ID
+    return ResponseEntity.ok(chatService.chatTemplate(q, userId));
+}
+</script></div>
+
+<p><strong>Step 2.</strong> Pass it into the advisor via <code class="i">.advisors(...)</code> with a lambda:</p>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java"><script type="text/plain">
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
+
+@Override
+public String chatTemplate(String query, String userId) {
+    return chatClient.prompt()
+            .system(this.systemMessage)
+            .user(u -> u.text(this.userMessage).param("query", query))
+            // set the conversation ID for THIS request only
+            .advisors(a -> a.param(CONVERSATION_ID, userId))
+            .call()
+            .content();
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Use the constant</span>
+  <p>You <em>can</em> hard-code the string key, but <code class="i">ChatMemory.CONVERSATION_ID</code> is
+  <code class="i">public static final</code> (interface fields always are) — use it and avoid typos.</p>
+</div>
+
+<h3>Verified in the debugger</h3>
+<p>A breakpoint inside <code class="i">InMemoryChatMemoryRepository.findByConversationId()</code> showed the
+map growing correctly:</p>
+<ul>
+  <li>Key <strong>"Harsh-user"</strong> → 4 messages (2 user + 2 assistant)</li>
+  <li>Key <strong>"Ankit-user"</strong> → 2 messages (1 user + 1 assistant)</li>
+</ul>
+<p>Asking <em>"Can you repeat my name three times?"</em> under each header returned the correct name every
+time. Sessions are now genuinely isolated.</p>
+
+<div class="box warn">
+  <span class="lbl">Still one problem left</span>
+  <p>It's all in RAM. Restart the app and every conversation vanishes. Chapter 17 fixes that.</p>
+</div>
+</section>
+
+<!-- ==================== 17 ==================== -->
+<section class="ch" id="c17" data-t="Persistent Memory — JDBC">
+<div class="chead"><span class="num">17</span><h2>Persistent Memory with JDBC</h2></div>
+<p class="ts">6:28:52 — 6:54:41</p>
+
+<p>In-memory storage is fine for a demo. Real applications need conversations in a database.
+Swap the <strong>repository</strong>; the <strong>strategy</strong> (<code class="i">MessageWindowChatMemory</code>) stays the same.</p>
+
+<div class="flow">
+  <span class="n">ChatMemory<br>(strategy)</span><span class="ar">→</span>
+  <span class="n hl">ChatMemoryRepository<br>(storage)</span><span class="ar">→</span>
+  <span class="n">JdbcChatMemoryRepository</span><span class="ar">→</span>
+  <span class="n">MySQL</span>
+</div>
+
+<h3>Step 1 — Dependencies</h3>
+<div class="code" data-lang="xml" data-file="pom.xml"><script type="text/plain">
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>8.4.0</version>
+</dependency>
+</script></div>
+
+<h3>Step 2 — Database configuration</h3>
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+spring.datasource.url=jdbc:mysql://localhost:3306/spring_ai_yt
+spring.datasource.username=root
+spring.datasource.password=root1234
+
+# Create the spring_ai_chat_memory table automatically on startup
+spring.ai.chat.memory.repository.jdbc.initialize-schema=always
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Create the schema first</span>
+  <p>Spring creates the <em>table</em>, not the <em>database</em>. Create the schema in MySQL Workbench
+  (the video used <code class="i">spring_ai_yt</code>) before starting the app, or you'll get
+  <em>"failed to obtain JDBC connection"</em>.</p>
+</div>
+
+<h3>Supported databases</h3>
+<p>PostgreSQL · MySQL · MariaDB · SQL Server · HSQLDB. Not on the list? Implement
+<code class="i">ChatMemoryRepository</code> yourself — the video walks through
+<code class="i">JdbcChatMemoryRepository</code> as the reference, which uses a
+<code class="i">JdbcTemplate</code>, a <code class="i">TransactionTemplate</code> and a dialect class.</p>
+
+<h3>The generated table</h3>
+<table>
+<tr><th>Column</th><th>Holds</th></tr>
+<tr><td><code class="i">conversation_id</code></td><td>Which session the message belongs to</td></tr>
+<tr><td><code class="i">content</code></td><td>The message text</td></tr>
+<tr><td><code class="i">type</code></td><td><code class="i">USER</code> or <code class="i">ASSISTANT</code> — messages are stored role-wise</td></tr>
+<tr><td><code class="i">timestamp</code></td><td>When it arrived</td></tr>
+</table>
+
+<h3>Step 3 — Auto-configuration takes over</h3>
+<p>Once that dependency is on the classpath, Spring AI auto-configures a
+<code class="i">JdbcChatMemoryRepository</code> bean and <code class="i">MessageWindowChatMemory</code> uses it
+<strong>automatically</strong>. You literally don't have to change any Java.</p>
+
+<h3>Step 4 — Customising the window size</h3>
+<p>To change the default 20 messages, build <code class="i">ChatMemory</code> yourself:</p>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java"><script type="text/plain">
+@Bean
+public ChatMemory chatMemory(JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+    return MessageWindowChatMemory.builder()
+            .chatMemoryRepository(jdbcChatMemoryRepository)  // store in MySQL
+            .maxMessages(10)                                 // instead of the default 20
+            .build();
+}
+</script></div>
+
+<div class="box vid">
+  <span class="lbl">Proven persistent</span>
+  <p>User <em>Ankit</em> says <em>"My company name is Substring Technologies"</em>. Later — after
+  restarting the app — <em>"Which company am I working in?"</em> is answered correctly, and even
+  <em>"Tell me the last word of my company name"</em> → <em>"Technologies"</em>. The rows are visible in
+  MySQL, split cleanly by conversation ID.</p>
+</div>
+
+<div class="box key">
+  <span class="lbl">Custom schema location</span>
+  <p>Using an unsupported DB (e.g. H2)? Write your own schema file under
+  <code class="i">resources/schema/</code> and point at it with
+  <code class="i">spring.ai.chat.memory.repository.jdbc.schema=classpath:/schema/schema-h2.sql</code>.</p>
+</div>
+</section>
+
+<!-- ==================== 18 ==================== -->
+<section class="ch" id="c18" data-t="RAG — Concepts, Vectors & Vector DBs">
+<div class="chead"><span class="num">18</span><h2>RAG — Concepts, Vectors &amp; Vector Databases</h2></div>
+<p class="ts">6:54:41 — 7:20:23</p>
+
+<h3>Why chat memory isn't enough</h3>
+<p>Storing conversations in a DB works for <em>limited</em> context. But imagine a chatbot for
+"Substring Technologies" that must answer questions about <strong>company policies</strong>. That data is huge.
+You can't send it all with every prompt because:</p>
+<ul>
+  <li>More context → more tokens → higher bill</li>
+  <li>Every model has a hard <strong>context window</strong> — you physically cannot exceed it</li>
+</ul>
+
+<h3>What RAG stands for</h3>
+<table>
+<tr><th>Letter</th><th>Stands for</th><th>What happens</th></tr>
+<tr><td><strong>R</strong></td><td>Retrieval</td><td>Fetch the most relevant chunks from the database</td></tr>
+<tr><td><strong>A</strong></td><td>Augmented</td><td>Attach those chunks to the prompt as context</td></tr>
+<tr><td><strong>G</strong></td><td>Generation</td><td>The LLM generates an answer grounded in that context</td></tr>
+</table>
+
+<h3>The full flow</h3>
+<div class="flow">
+  <span class="n">1. User query</span><span class="ar">→</span>
+  <span class="n">2. App</span><span class="ar">→</span>
+  <span class="n hl">3. Similarity search in Vector DB</span><span class="ar">→</span>
+  <span class="n">4. Context + query → LLM</span><span class="ar">→</span>
+  <span class="n">5. Answer</span><span class="ar">→</span>
+  <span class="n">6. User</span>
+</div>
+
+<div class="box key">
+  <span class="lbl">The prerequisite step</span>
+  <p>Before any of this, you must <strong>load your data into the vector DB</strong> — chunk it, embed it,
+  store it. That's the ETL pipeline (Chapter 21).</p>
+</div>
+
+<h3>What problems RAG solves</h3>
+<ul>
+  <li><strong>Limited memory</strong> — models are trained on public data, never on your private data</li>
+  <li><strong>Training cutoff</strong> — they can't know anything recent</li>
+  <li><strong>Context limit</strong> — you can't paste a whole book into a prompt</li>
+  <li><strong>Hallucination</strong> — grounding in retrieved facts improves accuracy and trust</li>
+</ul>
+
+<h3>Vectors</h3>
+<p>In ML terms, a vector is simply <strong>an array of numbers</strong> (an n-dimensional matrix) that represents
+some piece of information — text, image, audio, video. Those numbers are the <strong>embeddings</strong>.</p>
+
+<h3>Vector databases</h3>
+<p>Regular databases (MySQL, Postgres) store structured rows and search by exact property.
+Vector databases store embeddings and search by <strong>similarity</strong>.</p>
+
+<div class="box vid">
+  <span class="lbl">The 3D-space analogy</span>
+  <p>Picture objects plotted on x/y/z axes. Similar items cluster together; unrelated items sit far
+  apart. Search for one embedding and the DB returns its <strong>nearest neighbours</strong> —
+  ranked by similarity, e.g. the top 5. Under the hood it's maths: <strong>cosine similarity</strong> or
+  <strong>Euclidean distance</strong>.</p>
+</div>
+
+<p>Supported vector stores in Spring AI: Azure AI Search, Chroma, <strong>MariaDB</strong>, Neo4j, Oracle,
+PgVector, Pinecone, <strong>Qdrant</strong>, Redis, and more.</p>
+
+<h3>How a query is answered</h3>
+<ol>
+  <li>The user's query is converted into an <strong>embedding vector</strong></li>
+  <li>That vector is searched against the vector DB</li>
+  <li>The <strong>top-K most similar</strong> chunks come back (the "knowledge")</li>
+  <li>Knowledge + original query are sent to the LLM</li>
+  <li>The LLM answers <em>from that knowledge</em></li>
+</ol>
+</section>
+
+<!-- ==================== 19 ==================== -->
+<section class="ch" id="c19" data-t="RAG Implementation">
+<div class="chead"><span class="num">19</span><h2>RAG Implementation — Manual &amp; QuestionAnswerAdvisor</h2></div>
+<p class="ts">7:20:23 — 8:31:42</p>
+
+<h3>Step 1 — Run MariaDB (vector support since 11.7) via Docker</h3>
+
+<div class="code" data-lang="bash" data-file="terminal"><script type="text/plain">
+docker run -d --name mariadb1 \
+  -e MARIADB_ROOT_PASSWORD=root1234 \
+  -p 3308:3306 \
+  mariadb:11.8
+</script></div>
+
+<p>Connect with DBeaver (host <code class="i">localhost</code>, port <code class="i">3308</code>, user
+<code class="i">root</code>), create a schema called <code class="i">spring_ai</code>. Creating a test table confirms a
+<strong>VECTOR</strong> column type is available.</p>
+
+<h3>Step 2 — Dependencies</h3>
+<div class="code" data-lang="xml" data-file="pom.xml"><script type="text/plain">
+<!-- Vector store + auto-configuration for MariaDB -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-vector-store-mariadb</artifactId>
+</dependency>
+
+<!-- Advisors that plug RAG into the ChatClient -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-advisors-vector-store</artifactId>
+</dependency>
+
+<!-- Core RAG module (needed for RetrievalAugmentationAdvisor) -->
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-rag</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.mariadb.jdbc</groupId>
+    <artifactId>mariadb-java-client</artifactId>
+</dependency>
+</script></div>
+
+<h3>Step 3 — Configuration</h3>
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+spring.datasource.url=jdbc:mariadb://localhost:3308/spring_ai
+spring.datasource.username=root
+spring.datasource.password=root1234
+
+spring.ai.vectorstore.mariadb.initialize-schema=true
+spring.ai.vectorstore.mariadb.distance-type=COSINE
+spring.ai.vectorstore.mariadb.dimensions=1536
+</script></div>
+
+<p>On startup Spring creates a <code class="i">vector_store</code> table with columns
+<code class="i">id</code> (UUID), <code class="i">content</code> (TEXT), <code class="i">metadata</code> (LONGTEXT) and
+<code class="i">embedding</code> (<strong>VECTOR</strong>, 1536 dimensions).</p>
+
+<h3>Step 4 — Load data into the vector store</h3>
+
+<div class="code" data-lang="java" data-file="helper/Helper.java"><script type="text/plain">
+public class Helper {
+    public static List<String> getData() {
+        return List.of(
+            "Java is a platform independent object oriented programming language",
+            "JDK includes compiler and JVM tools",
+            "Java supports multi-threading using the Thread class",
+            "Microservices in Spring Boot use Eureka for service discovery",
+            "Spring Boot applications typically run on embedded Tomcat servers",
+            "The Optional class avoids null pointer exceptions",
+            "Java 8 introduced lambda expressions and the Stream API",
+            "JPA is a specification, Hibernate implements it"
+        );
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java — saveData()"><script type="text/plain">
+private final VectorStore vectorStore;   // auto-configured, just inject it
+
+@Override
+public void saveData(List<String> list) {
+    // convert each String into a Spring AI Document
+    List<Document> documentList = list.stream()
+            .map(Document::new)
+            .toList();
+
+    // add() embeds them and writes them to the vector DB
+    this.vectorStore.add(documentList);
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Loading via a JUnit test</span>
+  <p>The neat trick used in the video: run the loader as a <code class="i">@Test</code> so you don't have to
+  build an endpoint for it. Remember to add <code class="i">OPENAI_API_KEY</code> to the test run
+  configuration — creating embeddings calls the model.</p>
+</div>
+
+<div class="code" data-lang="java" data-file="src/test/java/.../ApplicationTests.java"><script type="text/plain">
+@SpringBootTest
+class ApplicationTests {
+
+    @Autowired
+    private ChatService chatService;
+
+    @Test
+    void saveDataToVectorDatabase() {
+        System.out.println("Saving data to database");
+        chatService.saveData(Helper.getData());
+        System.out.println("Data saved successfully");
+    }
+}
+</script></div>
+
+<h3>Step 5 — Manual RAG (full control)</h3>
+
+<div class="code" data-lang="text" data-file="resources/prompts/system-message.st"><script type="text/plain">
+You are a coding assistant. Explain the concept clearly with examples.
+Answer ONLY from the documents provided below.
+
+{documents}
+
+If something is not in the documents, reply with:
+"This query is not in my database"
+</script></div>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java — manual similarity search"><script type="text/plain">
+private final Logger logger = LoggerFactory.getLogger(ChatServiceImpl.class);
+
+@Override
+public String chatTemplate(String query, String userId) {
+
+    // 1. RETRIEVE — similarity search against the vector DB
+    List<Document> documents = this.vectorStore.similaritySearch(
+            SearchRequest.builder()
+                    .topK(3)                    // only the 3 best matches
+                    .similarityThreshold(0.6)   // 0.0 = anything, 1.0 = exact
+                    .query(query)
+                    .build());
+
+    // 2. flatten them into a single context string
+    List<String> documentList = documents.stream()
+            .map(Document::getText)
+            .toList();
+    String contextData = String.join(", ", documentList);
+    logger.info("Context data: {}", contextData);
+
+    // 3. AUGMENT + GENERATE
+    return chatClient.prompt()
+            .system(s -> s.text(this.systemMessage).param("documents", contextData))
+            .user(u -> u.text(this.userMessage).param("query", query))
+            .call()
+            .content();
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">The two knobs that matter</span>
+  <p><strong>topK</strong> — how many chunks to send. Keep it small (3–5); every extra chunk is extra tokens.<br>
+  <strong>similarityThreshold</strong> — 0.0 to 1.0. <code class="i">1.0</code> demands an exact match,
+  <code class="i">0.0</code> accepts anything. The video settles on <strong>0.5–0.6</strong>.</p>
+</div>
+
+<div class="box vid">
+  <span class="lbl">It works</span>
+  <p><em>"What is Java?"</em> → answered from the stored sentences.
+  <em>"Which class avoids null pointer exception?"</em> → <em>"Optional"</em>.
+  <em>"What is Node.js?"</em> → <em>"This query is not in my database"</em>, because nothing about Node was
+  ever loaded. Exactly the behaviour the strict system prompt demanded.</p>
+</div>
+
+<h3>Step 6 — QuestionAnswerAdvisor (let Spring do it)</h3>
+<p>All of the above — search, context assembly, strict instructions — can be replaced by one advisor.</p>
+
+<div class="code" data-lang="java" data-file="Automatic RAG"><script type="text/plain">
+// simplest form
+return chatClient.prompt()
+        .advisors(new QuestionAnswerAdvisor(vectorStore))
+        .user(query)
+        .call()
+        .content();
+</script></div>
+
+<div class="code" data-lang="java" data-file="With a customised search request"><script type="text/plain">
+return chatClient.prompt()
+        .advisors(QuestionAnswerAdvisor.builder(vectorStore)
+                .searchRequest(SearchRequest.builder()
+                        .topK(3)
+                        .similarityThreshold(0.5)
+                        .build())
+                .build())
+        .user(query)
+        .call()
+        .content();
+</script></div>
+
+<p>The advisor injects its own default prompt template into the request. In the logs you can see it
+appending the context, followed by wording like <em>"Given the context information and no prior
+knowledge, answer the query. If the answer is not in the context, say you cannot answer."</em></p>
+
+<div class="box key">
+  <span class="lbl">Custom template</span>
+  <p>Pass your own via <code class="i">.promptTemplate(...)</code>, built with
+  <code class="i">PromptTemplate.builder().renderer(StTemplateRenderer.builder()...)</code>
+  if you also want custom delimiters. Filtering is supported through
+  <code class="i">.filterExpression(...)</code> on the search request.</p>
+</div>
+</section>
+
+<!-- ==================== 20 ==================== -->
+<section class="ch" id="c20" data-t="Advanced RAG — Modular Pipeline">
+<div class="chead"><span class="num">20</span><h2>Advanced RAG — Modular Pipeline</h2></div>
+<p class="ts">8:31:42 — 9:43:25</p>
+
+<p>Spring AI implements a <strong>modular RAG architecture</strong> (inspired by the "Modular RAG" paper).
+Instead of one search, the flow is broken into four phases, each pluggable.</p>
+
+<div class="flow">
+  <span class="n hl">Pre-Retrieval</span><span class="ar">→</span>
+  <span class="n hl">Retrieval</span><span class="ar">→</span>
+  <span class="n hl">Post-Retrieval</span><span class="ar">→</span>
+  <span class="n hl">Generation</span>
+</div>
+
+<h3>Phase 1 — Pre-Retrieval (process the query before searching)</h3>
+<table>
+<tr><th>Component</th><th>Implementation</th><th>What it does</th></tr>
+<tr><td rowspan="3">Query Transformer</td><td><code class="i">RewriteQueryTransformer</code></td>
+    <td>Rewrites a verbose/ambiguous query into a clean one</td></tr>
+<tr><td><code class="i">TranslationQueryTransformer</code></td><td>Translates the query into a target language</td></tr>
+<tr><td><code class="i">CompressionQueryTransformer</code></td><td>Compresses conversation history into one standalone query</td></tr>
+<tr><td>Query Expander</td><td><code class="i">MultiQueryExpander</code></td>
+    <td>Turns 1 query into N variations to cast a wider net</td></tr>
+</table>
+
+<div class="box vid">
+  <span class="lbl">Rewrite example</span>
+  <p>User types <em>"I'm studying ML, what is an LLM?"</em> → rewritten to
+  <em>"Large Language Model definition"</em>. In the live demo <em>"what is java"</em> became
+  <em>"what is java programming language"</em> — more context, better vector matches.</p>
+</div>
+
+<h3>Phase 2 — Retrieval</h3>
+<ul>
+  <li><strong>DocumentRetriever</strong> → <code class="i">VectorStoreDocumentRetriever</code> does the similarity
+      search with optional metadata filtering and threshold.</li>
+  <li><strong>DocumentJoiner</strong> → <code class="i">ConcatenationDocumentJoiner</code> merges results from
+      multiple queries / multiple sources and removes duplicates.</li>
+</ul>
+
+<h3>Phase 3 — Post-Retrieval</h3>
+<p><strong>DocumentPostProcessor</strong> — clean, re-rank, compress or drop irrelevant chunks before they
+reach the LLM. No built-in implementation ships; write your own <code class="i">process()</code> method.</p>
+
+<h3>Phase 4 — Generation</h3>
+<p><strong>QueryAugmenter</strong> → <code class="i">ContextualQueryAugmenter</code> merges the retrieved documents
+into the query and hands the final prompt to the model.</p>
+
+<h3>Putting it together</h3>
+
+<div class="code" data-lang="java" data-file="service/ChatServiceImpl.java — advanced RAG pipeline"><script type="text/plain">
+@Override
+public String getResponse(String userQuery) {
+
+    Advisor advisor = RetrievalAugmentationAdvisor.builder()
+
+            // --- PRE-RETRIEVAL: rewrite then translate the query ---
+            .queryTransformers(
+                    RewriteQueryTransformer.builder()
+                            // transformers use the LLM, so they need a builder
+                            .chatClientBuilder(this.chatClient.mutate().clone())
+                            .build(),
+                    TranslationQueryTransformer.builder()
+                            .chatClientBuilder(this.chatClient.mutate().clone())
+                            .targetLanguage("english")
+                            .build())
+
+            // --- PRE-RETRIEVAL: expand 1 query into several ---
+            .queryExpander(MultiQueryExpander.builder()
+                    .chatClientBuilder(this.chatClient.mutate().clone())
+                    .numberOfQueries(3)      // default is 3
+                    .build())
+
+            // --- RETRIEVAL ---
+            .documentRetriever(VectorStoreDocumentRetriever.builder()
+                    .vectorStore(this.vectorStore)   // MUST be set or you get "vectorStore cannot be null"
+                    .topK(3)
+                    .similarityThreshold(0.5)
+                    .build())
+
+            .documentJoiner(new ConcatenationDocumentJoiner())
+
+            // --- GENERATION ---
+            .queryAugmenter(ContextualQueryAugmenter.builder().build())
+
+            .build();
+
+    return this.chatClient.prompt()
+            .advisors(advisor)
+            .user(userQuery)
+            .call()
+            .content();
+}
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Two errors hit live</span>
+  <p><strong>1.</strong> <em>"vectorStore cannot be null"</em> — <code class="i">VectorStoreDocumentRetriever</code>
+  needs <code class="i">.vectorStore(...)</code> explicitly.<br>
+  <strong>2.</strong> The query expander also calls the LLM, so it needs a
+  <code class="i">chatClientBuilder</code> too — obtained via
+  <code class="i">chatClient.mutate().clone()</code>.</p>
+</div>
+
+<h3>What the debugger showed, step by step</h3>
+<p>Breakpoint inside <code class="i">RetrievalAugmentationAdvisor.before()</code>:</p>
+<ol>
+  <li>Original query created: <em>"what is java"</em></li>
+  <li>Transformed by RewriteQueryTransformer → <em>"what is java programming language"</em></li>
+  <li>Expanded by MultiQueryExpander into <strong>4 queries</strong> — including
+      <em>"What are the key features and uses of the Java programming language?"</em> and
+      <em>"How does Java compare to other programming languages?"</em></li>
+  <li>Each expanded query hit the vector DB → ~3 documents each</li>
+  <li>ConcatenationDocumentJoiner merged them into one deduplicated list</li>
+  <li>ContextualQueryAugmenter built the final prompt: context + rules + user query</li>
+</ol>
+
+<div class="box vid">
+  <span class="lbl">Translation demo</span>
+  <p>With <code class="i">TranslationQueryTransformer</code> set to <code class="i">"hindi"</code>, the log showed the
+  instruction <em>"Given a user query, translate it into Hindi. If the query is already in Hindi,
+  return it unchanged. Do not add explanations."</em> — then three expanded queries in Hindi.
+  Very useful when your vector data is in one language and users type in another.</p>
+</div>
+
+<div class="box key">
+  <span class="lbl">Beyond vector stores</span>
+  <p>Want documents from the web instead of a DB? Implement <code class="i">DocumentRetriever</code> and
+  override <code class="i">retrieve()</code>. Everything upstream and downstream is unchanged — the pipeline
+  has no idea where the documents came from.</p>
+</div>
+</section>
+
+<!-- ==================== 21 ==================== -->
+<section class="ch" id="c21" data-t="ETL Pipeline">
+<div class="chead"><span class="num">21</span><h2>ETL Pipeline — Getting Real Documents In</h2></div>
+<p class="ts">9:43:25 — 10:26:23</p>
+
+<p>Everything in Chapter 19 loaded hard-coded Strings. Real data lives in PDFs, JSON, DOCX and HTML.
+The ETL pipeline is how you move raw files into a vector store.</p>
+
+<div class="flow">
+  <span class="n">Source<br>(PDF/JSON/DOCX)</span><span class="ar">→</span>
+  <span class="n hl">DocumentReader<br>(Extract)</span><span class="ar">→</span>
+  <span class="n hl">DocumentTransformer<br>(Transform / chunk)</span><span class="ar">→</span>
+  <span class="n hl">DocumentWriter<br>(Load)</span><span class="ar">→</span>
+  <span class="n">Vector DB</span>
+</div>
+
+<h3>What a Document is</h3>
+<p>A <code class="i">Document</code> is not just text. It holds <strong>content</strong>, <strong>metadata</strong>, and optionally
+<strong>media references</strong>. Every stage of the pipeline passes around a
+<code class="i">List&lt;Document&gt;</code>.</p>
+
+<h3>E — DocumentReader</h3>
+<table>
+<tr><th>Reader</th><th>Reads</th><th>Extra dependency</th></tr>
+<tr><td><code class="i">JsonReader</code></td><td>JSON files</td><td>none</td></tr>
+<tr><td><code class="i">TextReader</code></td><td>Plain text</td><td>none</td></tr>
+<tr><td><code class="i">PagePdfDocumentReader</code></td><td>PDF — one document per page</td><td><code class="i">spring-ai-pdf-document-reader</code></td></tr>
+<tr><td><code class="i">ParagraphPdfDocumentReader</code></td><td>PDF — one document per paragraph</td><td><code class="i">spring-ai-pdf-document-reader</code></td></tr>
+<tr><td><code class="i">TikaDocumentReader</code></td><td>DOCX, PPTX, HTML and more</td><td><code class="i">spring-ai-tika-document-reader</code></td></tr>
+</table>
+
+<div class="code" data-lang="java" data-file="service/DataLoader.java"><script type="text/plain">
+public interface DataLoader {
+    List<Document> loadDocumentsFromJson();
+    List<Document> loadDocumentsFromPdf();
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="service/DataLoaderImpl.java — JSON"><script type="text/plain">
+@Service
+public class DataLoaderImpl implements DataLoader {
+
+    @Value("classpath:sample_data.json")
+    private Resource jsonResource;
+
+    @Override
+    public List<Document> loadDocumentsFromJson() {
+        System.out.println("Started loading from JSON");
+
+        // Optionally pass JSON keys to extract only certain fields:
+        //   new JsonReader(jsonResource, "project")
+        JsonReader jsonReader = new JsonReader(jsonResource);
+
+        return jsonReader.read();   // read() -> List<Document>
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="service/DataLoaderImpl.java — PDF"><script type="text/plain">
+@Value("classpath:cricket_rules.pdf")
+private Resource pdfResource;
+
+@Override
+public List<Document> loadDocumentsFromPdf() {
+
+    PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(
+            pdfResource,
+            PdfDocumentReaderConfig.builder()
+                    .withPageTopMargin(0)
+                    .withPagesPerDocument(1)      // 1 page == 1 Document (default)
+                    .withPageExtractedTextFormatter(
+                            ExtractedTextFormatter.builder()
+                                    .withNumberOfTopTextLinesToDelete(0)
+                                    .build())
+                    .build());
+
+    return pdfReader.read();
+}
+</script></div>
+
+<div class="code" data-lang="xml" data-file="pom.xml — PDF reader"><script type="text/plain">
+<dependency>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-pdf-document-reader</artifactId>
+</dependency>
+</script></div>
+
+<div class="box vid">
+  <span class="lbl">Result</span>
+  <p>A 2-page PDF read with <code class="i">withPagesPerDocument(1)</code> produced exactly
+  <strong>2 Documents</strong>, each with its own ID and the page's extracted text.
+  <code class="i">PagePdfDocumentReader</code> uses Apache PDFBox under the hood.</p>
+</div>
+
+<h3>T — DocumentTransformer (chunking)</h3>
+<p>You never insert a huge document as one chunk — it won't fit the model's context and matches
+poorly. <code class="i">TokenTextSplitter</code> splits by token count.</p>
+
+<div class="code" data-lang="java" data-file="service/DataTransformerImpl.java"><script type="text/plain">
+@Service
+public class DataTransformerImpl implements DataTransformer {
+
+    @Override
+    public List<Document> transform(List<Document> documents) {
+
+        // Default constructor uses: chunkSize 800, minChunkSizeChars 350,
+        // minChunkLengthToEmbed 5, maxNumChunks 10000, keepSeparator true
+        TokenTextSplitter splitter = new TokenTextSplitter(
+                300,    // defaultChunkSize
+                400,    // minChunkSizeChars
+                10,     // minChunkLengthToEmbed
+                5000,   // maxNumChunks
+                true);  // keepSeparator
+
+        return splitter.transform(documents);
+    }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Chunk size matters</span>
+  <p>Same PDF: default config → <strong>3 chunks</strong>. Chunk size 300 → <strong>6 chunks</strong>.
+  Smaller chunks are more specific, so similarity search returns more relevant matches — at the
+  cost of more rows.</p>
+</div>
+
+<p>Other transformers: <code class="i">ContentFormatTransformer</code>,
+<code class="i">KeywordMetadataEnricher</code>, <code class="i">SummaryMetadataEnricher</code>.</p>
+
+<h3>L — DocumentWriter</h3>
+<p><code class="i">VectorStore</code> extends <code class="i">DocumentWriter</code> — it acts as the sink. Implementations
+include <code class="i">MariaDBVectorStore</code>, <code class="i">SimpleVectorStore</code> and
+<code class="i">FileDocumentWriter</code>.</p>
+
+<div class="code" data-lang="java" data-file="Saving transformed chunks"><script type="text/plain">
+private final VectorStore vectorStore;   // MariaDBVectorStore by default here
+
+System.out.println("Saving data into the database");
+this.vectorStore.add(transformedDocuments);
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Error you'll see</span>
+  <p>The write failed until the API key was added to the <strong>test</strong> run configuration. Reason:
+  before a chunk can be stored it must be <strong>converted into an embedding</strong>, and that calls the
+  embedding model over the network.</p>
+</div>
+
+<h3>Full pipeline test</h3>
+<div class="code" data-lang="java" data-file="src/test/java/.../ApplicationTests.java"><script type="text/plain">
+@Autowired private DataLoader dataLoader;
+@Autowired private DataTransformer dataTransformer;
+
+@Test
+void testPdfDataLoader() {
+    var documents = dataLoader.loadDocumentsFromPdf();
+    System.out.println("Read: " + documents.size());
+
+    var transformed = dataTransformer.transform(documents);
+    System.out.println("After transform: " + transformed.size());
+
+    transformed.forEach(System.out::println);
+}
+</script></div>
+</section>
+
+<!-- ==================== 22 ==================== -->
+<section class="ch" id="c22" data-t="Tool Calling">
+<div class="chead"><span class="num">22</span><h2>Tool Calling — Giving the LLM Superpowers</h2></div>
+<p class="ts">10:26:23 — 11:27:38</p>
+
+<h3>The limitation being solved</h3>
+<p>Ask a plain LLM <em>"What is today's date?"</em> and it answers with its training cutoff —
+in the video, <strong>October 3, 2023</strong>, when the real date was 2025. It has no real-time access.
+Ask <em>"Set an alarm"</em> and it can't act at all.</p>
+
+<h3>Two kinds of tools</h3>
+<table>
+<tr><th>Type</th><th>Purpose</th><th>Examples</th></tr>
+<tr><td><strong>Information</strong></td><td>Retrieve data</td><td>Current date, weather, DB query, stock price</td></tr>
+<tr><td><strong>Action</strong></td><td>Do something</td><td>Set an alarm, send an email, insert a row, add to cart</td></tr>
+</table>
+
+<h3>How tool calling actually works</h3>
+<ol>
+  <li>Request arrives at your Spring AI backend</li>
+  <li>Your query <strong>plus the tool descriptions</strong> (name, description, parameter schema) go to the LLM</li>
+  <li>The LLM decides a tool is needed and <strong>replies with the tool name + parameters</strong></li>
+  <li><strong>Your application executes the tool</strong> — the LLM never runs code</li>
+  <li>The result is sent <em>back</em> to the LLM, which generates the final natural-language answer</li>
+  <li>That answer is returned to the user</li>
+</ol>
+
+<div class="box key">
+  <span class="lbl">Where the tool runs</span>
+  <p>Inside your Spring Boot app. The LLM only decides <em>which</em> tool and <em>with what arguments</em>.
+  Setting <code class="i">returnDirect = true</code> on <code class="i">@Tool</code> skips step 5 and returns the raw
+  result straight to the user.</p>
+</div>
+
+<h3>Example 1 — Date/time tool (information + action)</h3>
+
+<div class="code" data-lang="java" data-file="tools/SimpleDateTimeTool.java"><script type="text/plain">
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.context.i18n.LocaleContextHolder;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+public class SimpleDateTimeTool {
+
+    // The description is what the LLM reads to decide whether to call this
+    @Tool(description = "Get the current date and time in the user's zone")
+    public String getCurrentDateTime() {
+        return LocalDateTime.now()
+                .atZone(LocaleContextHolder.getTimeZone().toZoneId())
+                .toString();
+    }
+
+    @Tool(description = "Set the alarm for the given time")
+    public void setAlarm(
+            @ToolParam(description = "Time in ISO-8601 format") String time) {
+
+        LocalDateTime alarmTime =
+                LocalDateTime.parse(time, DateTimeFormatter.ISO_DATE_TIME);
+
+        System.out.println("Alarm set for: " + alarmTime);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="Attaching tools to the ChatClient"><script type="text/plain">
+return chatClient.prompt()
+        .user(query)
+        .tools(new SimpleDateTimeTool())   // varargs — pass as many as you want
+        .call()
+        .content();
+</script></div>
+
+<div class="box vid">
+  <span class="lbl">What the model can now do</span>
+  <p><em>"What is today's date?"</em> → correct date. <em>"What is the date tomorrow?"</em> → correct.
+  <em>"What was the date last Sunday?"</em> → correct. <em>"My DOB is 1998, what's my current age?"</em>
+  → 27. <em>"What will my age be in 2050?"</em> → 52. One small tool, and the LLM reasons on top of it.</p>
+  <p>Ask something unrelated — <em>"top five programming languages"</em> — and the logs show
+  <strong>no tool call at all</strong>. It only calls a tool when it needs one.</p>
+</div>
+
+<h3>Example 2 — A real external API (weather)</h3>
+<p>Sign up at <code class="i">weatherapi.com</code> for a free key, store it in properties, and expose it as a tool.</p>
+
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+app.weather.api-key=YOUR_KEY_HERE
+</script></div>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java — a RestClient bean"><script type="text/plain">
+@Bean
+public RestClient restClient() {
+    return RestClient.builder()
+            .baseUrl("http://api.weatherapi.com/v1")
+            .build();
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="tools/WeatherTool.java"><script type="text/plain">
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import java.util.Map;
+
+@Service
+public class WeatherTool {
+
+    @Value("${app.weather.api-key}")
+    private String weatherApiKey;
+
+    private final RestClient restClient;
+
+    public WeatherTool(RestClient restClient) {
+        this.restClient = restClient;
+    }
+
+    @Tool(description = "Get the weather of the given city")
+    public String getWeather(
+            @ToolParam(description = "This is the city for which we want to get weather")
+            String city) {
+
+        System.out.println("Getting weather information for: " + city);
+
+        Map<String, Object> response = restClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/current.json")
+                        .queryParam("key", weatherApiKey)
+                        .queryParam("q", city)
+                        .build())
+                .retrieve()
+                .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+
+        return response.toString();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="Registering multiple tools"><script type="text/plain">
+private final WeatherTool weatherTool;
+
+public ChatServiceImpl(ChatClient chatClient, WeatherTool weatherTool) {
+    this.chatClient = chatClient;
+    this.weatherTool = weatherTool;
+}
+
+public String chat(String query) {
+    return chatClient.prompt()
+            .user(query)
+            .tools(new SimpleDateTimeTool(), weatherTool)  // both available
+            .call()
+            .content();
+}
+</script></div>
+
+<div class="box vid">
+  <span class="lbl">The impressive bit</span>
+  <p><em>"Compare the weather in Delhi and Lucknow today"</em> → the logs show the weather tool
+  <strong>called twice</strong>, once per city, then the LLM compared the two results itself:
+  <em>"Delhi is significantly cooler than Lucknow today…"</em>. Nobody wrote comparison logic.</p>
+</div>
+
+<h3>@Tool attributes</h3>
+<table>
+<tr><th>Attribute</th><th>Meaning</th></tr>
+<tr><td><code class="i">name</code></td><td>Tool name. Defaults to the method name</td></tr>
+<tr><td><code class="i">description</code></td><td>What the LLM reads. Defaults to the method name — <strong>always write one</strong></td></tr>
+<tr><td><code class="i">returnDirect</code></td><td><code class="i">true</code> = send the result straight to the client, skip the second LLM round-trip. Default <code class="i">false</code></td></tr>
+<tr><td><code class="i">resultConverter</code></td><td>Custom class to convert the tool result into a String for the model</td></tr>
+</table>
+
+<div class="box key">
+  <span class="lbl">Two approaches</span>
+  <p><strong>Declarative</strong> — <code class="i">@Tool</code> / <code class="i">@ToolParam</code> (what's shown here) and
+  <strong>Programmatic</strong> — low-level <code class="i">ToolCallback</code> implementations.
+  The declarative style covers almost everything.</p>
+</div>
+
+<h3>Where tool calling shines</h3>
+<ul>
+  <li><strong>Data queries</strong> — <em>"What are today's sales?"</em> → the LLM builds the query, the tool runs it</li>
+  <li><strong>Data actions</strong> — <em>"Create an expense for today"</em> → row inserted automatically</li>
+  <li><strong>E-commerce</strong> — <em>"Find the cheapest iPhone"</em>, <em>"Add it to my cart"</em></li>
+  <li><strong>Customer support</strong> — send an email, create an invoice</li>
+</ul>
+<p>Combine <strong>RAG</strong> (context) + <strong>chat memory</strong> (conversation) + <strong>tool calling</strong> (actions)
+and you have a genuine <strong>AI agent</strong>.</p>
+</section>
+
+<!-- ==================== 23 ==================== -->
+<section class="ch" id="c23" data-t="Project — AI Help Desk (Backend)">
+<div class="chead"><span class="num">23</span><h2>Project — AI Help Desk (Backend)</h2></div>
+<p class="ts">11:27:38 — 13:39:58</p>
+
+<p>The capstone. Users describe a problem in natural language; the AI understands it, checks for an
+existing ticket, and either reports its status or <strong>creates a new ticket in MySQL</strong> — deciding
+priority, category and summary on its own.</p>
+
+<div class="flow">
+  <span class="n">React UI</span><span class="ar">→</span>
+  <span class="n">Spring Boot + Spring AI</span><span class="ar">→</span>
+  <span class="n">GPT-4o-mini</span><span class="ar">↔</span>
+  <span class="n hl">Tools</span><span class="ar">→</span>
+  <span class="n">MySQL</span>
+</div>
+
+<p>Concepts used: <strong>ChatClient API</strong>, <strong>tool calling</strong>, <strong>database access</strong>,
+<strong>chat memory</strong>, <strong>prompt templates</strong>, <strong>streaming</strong>.</p>
+
+<h3>Setup</h3>
+<p>Spring Initializr 3.5.6, group <code class="i">com.substring.helpdesk</code>, dependencies:
+<strong>Web · Spring Data JPA · MySQL Driver · Lombok · OpenAI</strong>.</p>
+
+<div class="code" data-lang="yaml" data-file="src/main/resources/application.yml"><script type="text/plain">
+spring:
+  application:
+    name: spring-ai-helpdesk-backend
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring_ai_yt
+    username: root
+    password: root1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG
+</script></div>
+
+<h3>Entity</h3>
+
+<div class="code" data-lang="java" data-file="entity/Ticket.java"><script type="text/plain">
+package com.substring.helpdesk.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "help_desk_tickets")
+@Getter @Setter @Builder
+@AllArgsConstructor @NoArgsConstructor
+public class Ticket {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Lob
+    private String summary;
+
+    @Column(length = 1000)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    private String category;
+
+    @Column(unique = true)
+    private String email;          // unique per user
+
+    private LocalDateTime createdOn;
+    private LocalDateTime updatedOn;
+
+    @PrePersist
+    public void preSave() {
+        this.createdOn = LocalDateTime.now();
+        this.updatedOn = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updatedOn = LocalDateTime.now();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="entity/Priority.java & entity/Status.java"><script type="text/plain">
+public enum Priority { LOW, MEDIUM, HIGH, URGENT }
+
+public enum Status { OPEN, IN_PROGRESS, RESOLVED, CLOSED }
+</script></div>
+
+<div class="code" data-lang="java" data-file="repository/TicketRepository.java"><script type="text/plain">
+public interface TicketRepository extends JpaRepository<Ticket, Long> {
+    Optional<Ticket> findByEmail(String email);
+}
+</script></div>
+
+<h3>Service</h3>
+
+<div class="code" data-lang="java" data-file="service/TicketService.java"><script type="text/plain">
+@Service
+@Getter @Setter
+@RequiredArgsConstructor
+public class TicketService {
+
+    private final TicketRepository ticketRepository;
+
+    @Transactional
+    public Ticket createTicket(Ticket ticket) {
+        // Force the ID to null so Hibernate INSERTs instead of trying to UPDATE
+        ticket.setId(null);
+        return ticketRepository.save(ticket);
+    }
+
+    public Ticket getTicket(Long ticketId) {
+        return ticketRepository.findById(ticketId).orElse(null);
+    }
+
+    public Ticket getTicketByEmailId(String email) {
+        return ticketRepository.findByEmail(email).orElse(null);
+    }
+
+    public Ticket updateTicket(Ticket ticket) {
+        return ticketRepository.save(ticket);
+    }
+}
+</script></div>
+
+<div class="box err">
+  <span class="lbl">Bug that broke ticket creation</span>
+  <p>The AI passed a ticket object with an <strong>ID already populated</strong>. Hibernate saw an ID, assumed
+  UPDATE, found no such row, and threw. Fix: <code class="i">ticket.setId(null)</code> before saving, plus
+  <code class="i">@Transactional</code>. Until this was fixed, the bot kept replying
+  <em>"It seems I'm encountering a technical issue while creating your ticket."</em></p>
+</div>
+
+<h3>Tools — how the AI touches the database</h3>
+
+<div class="code" data-lang="java" data-file="tools/TicketDatabaseTool.java"><script type="text/plain">
+package com.substring.helpdesk.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.stereotype.Component;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class TicketDatabaseTool {
+
+    private final TicketService ticketService;
+
+    @Tool(description = "This tool helps to create a new ticket in the database")
+    public Ticket createTicketTool(
+            @ToolParam(description = "Ticket fields required to create a new ticket")
+            Ticket ticket) {
+        try {
+            return ticketService.createTicket(ticket);
+        } catch (Exception e) {
+            e.printStackTrace();   // so failures show up in the console
+            return null;
+        }
+    }
+
+    @Tool(description = "This tool helps you get the ticket by the email id")
+    public Ticket getTicketByEmailId(
+            @ToolParam(description = "Email address whose ticket is required")
+            String email) {
+        return ticketService.getTicketByEmailId(email);
+    }
+
+    @Tool(description = "This tool helps us to update the ticket")
+    public Ticket updateTicket(
+            @ToolParam(description = "New ticket details with the OLD ticket id")
+            Ticket ticket) {
+        return ticketService.updateTicket(ticket);
+    }
+
+    @Tool(description = "This tool helps you to get the current system time")
+    public long getCurrentSystemTime() {
+        return System.currentTimeMillis();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="tools/EmailTool.java (optional extension)"><script type="text/plain">
+@Component
+public class EmailTool {
+
+    @Tool(description = "Sends an email to the support team regarding new tickets")
+    public void sendEmail(
+            @ToolParam(description = "Email id associated with the ticket") String email,
+            @ToolParam(description = "Short description / ticket summary") String message) {
+
+        System.out.println("Sending email to support team: " + message);
+        // wire in JavaMailSender here
+    }
+}
+</script></div>
+
+<h3>The system prompt — the real engineering</h3>
+<p>Stored in <code class="i">resources/help-desk-system.st</code>. The instructor is explicit that writing it
+took the longest: <em>"compiling everything into the script and ensuring it doesn't become too long is
+an art in itself."</em> Its structure:</p>
+
+<ol>
+  <li><strong>Identity</strong> — "You are Lisa, a polite, professional and efficient help desk assistant
+      for Substring Technologies."</li>
+  <li><strong>Goal</strong> — help users report, track and resolve issues accurately.</li>
+  <li><strong>Personality &amp; tone</strong> — polite, patient, empathetic, human, never robotic.</li>
+  <li><strong>Responsibilities</strong> — understand the request, classify the category, judge urgency,
+      always ask questions first, thank the user.</li>
+  <li><strong>Check existing tickets first</strong> — never create a duplicate; report the existing
+      ticket ID, summary and status instead.</li>
+  <li><strong>Ticket field spec</strong> — this must mirror the JPA entity exactly:
+      <ul>
+        <li><code class="i">ticket id</code> — auto-generated in the database, don't ask the user</li>
+        <li><code class="i">summary</code>, <code class="i">description</code> — generate from user input</li>
+        <li><code class="i">priority</code> — LOW / MEDIUM / HIGH / URGENT, decide from the problem</li>
+        <li><code class="i">category</code> — decide from user input</li>
+        <li><code class="i">status</code> — OPEN / IN_PROGRESS / RESOLVED / CLOSED</li>
+        <li><code class="i">email</code> — <strong>must</strong> be taken from the user; ask if not given</li>
+      </ul></li>
+  <li><strong>Always greet the user by name</strong> and introduce yourself.</li>
+  <li><strong>Email the support team</strong> for every newly created ticket.</li>
+</ol>
+
+<div class="box warn">
+  <span class="lbl">Prompt ↔ entity must stay in sync</span>
+  <p>The video renames fields (username → email) and instantly hits
+  <em>"No property 'username' found on Ticket"</em>. Whenever the entity changes, update the repository,
+  the service <strong>and</strong> the system prompt.</p>
+</div>
+
+<h3>Config &amp; service</h3>
+
+<div class="code" data-lang="java" data-file="config/AiConfig.java"><script type="text/plain">
+@Configuration
+public class AiConfig {
+
+    private final Logger logger = LoggerFactory.getLogger(AiConfig.class);
+
+    @Bean
+    public ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory) {
+        logger.info("Chat memory bean created: {}", chatMemory.getClass().getName());
+
+        return builder
+                .defaultAdvisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        new SimpleLoggerAdvisor())
+                .build();
+    }
+
+    // Persist conversations in MySQL instead of RAM
+    @Bean
+    public ChatMemory chatMemory(JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+        return MessageWindowChatMemory.builder()
+                .chatMemoryRepository(jdbcChatMemoryRepository)
+                .maxMessages(15)
+                .build();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="service/AiService.java"><script type="text/plain">
+@Service
+@RequiredArgsConstructor
+public class AiService {
+
+    private final ChatClient chatClient;
+    private final TicketDatabaseTool ticketDatabaseTool;
+    private final EmailTool emailTool;
+
+    @Value("classpath:help-desk-system.st")
+    private Resource systemPromptResource;
+
+    public String getResponseFromAssistant(String query, String conversationId) {
+        return chatClient.prompt()
+                .system(this.systemPromptResource)
+                .user(query)
+                .tools(ticketDatabaseTool, emailTool)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .call()
+                .content();
+    }
+
+    public Flux<String> streamResponseFromAssistant(String query, String conversationId) {
+        return chatClient.prompt()
+                .system(this.systemPromptResource)
+                .user(query)
+                .tools(ticketDatabaseTool, emailTool)
+                .advisors(a -> a.param(ChatMemory.CONVERSATION_ID, conversationId))
+                .stream()
+                .content();
+    }
+}
+</script></div>
+
+<div class="box err">
+  <span class="lbl">@Value gotcha</span>
+  <p>Reading a <em>file</em>, not a property, so there is <strong>no <code>$</code></strong>:
+  <code class="i">@Value("classpath:help-desk-system.st")</code>. Using
+  <code class="i">${...}</code> caused <em>"Help Desk system file could not be found"</em>.</p>
+</div>
+
+<h3>Controller</h3>
+
+<div class="code" data-lang="java" data-file="controller/AiController.java"><script type="text/plain">
+@RestController
+@RequestMapping("/api/v1/help-desk")
+@CrossOrigin("http://localhost:5173")     // allow the React dev server
+@RequiredArgsConstructor
+public class AiController {
+
+    private final AiService aiService;
+
+    @PostMapping
+    public ResponseEntity<String> getResponse(
+            @RequestBody String query,
+            @RequestHeader("conversationId") String conversationId) {
+
+        return ResponseEntity.ok(
+                aiService.getResponseFromAssistant(query, conversationId));
+    }
+
+    @PostMapping("/stream")
+    public ResponseEntity<Flux<String>> streamResponse(
+            @RequestBody String query,
+            @RequestHeader("conversationId") String conversationId) {
+
+        return ResponseEntity.ok(
+                aiService.streamResponseFromAssistant(query, conversationId));
+    }
+}
+</script></div>
+
+<h3>The conversation that creates a ticket</h3>
+<div class="box vid">
+  <span class="lbl">Real transcript from the demo</span>
+  <p><strong>User:</strong> "Hi" → <strong>Lisa:</strong> "Hi, I'm Lisa, your help desk assistant."<br>
+  <strong>User:</strong> "My name is Durgesh, I'm facing an issue accessing my course."<br>
+  <strong>Lisa:</strong> asks for email, a description, and the urgency.<br>
+  <strong>User:</strong> gives the error, the email and says it's urgent.<br>
+  <strong>Lisa:</strong> <em>"I have successfully created a ticket…"</em> — ticket #1, summary
+  <em>"Account locked message during login"</em>, priority <strong>URGENT</strong>, category
+  <em>"account issue"</em>, status <strong>OPEN</strong>.</p>
+  <p>Later: <em>"Can you provide the details of my ticket?"</em> → full details.
+  <em>"Close my ticket, my problem is resolved."</em> → status flips to <strong>CLOSED</strong>.
+  Every step verified directly in the MySQL table.</p>
+</div>
+
+<div class="box key">
+  <span class="lbl">Possible extension</span>
+  <p>Add RAG on top: load company FAQs and known problem/solution pairs into a vector store so
+  Lisa can <em>solve</em> common issues instead of always creating a ticket.</p>
+</div>
+</section>
+
+<!-- ==================== 24 ==================== -->
+<section class="ch" id="c24" data-t="React Frontend">
+<div class="chead"><span class="num">24</span><h2>React Frontend for the Help Desk</h2></div>
+<p class="ts">13:39:58 — 15:45:00</p>
+
+<p>Stack: <strong>Vite + React (JavaScript) · Tailwind CSS · shadcn/ui · React Router · Lucide icons ·
+Axios · uuid</strong>.</p>
+
+<h3>Project setup</h3>
+<div class="code" data-lang="bash" data-file="terminal"><script type="text/plain">
+npm create vite@latest         # name: helpdesk-frontend, framework: React, variant: JavaScript
+cd helpdesk-frontend
+
+npm install tailwindcss @tailwindcss/vite
+npm install react-router lucide-react axios uuid
+
+npx shadcn@latest init         # base colour: neutral
+npx shadcn@latest add button input scroll-area separator avatar card spinner
+</script></div>
+
+<div class="code" data-lang="javascript" data-file="vite.config.js"><script type="text/plain">
+import path from "path";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: { "@": path.resolve(__dirname, "./src") },
+  },
+});
+</script></div>
+
+<div class="code" data-lang="css" data-file="src/index.css"><script type="text/plain">
+@import "tailwindcss";
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">JavaScript, not TypeScript</span>
+  <p>shadcn's docs assume TypeScript. Because the project is JS, create
+  <code class="i">jsconfig.json</code> (not <code class="i">tsconfig.json</code>) with the same path-alias content.</p>
+</div>
+
+<h3>Routing</h3>
+<div class="code" data-lang="javascript" data-file="src/main.jsx"><script type="text/plain">
+import { BrowserRouter, Routes, Route } from "react-router";
+import ChatHome from "./pages/ChatHome";
+import Chat from "./pages/Chat";
+
+createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <Routes>
+      <Route path="" element={<ChatHome />} />
+      <Route path="chat" element={<Chat />} />
+    </Routes>
+  </BrowserRouter>
+);
+</script></div>
+
+<div class="code" data-lang="javascript" data-file="src/pages/ChatHome.jsx"><script type="text/plain">
+import { useNavigate } from "react-router";
+import { Button } from "@/components/ui/button";
+import { Bot } from "lucide-react";
+
+export default function ChatHome() {
+  const navigate = useNavigate();
+
+  // programmatic navigation lets us add logic (generate an ID, ask for email…)
+  const handleChatStartClick = () => {
+    navigate("/chat");
+  };
+
+  return (
+    <div className="h-screen w-screen flex flex-col justify-center items-center gap-4">
+      <Bot size={80} />
+      <h1 className="text-4xl font-semibold">Welcome to Help Desk System</h1>
+      <Button variant="outline" className="cursor-pointer"
+              onClick={handleChatStartClick}>
+        Start getting help
+      </Button>
+    </div>
+  );
+}
+</script></div>
+
+<h3>The API service</h3>
+<div class="code" data-lang="javascript" data-file="src/services/chat.service.js"><script type="text/plain">
+import axios from "axios";
+
+const BASE_URL = "http://localhost:8081/api/v1";
+
+export const sendMessageToServer = async (message, conversationId) => {
+  const response = await axios.post(
+    `${BASE_URL}/help-desk`,
+    message,                               // request body = the raw query string
+    { headers: { conversationId: conversationId } }
+  );
+  return response.data;
+};
+</script></div>
+
+<div class="box err">
+  <span class="lbl">CORS</span>
+  <p>The first call failed with <em>"blocked by CORS policy"</em>. Fix on the backend:
+  <code class="i">@CrossOrigin("http://localhost:5173")</code> on the controller. A stray double slash
+  in the base URL caused a second failure.</p>
+</div>
+
+<h3>Chat page — state &amp; message sending</h3>
+<div class="code" data-lang="javascript" data-file="src/pages/Chat.jsx (core logic)"><script type="text/plain">
+import { useState, useEffect, useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { sendMessageToServer } from "../services/chat.service";
+
+const [messages, setMessages]  = useState([...]);
+const [draft, setDraft]        = useState("");
+const [sending, setSending]    = useState(false);
+const [conversationId, setConversationId] = useState("");
+
+const endRef   = useRef(null);   // invisible div at the bottom, for auto-scroll
+const inputRef = useRef(null);
+
+// one random conversation id per session
+useEffect(() => {
+  setConversationId(uuidv4());
+  inputRef.current.focus();
+}, []);
+
+// scroll to the bottom whenever a message is added
+useEffect(() => {
+  endRef.current?.scrollIntoView({ behavior: "smooth" });
+}, [messages]);
+
+const sendMessages = async () => {
+  const textMessage = draft.trim();
+  if (textMessage.length === 0) return;
+
+  setSending(true);
+
+  // 1. show the user's own message immediately
+  setMessages(prev => [...prev, {
+    id: uuidv4(), author: "user", text: textMessage,
+    at: new Date().toLocaleTimeString()
+  }]);
+
+  // 2. call the backend
+  const response = await sendMessageToServer(textMessage, conversationId);
+
+  // 3. append the bot's reply
+  setMessages(prev => [...prev, {
+    id: uuidv4(), author: "bot", text: response,
+    at: new Date().toLocaleTimeString()
+  }]);
+
+  setDraft("");
+  setSending(false);
+  inputRef.current.focus();
+};
+</script></div>
+
+<div class="code" data-lang="javascript" data-file="src/components/MessageBubble.jsx"><script type="text/plain">
+export default function MessageBubble({ author, at, children }) {
+  const isMe = author;   // "user" or "bot"
+
+  return (
+    <div className={`flex ${isMe === "user" ? "justify-end" : "justify-start"}`}>
+      <div className={`max-w-[65%] rounded-3xl px-3 py-2 shadow-sm
+        ${isMe === "user"
+            ? "bg-slate-900 text-white"
+            : "bg-muted text-foreground"}`}>
+        <p className="whitespace-pre-wrap break-words leading-relaxed">
+          {children}
+        </p>
+        <div className="text-[10px] opacity-70">{at}</div>
+      </div>
+    </div>
+  );
+}
+</script></div>
+
+<h3>Layout tricks used</h3>
+<ul>
+  <li><strong>Two-column grid</strong> — <code class="i">md:grid-cols-[300px_minmax(0,1fr)]</code>: fixed
+      sidebar, flexible chat area. On small screens it collapses to one column.</li>
+  <li><strong>Fixed layout</strong> — the outer container is <code class="i">fixed top-0 left-0 right-0</code>
+      so the page itself never scrolls; only the message list does.</li>
+  <li><strong>Scrollable message area</strong> — <code class="i">h-[calc(100vh-150px)]</code> reserves room for
+      the header and composer.</li>
+  <li><strong>Auto-scroll</strong> — an empty <code class="i">&lt;div ref={endRef}&gt;</code> after the message
+      loop; <code class="i">scrollIntoView</code> pulls it into view on every new message.</li>
+  <li><strong>Send button state</strong> — <code class="i">disabled={sending}</code> with a
+      <code class="i">&lt;Spinner /&gt;</code> swapped in while the request is in flight.</li>
+</ul>
+
+<div class="box err">
+  <span class="lbl">React warning</span>
+  <p><em>"Encountering two children with the same key"</em> — the message <code class="i">key</code> wasn't
+  unique. Fixed by generating a <code class="i">uuidv4()</code> per message (or using the map index).</p>
+</div>
+
+<h3>Assignments left in the video</h3>
+<ul>
+  <li>Tie the conversation ID to the user's email instead of a random UUID, so returning users resume
+      their existing thread.</li>
+  <li>Load past conversations into the sidebar and switch between them by clicking.</li>
+  <li>Use the <code class="i">/stream</code> endpoint so replies type out like ChatGPT.</li>
+</ul>
+</section>
+
+<!-- ==================== 25 ==================== -->
+<section class="ch" id="c25" data-t="Audio Transcription">
+<div class="chead"><span class="num">25</span><h2>Audio Transcription (Speech → Text)</h2></div>
+<p class="ts">15:45:00 — end</p>
+
+<p>Spring AI isn't only text generation. This chapter converts audio into text.</p>
+
+<div class="flow">
+  <span class="n">MP3 / M4A</span><span class="ar">→</span>
+  <span class="n">Spring Boot</span><span class="ar">→</span>
+  <span class="n hl">TranscriptionModel</span><span class="ar">→</span>
+  <span class="n">OpenAI Whisper</span><span class="ar">→</span>
+  <span class="n">Text</span>
+</div>
+
+<h3>Setup</h3>
+<p>Spring Boot <strong>3.5.9</strong> with <strong>Web</strong> + <strong>OpenAI</strong>. The instructor notes the OpenAI starter
+wasn't available for 4.0 at recording time, hence 3.5.x.</p>
+
+<div class="code" data-lang="properties" data-file="application.properties"><script type="text/plain">
+server.port=8083
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Check provider support first</span>
+  <p>Not every provider does transcription. OpenAI does (Whisper). Before picking Gemini or another
+  provider, confirm it supports transcription <em>and</em> your audio format (MP3, M4A…).</p>
+</div>
+
+<h3>The TranscriptionModel API</h3>
+<p>A unified interface across providers, so your code stays portable. The bean is auto-configured —
+just inject it.</p>
+
+<div class="code" data-lang="java" data-file="service/AudioService.java"><script type="text/plain">
+package com.substring.audio.services;
+
+import org.springframework.ai.audio.transcription.TranscriptionModel;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+
+@Service
+public class AudioService {
+
+    private final TranscriptionModel transcriptionModel;
+
+    public AudioService(TranscriptionModel transcriptionModel) {
+        this.transcriptionModel = transcriptionModel;
+    }
+
+    // simplest form
+    public String convertAudioToText(Resource inputAudio) {
+        return transcriptionModel.transcribe(inputAudio);
+    }
+
+    // with provider-specific options
+    public String convertAudioToTextWithOptions(Resource inputAudio) {
+        return transcriptionModel.transcribe(
+                inputAudio,
+                OpenAiAudioTranscriptionOptions.builder()
+                        .language("en")
+                        .temperature(0.7f)
+                        .prompt("Spring")    // hint to improve accuracy
+                        .build());
+    }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Options are provider-specific</span>
+  <p><code class="i">AudioTranscriptionOptions</code> is an interface;
+  <code class="i">OpenAiAudioTranscriptionOptions</code> is the OpenAI implementation. Switch provider and
+  the options class changes too.</p>
+</div>
+
+<h3>Controller — three endpoints</h3>
+
+<div class="code" data-lang="java" data-file="controller/AudioController.java"><script type="text/plain">
+package com.substring.audio.controllers;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+
+@RestController
+@RequestMapping("/api/v1/audio")
+public class AudioController {
+
+    private final AudioService audioService;
+
+    // Load a file that already sits on the classpath (src/main/resources)
+    @Value("classpath:sample.m4a")
+    private Resource inputAudio;
+
+    public AudioController(AudioService audioService) {
+        this.audioService = audioService;
+    }
+
+    // 1. transcribe the bundled file
+    @PostMapping("/transcript")
+    public ResponseEntity<String> transcriptAudio() {
+        return ResponseEntity.ok(audioService.convertAudioToText(inputAudio));
+    }
+
+    // 2. same, but with options
+    @PostMapping("/transcript-with-options")
+    public ResponseEntity<String> transcriptAudioWithOptions() {
+        return ResponseEntity.ok(
+                audioService.convertAudioToTextWithOptions(inputAudio));
+    }
+
+    // 3. the real one: accept an uploaded file
+    @PostMapping("/text")
+    public ResponseEntity<String> speechToText(
+            @RequestParam("audioFile") MultipartFile audioFile) throws IOException {
+
+        // MultipartFile -> Resource, then the rest of the flow is identical
+        return ResponseEntity.ok(
+                audioService.convertAudioToText(audioFile.getResource()));
+    }
+}
+</script></div>
+
+<div class="box vid">
+  <span class="lbl">It handles multiple languages</span>
+  <p><code class="i">sample.m4a</code> (spoken in English) transcribed to a clean sentence about Spring Boot
+  and auto-configuration. <code class="i">sample2.m4a</code>, <strong>spoken in Hindi</strong>, was transcribed
+  correctly too — Whisper handles both.</p>
+</div>
+
+<div class="box err">
+  <span class="lbl">Two errors</span>
+  <p><strong>404 Not Found</strong> — the URL said <code class="i">/text</code> but the mapping was
+  <code class="i">/transcript</code>. Match them.<br>
+  <strong>"Current request is not a multipart request"</strong> — in Postman use
+  <em>Body → form-data</em>, key <code class="i">audioFile</code>, type <strong>File</strong>.</p>
+</div>
+
+<h3>Which model does the work?</h3>
+<p>Not GPT-4/5. The default is <strong>Whisper</strong>:</p>
+
+<div class="code" data-lang="properties" data-file="Overriding the transcription model"><script type="text/plain">
+spring.ai.openai.audio.transcription.options.model=whisper-1
+</script></div>
+
+<table>
+<tr><th>Model ID</th><th>Notes</th></tr>
+<tr><td><code class="i">whisper-1</code></td><td>General-purpose speech recognition — <strong>the default</strong></td></tr>
+<tr><td><code class="i">gpt-4o-transcribe</code></td><td>Speech-to-text powered by GPT-4o</td></tr>
+<tr><td><code class="i">gpt-4o-mini-transcribe</code></td><td>Cheaper GPT-4o-mini variant</td></tr>
+</table>
+
+<div class="box key">
+  <span class="lbl">Real-world use case</span>
+  <p>Voice input for a chatbot: the user speaks, you transcribe to text on the backend, then feed
+  that text through everything from Chapters 09–23. OpenAI also exposes the reverse —
+  text-to-speech — through the Audio API.</p>
+</div>
+</section>
+
+<!-- ==================== APPENDIX ==================== -->
+<section class="ch" id="c26" data-t="Appendix — Full Code Files">
+<div class="chead"><span class="num">A</span><h2>Appendix — Complete Code Files</h2></div>
+<p class="ts">Consolidated, section by section</p>
+
+<p>Every file below is complete and copy-pasteable. Together they form the final Help Desk project
+plus the standalone RAG / ETL / transcription modules.</p>
+
+<h3>A.1 — pom.xml (all dependencies used across the course)</h3>
+<div class="code" data-lang="xml" data-file="pom.xml"><script type="text/plain">
+<dependencies>
+
+    <!-- ============ web ============ -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- ============ model providers ============ -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-openai</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-ollama</artifactId>
+    </dependency>
+
+    <!-- ============ chat memory in a relational DB ============ -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
+    </dependency>
+
+    <!-- ============ RAG: vector store + advisors ============ -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-vector-store-mariadb</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-advisors-vector-store</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-rag</artifactId>
+    </dependency>
+
+    <!-- ============ ETL document readers ============ -->
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-pdf-document-reader</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-tika-document-reader</artifactId>
+    </dependency>
+
+    <!-- ============ persistence ============ -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+        <version>8.4.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+    </dependency>
+
+    <!-- ============ misc ============ -->
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+    </dependency>
+
+</dependencies>
+</script></div>
+
+<h3>A.2 — application.yml (complete)</h3>
+<div class="code" data-lang="yaml" data-file="src/main/resources/application.yml"><script type="text/plain">
+spring:
+  application:
+    name: spring-ai-helpdesk-backend
+
+  # ---------- relational DB (tickets + chat memory) ----------
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring_ai_yt
+    username: root
+    password: root1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+
+  ai:
+    # ---------- OpenAI ----------
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.3
+          max-tokens: 200
+      audio:
+        transcription:
+          options:
+            model: whisper-1
+
+    # ---------- Ollama (optional second provider) ----------
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: codellama:latest
+          temperature: 0.7
+
+    # ---------- chat memory ----------
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+
+    # ---------- vector store (RAG) ----------
+    vectorstore:
+      mariadb:
+        initialize-schema: true
+        distance-type: COSINE
+        dimensions: 1536
+
+server:
+  port: 8081
+
+logging:
+  level:
+    org.springframework.ai.chat.client.advisor: DEBUG
+</script></div>
+
+<h3>A.3 — AiConfig.java (final version)</h3>
+<div class="code" data-lang="java" data-file="config/AiConfig.java"><script type="text/plain">
+package com.substring.helpdesk.config;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestClient;
+
+@Configuration
+public class AiConfig {
+
+    private final Logger logger = LoggerFactory.getLogger(AiConfig.class);
+
+    /**
+     * The single ChatClient bean used across the app.
+     * Memory + request logging are attached as DEFAULT advisors,
+     * so every call through this client gets them.
+     */
+    @Bean
+    public ChatClient chatClient(ChatClient.Builder builder, ChatMemory chatMemory) {
+        logger.info("Chat memory implementation: {}", chatMemory.getClass().getName());
+
+        return builder
+                .defaultAdvisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory).build(),
+                        new SimpleLoggerAdvisor())
+                .build();
+    }
+
+    /**
+     * MessageWindowChatMemory = the STRATEGY (how many messages to keep).
+     * JdbcChatMemoryRepository = the STORAGE (a real database).
+     */
+    @Bean
+    public ChatMemory chatMemory(JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+        return MessageWindowChatMemory.builder()
+                .chatMemoryRepository(jdbcChatMemoryRepository)
+                .maxMessages(15)
+                .build();
+    }
+
+    /** Used by WeatherTool to call the external weather API. */
+    @Bean
+    public RestClient restClient() {
+        return RestClient.builder()
+                .baseUrl("http://api.weatherapi.com/v1")
+                .build();
+    }
+}
+</script></div>
+
+<h3>A.4 — RAG service (manual + advisor + advanced, side by side)</h3>
+<div class="code" data-lang="java" data-file="service/RagChatServiceImpl.java"><script type="text/plain">
+package com.substring.rag.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
+import org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpander;
+import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
+import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
+import org.springframework.ai.rag.retrieval.join.ConcatenationDocumentJoiner;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class RagChatServiceImpl {
+
+    private final Logger logger = LoggerFactory.getLogger(RagChatServiceImpl.class);
+
+    private final ChatClient chatClient;
+    private final VectorStore vectorStore;
+
+    @Value("classpath:/prompts/system-message.st")
+    private Resource systemMessage;
+
+    @Value("classpath:/prompts/user-message.st")
+    private Resource userMessage;
+
+    public RagChatServiceImpl(ChatClient chatClient, VectorStore vectorStore) {
+        this.chatClient = chatClient;
+        this.vectorStore = vectorStore;
+    }
+
+    // ---------- ETL: push data into the vector store ----------
+    public void saveData(List<String> list) {
+        List<Document> documentList = list.stream().map(Document::new).toList();
+        this.vectorStore.add(documentList);
+    }
+
+    // ---------- 1. MANUAL RAG (full control) ----------
+    public String manualRag(String query) {
+
+        List<Document> documents = this.vectorStore.similaritySearch(
+                SearchRequest.builder()
+                        .topK(3)
+                        .similarityThreshold(0.6)
+                        .query(query)
+                        .build());
+
+        String contextData = String.join(", ",
+                documents.stream().map(Document::getText).toList());
+        logger.info("Context data: {}", contextData);
+
+        return chatClient.prompt()
+                .system(s -> s.text(this.systemMessage).param("documents", contextData))
+                .user(u -> u.text(this.userMessage).param("query", query))
+                .call()
+                .content();
+    }
+
+    // ---------- 2. SIMPLE RAG via QuestionAnswerAdvisor ----------
+    public String simpleRag(String query) {
+        return chatClient.prompt()
+                .advisors(QuestionAnswerAdvisor.builder(vectorStore)
+                        .searchRequest(SearchRequest.builder()
+                                .topK(3)
+                                .similarityThreshold(0.5)
+                                .build())
+                        .build())
+                .user(query)
+                .call()
+                .content();
+    }
+
+    // ---------- 3. ADVANCED / MODULAR RAG ----------
+    public String advancedRag(String query) {
+
+        Advisor advisor = RetrievalAugmentationAdvisor.builder()
+                .queryTransformers(
+                        RewriteQueryTransformer.builder()
+                                .chatClientBuilder(this.chatClient.mutate().clone())
+                                .build(),
+                        TranslationQueryTransformer.builder()
+                                .chatClientBuilder(this.chatClient.mutate().clone())
+                                .targetLanguage("english")
+                                .build())
+                .queryExpander(MultiQueryExpander.builder()
+                        .chatClientBuilder(this.chatClient.mutate().clone())
+                        .numberOfQueries(3)
+                        .build())
+                .documentRetriever(VectorStoreDocumentRetriever.builder()
+                        .vectorStore(this.vectorStore)
+                        .topK(3)
+                        .similarityThreshold(0.5)
+                        .build())
+                .documentJoiner(new ConcatenationDocumentJoiner())
+                .queryAugmenter(ContextualQueryAugmenter.builder().build())
+                .build();
+
+        return this.chatClient.prompt()
+                .advisors(advisor)
+                .user(query)
+                .call()
+                .content();
+    }
+}
+</script></div>
+
+<h3>A.5 — ETL loader + transformer</h3>
+<div class="code" data-lang="java" data-file="service/EtlServiceImpl.java"><script type="text/plain">
+package com.substring.rag.service;
+
+import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.JsonReader;
+import org.springframework.ai.reader.ExtractedTextFormatter;
+import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class EtlServiceImpl {
+
+    private final VectorStore vectorStore;
+
+    @Value("classpath:sample_data.json")
+    private Resource jsonResource;
+
+    @Value("classpath:cricket_rules.pdf")
+    private Resource pdfResource;
+
+    public EtlServiceImpl(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
+
+    // ---------- EXTRACT ----------
+    public List<Document> loadFromJson() {
+        return new JsonReader(jsonResource).read();
+    }
+
+    public List<Document> loadFromPdf() {
+        PagePdfDocumentReader reader = new PagePdfDocumentReader(
+                pdfResource,
+                PdfDocumentReaderConfig.builder()
+                        .withPageTopMargin(0)
+                        .withPagesPerDocument(1)
+                        .withPageExtractedTextFormatter(
+                                ExtractedTextFormatter.builder()
+                                        .withNumberOfTopTextLinesToDelete(0)
+                                        .build())
+                        .build());
+        return reader.read();
+    }
+
+    // ---------- TRANSFORM ----------
+    public List<Document> transform(List<Document> documents) {
+        TokenTextSplitter splitter =
+                new TokenTextSplitter(300, 400, 10, 5000, true);
+        return splitter.transform(documents);
+    }
+
+    // ---------- LOAD ----------
+    public void save(List<Document> documents) {
+        this.vectorStore.add(documents);
+    }
+
+    /** Run the whole pipeline in one call. */
+    public void runPdfPipeline() {
+        save(transform(loadFromPdf()));
+    }
+}
+</script></div>
+
+<h3>A.6 — help-desk-system.st (system prompt skeleton)</h3>
+<div class="code" data-lang="text" data-file="src/main/resources/help-desk-system.st"><script type="text/plain">
+You are Lisa, a polite, professional and efficient Help Desk Assistant
+for Substring Technologies.
+
+GOAL
+Help users report, track and resolve issues politely and accurately.
+Listen carefully, collect relevant information, check whether a similar
+ticket already exists, and either provide an update or create a new ticket.
+
+PERSONALITY AND TONE
+- Always be polite, patient and empathetic.
+- Communicate clearly in simple, human language.
+- Maintain professionalism. Avoid sounding robotic.
+- Thank users often and appreciate their patience.
+
+RESPONSIBILITIES
+1. Always greet the user, telling them your name.
+2. Understand the user's request. Ask questions first if anything is unclear.
+3. Identify the issue category (technical / account / hardware / software).
+4. Determine urgency yourself from the description.
+5. CHECK FOR EXISTING TICKETS before creating a new one.
+   If a matching ticket exists, do NOT create a duplicate — share the
+   ticket id, summary and current status instead.
+6. Create a new ticket only when none exists.
+7. Confirm ticket creation and give a short summary back to the user.
+8. For every NEW ticket created, send an email summary to the support team.
+
+TICKET FIELDS TO COLLECT
+- ticket id     : auto-generated in the database. Do NOT ask the user.
+- summary       : generate this field based on user input.
+- description   : generate this field based on user input.
+- priority      : LOW | MEDIUM | HIGH | URGENT — decide from the problem.
+- category      : decide this field based on user input.
+- status        : OPEN | IN_PROGRESS | RESOLVED | CLOSED.
+- email         : MUST be taken from the user. Ask for it if not given.
+- created on    : auto-generated in the database.
+- updated on    : auto-generated in the database.
+
+Feel free to ask any question if the information is not clear.
+</script></div>
+
+<h3>A.7 — Quick property reference</h3>
+<table>
+<tr><th>Property</th><th>Purpose</th></tr>
+<tr><td><code class="i">spring.ai.openai.api-key</code></td><td>OpenAI key (use an env var)</td></tr>
+<tr><td><code class="i">spring.ai.openai.chat.options.model</code></td><td>Which OpenAI model</td></tr>
+<tr><td><code class="i">spring.ai.openai.chat.options.temperature</code></td><td>Randomness / creativity</td></tr>
+<tr><td><code class="i">spring.ai.openai.chat.options.max-tokens</code></td><td>Cap the response length</td></tr>
+<tr><td><code class="i">spring.ai.ollama.base-url</code></td><td>Local Ollama server URL</td></tr>
+<tr><td><code class="i">spring.ai.ollama.chat.options.model</code></td><td>Local model name</td></tr>
+<tr><td><code class="i">spring.ai.chat.client.enabled=false</code></td><td>Disable the auto ChatClient.Builder (multi-provider)</td></tr>
+<tr><td><code class="i">spring.ai.chat.memory.repository.jdbc.initialize-schema</code></td><td>Auto-create the chat memory table</td></tr>
+<tr><td><code class="i">spring.ai.vectorstore.mariadb.initialize-schema</code></td><td>Auto-create the vector_store table</td></tr>
+<tr><td><code class="i">spring.ai.vectorstore.mariadb.distance-type</code></td><td>COSINE / EUCLIDEAN</td></tr>
+<tr><td><code class="i">spring.ai.vectorstore.mariadb.dimensions</code></td><td>Embedding size (1536 for OpenAI)</td></tr>
+<tr><td><code class="i">spring.ai.openai.audio.transcription.options.model</code></td><td>whisper-1 by default</td></tr>
+<tr><td><code class="i">logging.level.org.springframework.ai.chat.client.advisor</code></td><td>Set to DEBUG to see advisor logs</td></tr>
+</table>
+
+<h3>A.8 — Errors encountered in the course, and fixes</h3>
+<table>
+<tr><th>Error</th><th>Cause</th><th>Fix</th></tr>
+<tr><td>Bean of type <code class="i">ChatClient</code> not found</td><td>Injected the wrong type</td><td>Inject <code class="i">ChatClient.Builder</code>, call <code class="i">.build()</code></td></tr>
+<tr><td>temperature does not support 0.7</td><td>Model rejects Spring AI's default</td><td>Set a supported value or change model</td></tr>
+<tr><td>Invalid model ID</td><td>Stray space in the property</td><td>Clean the property value</td></tr>
+<tr><td>model 'mistral' not found</td><td>Ollama default model not pulled</td><td>Set <code class="i">ollama.chat.options.model</code></td></tr>
+<tr><td>Incorrect API key (in tests)</td><td>Test run config has no env var</td><td>Add <code class="i">OPENAI_API_KEY</code> to the test config</td></tr>
+<tr><td>Attribute <code class="i">techName</code> is not defined</td><td>Placeholder/param name mismatch</td><td>Make the names identical</td></tr>
+<tr><td>Streaming returns nothing</td><td><code class="i">adviseStream</code> returned null</td><td><code class="i">return streamAdvisorChain.nextStream(req)</code></td></tr>
+<tr><td>vectorStore cannot be null</td><td>Retriever built without a store</td><td>Add <code class="i">.vectorStore(vectorStore)</code></td></tr>
+<tr><td>InMemoryChatMemoryRepository not found</td><td>JDBC dependency overrode it</td><td>Remove the dependency or create the bean manually</td></tr>
+<tr><td>Bad SQL — could not insert</td><td>Vector table not created</td><td>Set <code class="i">initialize-schema=true</code> + correct datasource</td></tr>
+<tr><td>No property 'username' on Ticket</td><td>Renamed field, repo not updated</td><td>Update entity, repository, service <em>and</em> prompt</td></tr>
+<tr><td>Help Desk system file not found</td><td>Used <code class="i">${...}</code> for a classpath file</td><td>Use <code class="i">@Value("classpath:file.st")</code></td></tr>
+<tr><td>Blocked by CORS policy</td><td>React on 5173, API on 8081</td><td><code class="i">@CrossOrigin("http://localhost:5173")</code></td></tr>
+<tr><td>Not a multipart request</td><td>File not sent as form-data</td><td>Postman → Body → form-data → type File</td></tr>
+</table>
+
+<div class="box key">
+  <span class="lbl">The one habit worth keeping</span>
+  <p>Repeated in nearly every chapter: <strong>never memorise properties or class names — read the
+  Spring AI reference documentation.</strong> Bookmark it. Every property, default value, supported
+  provider and code sample lives there, and it changes faster than any video can.</p>
+</div>
+</section>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /wrap -->
+
+<script>
+/* ---------- render code blocks from <script type="text/plain"> ---------- */
+(function(){
+  const KW = /\b(public|private|protected|class|interface|enum|extends|implements|new|return|void|static|final|import|package|if|else|for|while|try|catch|throw|throws|this|super|null|true|false|var|record|instanceof|synchronized|abstract|default)\b/g;
+  const TY = /\b(String|List|Map|Optional|Integer|Long|Double|Boolean|Flux|Mono|ChatClient|ChatModel|ChatResponse|Prompt|PromptTemplate|SystemPromptTemplate|Document|VectorStore|SearchRequest|Advisor|CallAdvisor|StreamAdvisor|ChatMemory|MessageWindowChatMemory|ChatMemoryRepository|JdbcChatMemoryRepository|InMemoryChatMemoryRepository|Resource|ResponseEntity|RestClient|TranscriptionModel|Ticket|Priority|Status)\b/g;
+
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function hi(src, lang){
+    let t = esc(src);
+    const store = []; const KEEP = c => ''+(store.push(c)-1)+'';
+
+    // comments + strings first, stashed so later regexes can't touch them
+    t = t.replace(/(\/\/[^\n]*|\/\*[\s\S]*?\*\/|^\s*#[^\n]*)/gm, m => KEEP('<span class="c">'+m+'</span>'));
+    t = t.replace(/(&lt;!--[\s\S]*?--&gt;)/g, m => KEEP('<span class="c">'+m+'</span>'));
+    t = t.replace(/("(?:[^"\\\n]|\\.)*")/g, m => KEEP('<span class="s">'+m+'</span>'));
+
+    if (lang === 'xml') {
+      t = t.replace(/(&lt;\/?)([\w.-]+)/g, (m,a,b)=>a+'<span class="t">'+b+'</span>');
+    } else if (lang === 'properties' || lang === 'text' || lang === 'bash') {
+      t = t.replace(/^([\w.\-]+)(?==)/gm, m=>'<span class="nm">'+m+'</span>');
+      t = t.replace(/(\{[\w.]+\})/g, m=>'<span class="a">'+m+'</span>');
+    } else {
+      t = t.replace(/(@[A-Za-z]\w*)/g, m=>'<span class="a">'+m+'</span>');
+      t = t.replace(KW, m=>'<span class="k">'+m+'</span>');
+      t = t.replace(TY, m=>'<span class="t">'+m+'</span>');
+      t = t.replace(/\b([a-z]\w*)(?=\s*\()/g, m=>'<span class="f">'+m+'</span>');
+    }
+    return t.replace(/(\d+)/g, (m,i)=>store[+i]);
+  }
+
+  document.querySelectorAll('.code').forEach(box=>{
+    const holder = box.querySelector('script[type="text/plain"]');
+    if(!holder) return;
+    const raw  = holder.textContent.replace(/^\n/,'').replace(/\s+$/,'');
+    const lang = box.dataset.lang || 'java';
+    const file = box.dataset.file || lang;
+    holder.remove();
+    box.insertAdjacentHTML('afterbegin',
+      '<div class="bar"><span class="fn">'+file.replace(/</g,'&lt;')+'</span>'+
+      '<button class="cp">copy</button></div>'+
+      '<pre><code>'+hi(raw,lang)+'</code></pre>');
+    box.querySelector('.cp').addEventListener('click', function(){
+      navigator.clipboard.writeText(raw);
+      this.textContent='copied'; setTimeout(()=>this.textContent='copy',1200);
+    });
+  });
+
+  /* ---------- build TOC ---------- */
+  const toc = document.getElementById('toc');
+  const secs = [...document.querySelectorAll('section.ch')];
+  secs.forEach(s=>{
+    const li=document.createElement('li');
+    li.innerHTML='<a href="#'+s.id+'"><span class="n">'+
+      s.querySelector('.num').textContent+'</span><span>'+s.dataset.t+'</span></a>';
+    toc.appendChild(li);
+  });
+
+  /* ---------- filter ---------- */
+  document.getElementById('q').addEventListener('input',e=>{
+    const v=e.target.value.toLowerCase();
+    [...toc.children].forEach(li=>{
+      li.style.display = li.textContent.toLowerCase().includes(v) ? '' : 'none';
+    });
+  });
+
+  /* ---------- scroll spy ---------- */
+  const links=[...toc.querySelectorAll('a')];
+  const io=new IntersectionObserver(es=>{
+    es.forEach(en=>{
+      if(en.isIntersecting){
+        links.forEach(a=>a.classList.remove('on'));
+        const a=links.find(a=>a.getAttribute('href')==='#'+en.target.id);
+        if(a){a.classList.add('on'); a.scrollIntoView({block:'nearest'});}
+      }
+    });
+  },{rootMargin:'-15% 0px -75% 0px'});
+  secs.forEach(s=>io.observe(s));
+})();
+</script>
+</body>
+</html>

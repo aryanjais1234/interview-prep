@@ -1,0 +1,3201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ReviewIQ — AI Microservices without Spring AI</title>
+<style>
+:root{
+  --bg:#0b0e14; --bg2:#141922; --bg3:#1a212c; --line:#26303c;
+  --tx:#e6edf5; --tx2:#92a0b2; --tx3:#68758a;
+  --ac:#5ec8c0; --ac2:#6aa9ff; --warn:#e6b455; --red:#f2686b; --pur:#c99bff; --org:#ffab6b;
+  --mono:'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font:16px/1.72 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--ac2);text-decoration:none}a:hover{text-decoration:underline}
+
+#wrap{display:flex;min-height:100vh}
+#side{width:300px;flex:0 0 300px;background:var(--bg2);border-right:1px solid var(--line);
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding-bottom:60px}
+#brand{padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg2);z-index:5}
+#home{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--tx3);
+  border:1px solid var(--line);border-radius:6px;padding:4px 10px;margin-bottom:12px;font-family:var(--mono)}
+#home:hover{color:var(--ac);border-color:var(--ac);text-decoration:none}
+#brand .t{font-size:16.5px;font-weight:700;letter-spacing:-.01em}
+#brand .s{font-size:12px;color:var(--tx3);margin-top:3px;line-height:1.5}
+#q{width:100%;margin-top:12px;padding:8px 11px;border-radius:7px;border:1px solid var(--line);
+  background:var(--bg);color:var(--tx);font-size:13px;font-family:inherit}
+#q:focus{outline:none;border-color:var(--ac)}
+#toc{list-style:none;margin:8px 0 0;padding:0}
+#toc .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--tx3);
+  padding:16px 20px 5px;font-weight:700}
+#toc li a{display:block;padding:6px 20px 6px 22px;color:var(--tx2);font-size:13px;
+  border-left:2px solid transparent;line-height:1.45}
+#toc li a:hover{background:var(--bg3);color:var(--tx);text-decoration:none}
+#toc li a.on{border-left-color:var(--ac);color:var(--tx);background:var(--bg3)}
+#toc li a .f{font-family:var(--mono);font-size:12px}
+#main{flex:1;min-width:0;padding-bottom:120px}
+.inner{max-width:920px;margin:0 auto;padding:0 40px}
+
+#hero{border-bottom:1px solid var(--line);padding:52px 0 38px;
+  background:radial-gradient(900px 320px at 15% -10%,rgba(94,200,192,.13),transparent 62%),var(--bg)}
+#hero .sub{color:var(--ac);font-family:var(--mono);font-size:13px;margin:0 0 14px}
+#hero h1{font-size:38px;line-height:1.14;margin:0 0 10px;letter-spacing:-.026em}
+#hero p{color:var(--tx2);margin:0 0 20px;font-size:17px;max-width:680px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-size:12px;padding:4px 11px;border-radius:20px;background:var(--bg3);
+  border:1px solid var(--line);color:var(--tx2);font-family:var(--mono)}
+
+section.ch{padding:46px 0 8px;border-bottom:1px solid var(--line)}
+.chead{display:flex;align-items:baseline;gap:13px;margin-bottom:18px}
+.chead .num{font-family:var(--mono);font-size:12px;color:var(--ac);border:1px solid var(--ac);
+  border-radius:6px;padding:2px 9px;flex:0 0 auto}
+.chead h2{font-size:26px;margin:0;letter-spacing:-.02em;line-height:1.25}
+h3{font-size:19px;margin:30px 0 10px;letter-spacing:-.01em}
+h4{font-size:15.5px;margin:22px 0 8px}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin-bottom:6px}
+code.i{font-family:var(--mono);font-size:.86em;background:var(--bg3);padding:2px 6px;
+  border-radius:5px;border:1px solid var(--line);color:var(--org)}
+strong{color:#fff;font-weight:650}
+
+.box{border-radius:9px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);
+  background:var(--bg2);font-size:14.5px}
+.box .lbl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:6px}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.box.key{border-left:3px solid var(--ac)}.box.key .lbl{color:var(--ac)}
+.box.warn{border-left:3px solid var(--warn)}.box.warn .lbl{color:var(--warn)}
+.box.why{border-left:3px solid var(--pur)}.box.why .lbl{color:var(--pur)}
+
+.code{margin:16px 0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#070a0f}
+.code .bar{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);
+  padding:7px 14px;border-bottom:1px solid var(--line);gap:12px}
+.code .fn{font-family:var(--mono);font-size:11.5px;color:var(--tx2);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.code .cp{font-size:11px;font-family:var(--mono);background:transparent;border:1px solid var(--line);
+  color:var(--tx3);padding:3px 9px;border-radius:5px;cursor:pointer;flex:0 0 auto}
+.code .cp:hover{color:var(--tx);border-color:var(--tx3)}
+.code pre{margin:0;padding:14px 17px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.6;tab-size:4}
+.code pre::-webkit-scrollbar{height:9px}
+.code pre::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+.k{color:#ff7b8a}.s{color:#9fd8ff}.c{color:#5b6a7c;font-style:italic}
+.a{color:var(--warn)}.t{color:var(--pur)}.nm{color:#6aa9ff}.f{color:#7ee0c0}
+
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14px}
+th,td{text-align:left;padding:9px 13px;border:1px solid var(--line);vertical-align:top}
+th{background:var(--bg2);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--tx2)}
+td code.i{font-size:12px}
+
+.pipe{margin:22px 0;border:1px solid var(--line);border-radius:11px;background:var(--bg2);padding:20px}
+.lane{display:flex;align-items:stretch;gap:14px;margin-bottom:9px}
+.lane:last-child{margin-bottom:0}
+.lane .badge{flex:0 0 118px;font-family:var(--mono);font-size:10.5px;color:var(--tx3);
+  text-transform:uppercase;letter-spacing:.07em;padding-top:12px;text-align:right}
+.lane .body{flex:1;border:1px solid var(--line);border-radius:8px;background:var(--bg3);padding:10px 15px}
+.lane .body .ttl{font-weight:650;font-size:14px}
+.lane .body .dsc{font-size:12.5px;color:var(--tx2);margin-top:3px;line-height:1.55}
+.lane.hl .body{border-color:var(--ac)}
+.lane.hl .badge{color:var(--ac)}
+.arrow{margin:0 0 9px 132px;color:var(--tx3);font-family:var(--mono);font-size:13px;line-height:1}
+
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px;
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;font-size:13px}
+.flow .n{padding:6px 12px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;
+  font-family:var(--mono);font-size:12px}
+.flow .n.hl{border-color:var(--ac);color:var(--ac)}
+.flow .ar{color:var(--tx3)}
+
+::selection{background:rgba(94,200,192,.3)}
+#side::-webkit-scrollbar{width:9px}
+#side::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+@media(max-width:1040px){#side{display:none}.inner{padding:0 20px}#hero h1{font-size:28px}
+  .lane .badge{display:none}.arrow{margin-left:0}}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+<nav id="side">
+  <div id="brand">
+    <a id="home" href="index.html">&larr; Back to Home</a>
+    <div class="t">ReviewIQ</div>
+    <div class="s">AI microservices using RestTemplate<br>&amp; WebClient — no Spring AI</div>
+    <input id="q" placeholder="Filter files…" autocomplete="off">
+  </div>
+  <ul id="toc"></ul>
+</nav>
+
+<main id="main">
+
+<header id="hero">
+  <div class="inner">
+    <div class="sub">spring-boot · eureka · gateway · resttemplate · webclient · openai rest api</div>
+    <h1>ReviewIQ — AI without Spring AI</h1>
+    <p>An e-commerce review analyser built as microservices. Every AI feature — chat, embeddings,
+       RAG, streaming, memory, function calling — is written by hand against the OpenAI REST API
+       using RestTemplate and WebClient.</p>
+    <div class="pills">
+      <span class="pill">Java 21</span><span class="pill">Spring Boot 3.5</span>
+      <span class="pill">Eureka</span><span class="pill">Spring Cloud Gateway</span>
+      <span class="pill">RestTemplate</span><span class="pill">WebClient</span>
+      <span class="pill">Redis</span><span class="pill">PostgreSQL</span>
+      <span class="pill">4 services</span>
+    </div>
+  </div>
+</header>
+
+<div class="inner" id="body">
+
+<!-- ============ OVERVIEW ============ -->
+<section class="ch" id="s-overview" data-g="Overview" data-t="What &amp; why">
+<div class="chead"><span class="num">00</span><h2>What we are building, and why by hand</h2></div>
+
+<h3>The product</h3>
+<p>An online store gets thousands of reviews per product. Nobody reads them all. ReviewIQ does
+three things:</p>
+<ol>
+  <li><strong>Summarises</strong> all reviews of a product into sentiment, top complaints and top praises.</li>
+  <li><strong>Answers questions</strong> about a product using only what real customers wrote —
+      <em>"how is the battery life?"</em> — instead of the seller's marketing copy.</li>
+  <li><strong>Remembers the conversation</strong>, so the shopper can keep asking follow-ups.</li>
+</ol>
+
+<h3>Why write the AI calls manually?</h3>
+<p>Spring AI is a wrapper around the provider's REST API. Doing it yourself once teaches you what
+that wrapper is actually doing, and there are real situations where you have no choice:</p>
+<ul>
+  <li>The project is on an older Spring Boot version that Spring AI does not support.</li>
+  <li>Your company uses an internal LLM gateway with a custom API shape.</li>
+  <li>You need a provider feature that the abstraction has not exposed yet.</li>
+  <li>You are asked in an interview to explain how it works underneath.</li>
+</ul>
+
+<div class="box why">
+  <span class="lbl">What we have to build ourselves</span>
+  <table>
+  <tr><th>Spring AI gives you</th><th>We write instead</th></tr>
+  <tr><td><code class="i">ChatClient</code></td><td><code class="i">OpenAiClient</code> with RestTemplate</td></tr>
+  <tr><td>Message roles</td><td>A <code class="i">List&lt;ChatMessage&gt;</code> we build by hand</td></tr>
+  <tr><td><code class="i">.entity(Foo.class)</code></td><td>JSON mode + Jackson <code class="i">readValue()</code></td></tr>
+  <tr><td><code class="i">VectorStore</code></td><td>Embeddings API + cosine similarity in Java</td></tr>
+  <tr><td><code class="i">MessageChatMemoryAdvisor</code></td><td>A Redis list of past messages</td></tr>
+  <tr><td><code class="i">.stream()</code></td><td>WebClient reading the SSE <code class="i">data:</code> lines</td></tr>
+  <tr><td>Tool calling</td><td>A <code class="i">tools</code> array + handling <code class="i">tool_calls</code></td></tr>
+  </table>
+</div>
+
+<h3>The services</h3>
+
+<div class="pipe">
+  <div class="lane">
+    <div class="badge">Client</div>
+    <div class="body">
+      <div class="ttl">Browser / Postman</div>
+      <div class="dsc">Sends a JWT with every request.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane hl">
+    <div class="badge">Gateway</div>
+    <div class="body">
+      <div class="ttl">api-gateway · port 8080</div>
+      <div class="dsc">Checks the token, adds <code class="i">X-User-Id</code>, limits requests per user in
+        Redis, and routes by service name from Eureka.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane">
+    <div class="badge">Business</div>
+    <div class="body">
+      <div class="ttl">review-service · port 8082</div>
+      <div class="dsc">Owns reviews and products. Runs the RAG search. Calls ai-service whenever it
+        needs the model.</div>
+    </div>
+  </div>
+  <div class="arrow">│  (WebClient + Eureka load balancing)</div>
+
+  <div class="lane hl">
+    <div class="badge">AI</div>
+    <div class="body">
+      <div class="ttl">ai-service · port 8081</div>
+      <div class="dsc">The only service that knows the OpenAI API key exists. Chat, embeddings,
+        streaming, memory, function calling.</div>
+    </div>
+  </div>
+  <div class="arrow">│  (RestTemplate / WebClient)</div>
+
+  <div class="lane">
+    <div class="badge">Provider</div>
+    <div class="body">
+      <div class="ttl">api.openai.com</div>
+      <div class="dsc"><code class="i">/v1/chat/completions</code> and <code class="i">/v1/embeddings</code></div>
+    </div>
+  </div>
+</div>
+
+<div class="box key">
+  <span class="lbl">Why ai-service is separate</span>
+  <p>The API key lives in exactly one service. If five services each called OpenAI directly you would
+  have the key in five places, five different retry policies, and no single place to measure spend.
+  Putting it behind one service means one config, one circuit breaker, one token counter.</p>
+</div>
+
+<h3>Project layout</h3>
+<div class="code" data-lang="tree" data-file="folder structure"><script type="text/plain">
+reviewiq/
+├── docker-compose.yml
+├── db/schema.sql
+├── pom.xml                      (parent)
+│
+├── discovery-server/            Eureka - services find each other
+├── api-gateway/                 JWT check + rate limit + routing
+├── ai-service/                  ALL OpenAI calls live here
+└── review-service/              reviews, products, RAG search
+</script></div>
+
+<table>
+<tr><th>Service</th><th>Port</th><th>Responsibility</th></tr>
+<tr><td><code class="i">discovery-server</code></td><td>8761</td><td>Eureka registry. Every service registers here.</td></tr>
+<tr><td><code class="i">api-gateway</code></td><td>8080</td><td>The only public port.</td></tr>
+<tr><td><code class="i">ai-service</code></td><td>8081</td><td>Wraps the OpenAI REST API.</td></tr>
+<tr><td><code class="i">review-service</code></td><td>8082</td><td>Business logic and RAG.</td></tr>
+</table>
+
+<h3>Example calls</h3>
+<div class="code" data-lang="bash" data-file="what the API looks like"><script type="text/plain">
+# add a review (also creates and stores its embedding)
+curl -X POST http://localhost:8080/api/v1/reviews \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"productId":1,"rating":2,"text":"Battery dies in 3 hours. Camera is great though."}'
+
+# AI summary of every review for this product
+curl http://localhost:8080/api/v1/products/1/summary \
+  -H "Authorization: Bearer $TOKEN"
+
+# ask a question - answered only from real reviews (RAG)
+curl -X POST http://localhost:8080/api/v1/products/1/ask \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"How is the battery life?"}'
+
+# same thing but streamed word by word
+curl -N -X POST http://localhost:8080/api/v1/products/1/ask/stream \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"question":"How is the battery life?"}'
+</script></div>
+</section>
+
+<!-- ============ INFRA ============ -->
+<section class="ch" id="s-infra" data-g="Infrastructure" data-t="docker-compose + schema">
+<div class="chead"><span class="num">01</span><h2>Infrastructure</h2></div>
+
+<p>Two containers only: PostgreSQL for the data and Redis for chat memory and rate limiting.</p>
+
+<div class="code" data-lang="yaml" data-file="docker-compose.yml"><script type="text/plain">
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: reviewiq-postgres
+    environment:
+      POSTGRES_DB: reviewiq
+      POSTGRES_USER: reviewiq
+      POSTGRES_PASSWORD: reviewiq
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:7-alpine
+    container_name: reviewiq-redis
+    ports:
+      - "6379:6379"
+</script></div>
+
+<div class="code" data-lang="sql" data-file="db/schema.sql"><script type="text/plain">
+CREATE TABLE products (
+    id          BIGSERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    category    VARCHAR(100),
+    created_at  TIMESTAMP    NOT NULL DEFAULT now()
+);
+
+CREATE TABLE reviews (
+    id          BIGSERIAL PRIMARY KEY,
+    product_id  BIGINT       NOT NULL REFERENCES products (id),
+    user_id     VARCHAR(64)  NOT NULL,
+    rating      INT          NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    review_text TEXT         NOT NULL,
+
+    -- We store the embedding as text: "0.12,0.87,-0.34,..."
+    -- Not the best way for millions of rows, but it needs no
+    -- extra extension and it is easy to understand.
+    embedding   TEXT,
+
+    created_at  TIMESTAMP    NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_reviews_product ON reviews (product_id);
+
+-- Cache of AI summaries so we do not pay for the same summary twice
+CREATE TABLE product_summaries (
+    product_id      BIGINT PRIMARY KEY REFERENCES products (id),
+    sentiment       VARCHAR(20),
+    summary         TEXT,
+    top_complaints  TEXT,
+    top_praises     TEXT,
+    review_count    INT,
+    total_tokens    INT,
+    generated_at    TIMESTAMP NOT NULL DEFAULT now()
+);
+
+INSERT INTO products (name, category) VALUES
+    ('Nova X1 Smartphone', 'Electronics'),
+    ('AeroBook Pro 14', 'Laptops');
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Honest note about the embedding column</span>
+  <p>Storing a 1536-number vector as a comma-separated string and comparing in Java works fine up to
+  a few thousand reviews. Beyond that you want the <code class="i">pgvector</code> extension, which does the
+  similarity search inside the database with a proper index. I kept it simple here so the maths is
+  visible instead of hidden.</p>
+</div>
+</section>
+
+<!-- ============ PARENT ============ -->
+<section class="ch" id="s-parent" data-g="Infrastructure" data-t="Parent pom.xml">
+<div class="chead"><span class="num">02</span><h2>Parent pom</h2></div>
+
+<div class="code" data-lang="xml" data-file="pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.reviewiq</groupId>
+    <artifactId>reviewiq</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.5</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <java.version>21</java.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+    </properties>
+
+    <modules>
+        <module>discovery-server</module>
+        <module>api-gateway</module>
+        <module>ai-service</module>
+        <module>review-service</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
+</script></div>
+</section>
+
+<!-- ============ DISCOVERY ============ -->
+<section class="ch" id="s-eureka" data-g="discovery-server" data-t="Eureka registry">
+<div class="chead"><span class="num">03</span><h2>discovery-server — Eureka</h2></div>
+
+<p>Every service registers itself here with its name and address. Then <code class="i">review-service</code>
+can call <code class="i">ai-service</code> by <strong>name</strong> instead of hardcoding
+<code class="i">http://localhost:8081</code>, and if we run three copies of ai-service the calls are load
+balanced automatically.</p>
+
+<div class="code" data-lang="xml" data-file="discovery-server/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.reviewiq</groupId>
+        <artifactId>reviewiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>discovery-server</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="java" data-file="discovery-server/.../DiscoveryServerApplication.java"><script type="text/plain">
+package com.reviewiq.discovery;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer      // this one annotation turns the app into a registry
+public class DiscoveryServerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(DiscoveryServerApplication.class, args);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="discovery-server/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8761
+
+spring:
+  application:
+    name: discovery-server
+
+eureka:
+  client:
+    # The registry itself does not need to register with anyone
+    register-with-eureka: false
+    fetch-registry: false
+</script></div>
+
+<p>Open <code class="i">http://localhost:8761</code> after starting everything and you will see all four
+services listed. That is a quick way to check nothing failed to start.</p>
+</section>
+
+<!-- ============ GATEWAY ============ -->
+<section class="ch" id="s-gw-setup" data-g="api-gateway" data-t="pom.xml + application.yml">
+<div class="chead"><span class="num">04</span><h2>api-gateway — setup</h2></div>
+
+<div class="code" data-lang="xml" data-file="api-gateway/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.reviewiq</groupId>
+        <artifactId>reviewiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>api-gateway</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- Redis is used to count requests for rate limiting -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="api-gateway/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: false        # we write the routes ourselves, it is clearer
+
+      routes:
+        # lb:// means "look up this name in Eureka and load balance"
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/v1/reviews/**,/api/v1/products/**
+
+        - id: ai-service
+          uri: lb://ai-service
+          predicates:
+            - Path=/api/v1/ai/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:this-secret-must-be-at-least-32-characters-long}
+  rate-limit:
+    requests-per-minute: 30      # AI calls are expensive, keep it low
+</script></div>
+
+<div class="box key">
+  <span class="lbl">What lb:// does</span>
+  <p><code class="i">uri: lb://review-service</code> tells the gateway to ask Eureka where
+  review-service is running and to spread requests across every instance it finds. No IP addresses
+  anywhere in the config.</p>
+</div>
+</section>
+
+<section class="ch" id="s-gw-auth" data-g="api-gateway" data-t="JWT filter + rate limit">
+<div class="chead"><span class="num">05</span><h2>Auth and rate limiting</h2></div>
+
+<div class="code" data-lang="java" data-file="api-gateway/.../JwtUtil.java"><script type="text/plain">
+package com.reviewiq.gateway;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+
+@Component
+public class JwtUtil {
+
+    @Value("${app.jwt.secret}")
+    private String secret;
+
+    /**
+     * Returns the claims inside the token, or null if the token is
+     * invalid or expired. We return null instead of throwing because
+     * the caller only needs to know "allowed or not allowed".
+     */
+    public Claims getClaims(String token) {
+        try {
+            SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="api-gateway/.../AuthFilter.java"><script type="text/plain">
+package com.reviewiq.gateway;
+
+import io.jsonwebtoken.Claims;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+/**
+ * Runs for every request. Checks the token once here so that
+ * ai-service and review-service never have to deal with security.
+ */
+@Component
+public class AuthFilter implements GlobalFilter, Ordered {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthFilter.class);
+
+    private final JwtUtil jwtUtil;
+
+    public AuthFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Override
+    public int getOrder() {
+        // must run BEFORE RateLimitFilter, because that one needs
+        // the user id header that we add here
+        return -2;
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        String path = exchange.getRequest().getPath().toString();
+
+        if (path.startsWith("/actuator")) {
+            return chain.filter(exchange);
+        }
+
+        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return reject(exchange);
+        }
+
+        Claims claims = jwtUtil.getClaims(authHeader.substring(7));
+
+        if (claims == null || claims.getSubject() == null) {
+            logger.warn("Invalid token for path {}", path);
+            return reject(exchange);
+        }
+
+        // Always overwrite the header from the token.
+        // If we only added it when missing, a user could send their own
+        // X-User-Id header and pretend to be somebody else.
+        ServerHttpRequest newRequest = exchange.getRequest().mutate()
+                .header("X-User-Id", claims.getSubject())
+                .build();
+
+        return chain.filter(exchange.mutate().request(newRequest).build());
+    }
+
+    private Mono<Void> reject(ServerWebExchange exchange) {
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        return exchange.getResponse().setComplete();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="api-gateway/.../RateLimitFilter.java"><script type="text/plain">
+package com.reviewiq.gateway;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+/**
+ * Simple counter in Redis. The key contains the current minute,
+ * so when the minute changes the key changes and the count starts
+ * again from 1. Redis deletes old keys by itself using the TTL.
+ */
+@Component
+public class RateLimitFilter implements GlobalFilter, Ordered {
+
+    private static final Logger logger = LoggerFactory.getLogger(RateLimitFilter.class);
+
+    private final ReactiveStringRedisTemplate redisTemplate;
+
+    @Value("${app.rate-limit.requests-per-minute}")
+    private int limit;
+
+    public RateLimitFilter(ReactiveStringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Override
+    public int getOrder() {
+        return -1;   // after AuthFilter
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        String userId = exchange.getRequest().getHeaders().getFirst("X-User-Id");
+
+        if (userId == null) {
+            return chain.filter(exchange);     // public path, nothing to limit
+        }
+
+        String key = "rate:" + userId + ":" + LocalDateTime.now().getMinute();
+
+        return redisTemplate.opsForValue().increment(key)
+                .flatMap(count -> {
+                    if (count == 1) {
+                        // first request in this minute, set the expiry
+                        return redisTemplate.expire(key, Duration.ofMinutes(2))
+                                .thenReturn(count);
+                    }
+                    return Mono.just(count);
+                })
+                .flatMap(count -> {
+                    if (count > limit) {
+                        logger.warn("Rate limit hit. user={} count={}", userId, count);
+                        exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+                        exchange.getResponse().getHeaders().add("Retry-After", "60");
+                        return exchange.getResponse().setComplete();
+                    }
+
+                    exchange.getResponse().getHeaders()
+                            .add("X-RateLimit-Remaining", String.valueOf(limit - count));
+
+                    return chain.filter(exchange);
+                });
+    }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Why Redis and not a HashMap</span>
+  <p>If the count lived in a Java map, running two gateway instances would let a user send double
+  the limit, because each instance would have its own counter. Redis is shared, so the limit is
+  correct however many gateways are running.</p>
+</div>
+</section>
+
+<!-- ============ AI SERVICE ============ -->
+<section class="ch" id="s-ai-setup" data-g="ai-service" data-t="pom.xml + application.yml">
+<div class="chead"><span class="num">06</span><h2>ai-service — setup</h2></div>
+
+<p>This is the only service that knows the OpenAI key. Notice what is <strong>not</strong> in the pom:
+there is no Spring AI dependency anywhere.</p>
+
+<div class="code" data-lang="xml" data-file="ai-service/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.reviewiq</groupId>
+        <artifactId>reviewiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>ai-service</artifactId>
+
+    <dependencies>
+        <!-- RestTemplate comes from here -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- WebClient comes from here. We need it for streaming. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- chat memory is stored here -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- so one slow OpenAI outage does not hang every thread -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="ai-service/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8081
+
+spring:
+  application:
+    name: ai-service          # this name is what review-service calls
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+
+  main:
+    web-application-type: servlet   # we use both web and webflux, so be explicit
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+  base-url: https://api.openai.com/v1
+  chat-model: gpt-4o-mini
+  embedding-model: text-embedding-3-small
+  temperature: 0.3
+  max-tokens: 600
+  timeout-seconds: 60
+
+app:
+  memory:
+    max-messages: 10          # how many past messages we keep per conversation
+    ttl-hours: 24
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      openai:
+        slidingWindowSize: 10
+        failureRateThreshold: 60
+        waitDurationInOpenState: 30s
+  retry:
+    instances:
+      openai:
+        maxAttempts: 3
+        waitDuration: 2s
+        exponentialBackoffMultiplier: 2
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../config/OpenAiProperties.java"><script type="text/plain">
+package com.reviewiq.ai.config;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+/**
+ * Reads everything under "openai:" from application.yml.
+ * Keeping it in one class means no @Value scattered everywhere.
+ */
+@Component
+@ConfigurationProperties(prefix = "openai")
+public class OpenAiProperties {
+
+    private String apiKey;
+    private String baseUrl;
+    private String chatModel;
+    private String embeddingModel;
+    private double temperature;
+    private int maxTokens;
+    private int timeoutSeconds;
+
+    public String getApiKey() { return apiKey; }
+    public void setApiKey(String apiKey) { this.apiKey = apiKey; }
+
+    public String getBaseUrl() { return baseUrl; }
+    public void setBaseUrl(String baseUrl) { this.baseUrl = baseUrl; }
+
+    public String getChatModel() { return chatModel; }
+    public void setChatModel(String chatModel) { this.chatModel = chatModel; }
+
+    public String getEmbeddingModel() { return embeddingModel; }
+    public void setEmbeddingModel(String embeddingModel) { this.embeddingModel = embeddingModel; }
+
+    public double getTemperature() { return temperature; }
+    public void setTemperature(double temperature) { this.temperature = temperature; }
+
+    public int getMaxTokens() { return maxTokens; }
+    public void setMaxTokens(int maxTokens) { this.maxTokens = maxTokens; }
+
+    public int getTimeoutSeconds() { return timeoutSeconds; }
+    public void setTimeoutSeconds(int timeoutSeconds) { this.timeoutSeconds = timeoutSeconds; }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../config/HttpClientConfig.java"><script type="text/plain">
+package com.reviewiq.ai.config;
+
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
+
+@Configuration
+public class HttpClientConfig {
+
+    private final OpenAiProperties props;
+
+    public HttpClientConfig(OpenAiProperties props) {
+        this.props = props;
+    }
+
+    /**
+     * RestTemplate for normal (blocking) calls.
+     *
+     * The timeouts are important. Without them, if OpenAI hangs, the
+     * thread waits forever and eventually the whole app runs out of
+     * threads. This is the most common mistake with RestTemplate.
+     */
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+                .connectTimeout(Duration.ofSeconds(10))
+                .readTimeout(Duration.ofSeconds(props.getTimeoutSeconds()))
+                .build();
+    }
+
+    /**
+     * WebClient for streaming. RestTemplate cannot stream a response
+     * chunk by chunk, so we need WebClient for that one case.
+     */
+    @Bean
+    public WebClient openAiWebClient() {
+
+        HttpClient httpClient = HttpClient.create()
+                .responseTimeout(Duration.ofSeconds(props.getTimeoutSeconds()));
+
+        return WebClient.builder()
+                .baseUrl(props.getBaseUrl())
+                .defaultHeader("Authorization", "Bearer " + props.getApiKey())
+                .defaultHeader("Content-Type", "application/json")
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
+    }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-ai-dto" data-g="ai-service" data-t="OpenAI request/response DTOs">
+<div class="chead"><span class="num">07</span><h2>The OpenAI DTOs</h2></div>
+
+<p>This is the part Spring AI normally hides. To call the API we have to build the exact JSON it
+expects and parse the exact JSON it returns.</p>
+
+<div class="code" data-lang="json" data-file="what OpenAI expects and returns"><script type="text/plain">
+// ---- REQUEST to POST /v1/chat/completions ----
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    { "role": "system", "content": "You are a helpful assistant." },
+    { "role": "user",   "content": "How is the battery?" }
+  ],
+  "temperature": 0.3,
+  "max_tokens": 600
+}
+
+// ---- RESPONSE ----
+{
+  "id": "chatcmpl-abc123",
+  "model": "gpt-4o-mini",
+  "choices": [
+    {
+      "index": 0,
+      "message": { "role": "assistant", "content": "Most reviewers say..." },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 210,
+    "completion_tokens": 95,
+    "total_tokens": 305
+  }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../dto/openai/ChatMessage.java"><script type="text/plain">
+package com.reviewiq.ai.dto.openai;
+
+/**
+ * One message in the conversation.
+ * role is "system", "user", "assistant" or "tool".
+ */
+public class ChatMessage {
+
+    private String role;
+    private String content;
+
+    public ChatMessage() {
+    }
+
+    public ChatMessage(String role, String content) {
+        this.role = role;
+        this.content = content;
+    }
+
+    // small helpers so the calling code reads nicely
+    public static ChatMessage system(String content) {
+        return new ChatMessage("system", content);
+    }
+
+    public static ChatMessage user(String content) {
+        return new ChatMessage("user", content);
+    }
+
+    public static ChatMessage assistant(String content) {
+        return new ChatMessage("assistant", content);
+    }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../dto/openai/ChatRequest.java"><script type="text/plain">
+package com.reviewiq.ai.dto.openai;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * The body we POST to /v1/chat/completions.
+ *
+ * @JsonInclude(NON_NULL) is important: if we send "stream": null or
+ * "response_format": null the API rejects the request. Only the fields
+ * we actually set should appear in the JSON.
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ChatRequest {
+
+    private String model;
+    private List<ChatMessage> messages;
+    private Double temperature;
+
+    // Java uses camelCase, the API uses snake_case, so we map it
+    @JsonProperty("max_tokens")
+    private Integer maxTokens;
+
+    private Boolean stream;
+
+    // used for JSON mode: {"type": "json_object"}
+    @JsonProperty("response_format")
+    private Map<String, String> responseFormat;
+
+    public ChatRequest() {
+    }
+
+    public ChatRequest(String model, List<ChatMessage> messages,
+                       Double temperature, Integer maxTokens) {
+        this.model = model;
+        this.messages = messages;
+        this.temperature = temperature;
+        this.maxTokens = maxTokens;
+    }
+
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+
+    public List<ChatMessage> getMessages() { return messages; }
+    public void setMessages(List<ChatMessage> messages) { this.messages = messages; }
+
+    public Double getTemperature() { return temperature; }
+    public void setTemperature(Double temperature) { this.temperature = temperature; }
+
+    public Integer getMaxTokens() { return maxTokens; }
+    public void setMaxTokens(Integer maxTokens) { this.maxTokens = maxTokens; }
+
+    public Boolean getStream() { return stream; }
+    public void setStream(Boolean stream) { this.stream = stream; }
+
+    public Map<String, String> getResponseFormat() { return responseFormat; }
+    public void setResponseFormat(Map<String, String> responseFormat) {
+        this.responseFormat = responseFormat;
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../dto/openai/ChatResponse.java"><script type="text/plain">
+package com.reviewiq.ai.dto.openai;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.List;
+
+/**
+ * What comes back from /v1/chat/completions.
+ *
+ * @JsonIgnoreProperties(ignoreUnknown = true) matters a lot here.
+ * OpenAI adds new fields to their response over time. Without this,
+ * our app would suddenly start failing when they add something we
+ * did not know about.
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ChatResponse {
+
+    private String id;
+    private String model;
+    private List<Choice> choices;
+    private Usage usage;
+
+    // ---- helper so the service does not dig through the object graph ----
+    public String getFirstMessageContent() {
+        if (choices == null || choices.isEmpty()) {
+            return "";
+        }
+        return choices.get(0).getMessage().getContent();
+    }
+
+    public int getTotalTokens() {
+        return usage == null ? 0 : usage.getTotalTokens();
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Choice {
+        private int index;
+        private ChatMessage message;
+
+        @JsonProperty("finish_reason")
+        private String finishReason;
+
+        public int getIndex() { return index; }
+        public void setIndex(int index) { this.index = index; }
+
+        public ChatMessage getMessage() { return message; }
+        public void setMessage(ChatMessage message) { this.message = message; }
+
+        public String getFinishReason() { return finishReason; }
+        public void setFinishReason(String finishReason) { this.finishReason = finishReason; }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Usage {
+
+        @JsonProperty("prompt_tokens")
+        private int promptTokens;
+
+        @JsonProperty("completion_tokens")
+        private int completionTokens;
+
+        @JsonProperty("total_tokens")
+        private int totalTokens;
+
+        public int getPromptTokens() { return promptTokens; }
+        public void setPromptTokens(int promptTokens) { this.promptTokens = promptTokens; }
+
+        public int getCompletionTokens() { return completionTokens; }
+        public void setCompletionTokens(int completionTokens) { this.completionTokens = completionTokens; }
+
+        public int getTotalTokens() { return totalTokens; }
+        public void setTotalTokens(int totalTokens) { this.totalTokens = totalTokens; }
+    }
+
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
+
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+
+    public List<Choice> getChoices() { return choices; }
+    public void setChoices(List<Choice> choices) { this.choices = choices; }
+
+    public Usage getUsage() { return usage; }
+    public void setUsage(Usage usage) { this.usage = usage; }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../dto/openai/EmbeddingRequest.java + EmbeddingResponse.java"><script type="text/plain">
+package com.reviewiq.ai.dto.openai;
+
+/** Body for POST /v1/embeddings */
+public class EmbeddingRequest {
+
+    private String model;
+    private String input;
+
+    public EmbeddingRequest() {
+    }
+
+    public EmbeddingRequest(String model, String input) {
+        this.model = model;
+        this.input = input;
+    }
+
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+
+    public String getInput() { return input; }
+    public void setInput(String input) { this.input = input; }
+}
+
+// ---------------------------------------------------------------
+
+package com.reviewiq.ai.dto.openai;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class EmbeddingResponse {
+
+    private List<EmbeddingData> data;
+    private ChatResponse.Usage usage;
+
+    /** text-embedding-3-small returns 1536 numbers */
+    public float[] getFirstEmbedding() {
+        if (data == null || data.isEmpty()) {
+            return new float[0];
+        }
+        List<Float> list = data.get(0).getEmbedding();
+        float[] result = new float[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            result[i] = list.get(i);
+        }
+        return result;
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class EmbeddingData {
+        private int index;
+        private List<Float> embedding;
+
+        public int getIndex() { return index; }
+        public void setIndex(int index) { this.index = index; }
+
+        public List<Float> getEmbedding() { return embedding; }
+        public void setEmbedding(List<Float> embedding) { this.embedding = embedding; }
+    }
+
+    public List<EmbeddingData> getData() { return data; }
+    public void setData(List<EmbeddingData> data) { this.data = data; }
+
+    public ChatResponse.Usage getUsage() { return usage; }
+    public void setUsage(ChatResponse.Usage usage) { this.usage = usage; }
+}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Two annotations that will save you a production incident</span>
+  <ul>
+    <li><code class="i">@JsonIgnoreProperties(ignoreUnknown = true)</code> on every response class.
+      Providers add fields without warning; without this your parsing breaks overnight.</li>
+    <li><code class="i">@JsonInclude(NON_NULL)</code> on the request. Sending
+      <code class="i">"stream": null</code> makes the API return 400.</li>
+  </ul>
+</div>
+</section>
+
+<section class="ch" id="s-ai-client" data-g="ai-service" data-t="OpenAiClient (RestTemplate)">
+<div class="chead"><span class="num">08</span><h2>The OpenAI client — RestTemplate</h2></div>
+
+<p>This one class replaces <code class="i">ChatClient</code>. It builds the headers, posts the body, and
+turns provider errors into something the rest of the app can handle.</p>
+
+<div class="code" data-lang="java" data-file="ai-service/.../client/OpenAiClient.java"><script type="text/plain">
+package com.reviewiq.ai.client;
+
+import com.reviewiq.ai.config.OpenAiProperties;
+import com.reviewiq.ai.dto.openai.*;
+import com.reviewiq.ai.exception.OpenAiException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Map;
+
+@Component
+public class OpenAiClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenAiClient.class);
+
+    private final RestTemplate restTemplate;
+    private final OpenAiProperties props;
+
+    public OpenAiClient(RestTemplate restTemplate, OpenAiProperties props) {
+        this.restTemplate = restTemplate;
+        this.props = props;
+    }
+
+    /**
+     * Normal chat call. This is what Spring AI's
+     * chatClient.prompt(...).call().content() does underneath.
+     *
+     * @Retry     retries 3 times with backoff on failure
+     * @CircuitBreaker stops calling at all if OpenAI keeps failing
+     */
+    @Retry(name = "openai")
+    @CircuitBreaker(name = "openai", fallbackMethod = "chatFallback")
+    public ChatResponse chat(List<ChatMessage> messages) {
+        return chat(messages, false);
+    }
+
+    /** Same call, but asks the model to reply with valid JSON. */
+    @Retry(name = "openai")
+    @CircuitBreaker(name = "openai", fallbackMethod = "chatFallback")
+    public ChatResponse chatAsJson(List<ChatMessage> messages) {
+        return chat(messages, true);
+    }
+
+    private ChatResponse chat(List<ChatMessage> messages, boolean jsonMode) {
+
+        ChatRequest request = new ChatRequest(
+                props.getChatModel(),
+                messages,
+                props.getTemperature(),
+                props.getMaxTokens());
+
+        if (jsonMode) {
+            // This is the manual version of Spring AI's structured output.
+            // It forces the model to return syntactically valid JSON.
+            request.setResponseFormat(Map.of("type", "json_object"));
+        }
+
+        HttpEntity<ChatRequest> entity = new HttpEntity<>(request, buildHeaders());
+
+        try {
+            long start = System.currentTimeMillis();
+
+            ChatResponse response = restTemplate.postForObject(
+                    props.getBaseUrl() + "/chat/completions",
+                    entity,
+                    ChatResponse.class);
+
+            long took = System.currentTimeMillis() - start;
+
+            if (response == null) {
+                throw new OpenAiException("OpenAI returned an empty body");
+            }
+
+            logger.info("OpenAI chat ok. tokens={} took={}ms",
+                    response.getTotalTokens(), took);
+
+            return response;
+
+        } catch (HttpClientErrorException e) {
+            // 4xx - our fault. Do not retry these, they will fail again.
+            handleClientError(e);
+            return null;                       // unreachable, handleClientError throws
+
+        } catch (HttpServerErrorException e) {
+            // 5xx - their fault. Worth retrying.
+            logger.error("OpenAI server error {}", e.getStatusCode());
+            throw new OpenAiException("OpenAI is having problems, please try again");
+
+        } catch (ResourceAccessException e) {
+            // timeout or connection refused
+            logger.error("Could not reach OpenAI", e);
+            throw new OpenAiException("Could not reach the AI provider");
+        }
+    }
+
+    /** Turns text into a vector of 1536 numbers. */
+    @Retry(name = "openai")
+    @CircuitBreaker(name = "openai")
+    public float[] createEmbedding(String text) {
+
+        EmbeddingRequest request = new EmbeddingRequest(
+                props.getEmbeddingModel(), text);
+
+        HttpEntity<EmbeddingRequest> entity = new HttpEntity<>(request, buildHeaders());
+
+        try {
+            EmbeddingResponse response = restTemplate.postForObject(
+                    props.getBaseUrl() + "/embeddings",
+                    entity,
+                    EmbeddingResponse.class);
+
+            if (response == null) {
+                throw new OpenAiException("Embedding response was empty");
+            }
+
+            return response.getFirstEmbedding();
+
+        } catch (HttpClientErrorException e) {
+            handleClientError(e);
+            return null;
+        }
+    }
+
+    private HttpHeaders buildHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(props.getApiKey());   // Authorization: Bearer sk-...
+        return headers;
+    }
+
+    private void handleClientError(HttpClientErrorException e) {
+        HttpStatusCode status = e.getStatusCode();
+
+        if (status == HttpStatus.TOO_MANY_REQUESTS) {
+            logger.warn("OpenAI rate limit hit");
+            throw new OpenAiException("Too many AI requests, please wait a moment");
+        }
+        if (status == HttpStatus.UNAUTHORIZED) {
+            logger.error("OpenAI rejected the API key");
+            throw new OpenAiException("AI service is not configured correctly");
+        }
+
+        logger.error("OpenAI client error {} body={}", status, e.getResponseBodyAsString());
+        throw new OpenAiException("AI request was rejected: " + status);
+    }
+
+    /** Called when the circuit breaker is open. */
+    private ChatResponse chatFallback(List<ChatMessage> messages, Throwable t) {
+        logger.error("Circuit breaker open, using fallback. Cause: {}", t.getMessage());
+        throw new OpenAiException("The AI service is temporarily unavailable");
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../exception/OpenAiException.java"><script type="text/plain">
+package com.reviewiq.ai.exception;
+
+public class OpenAiException extends RuntimeException {
+
+    public OpenAiException(String message) {
+        super(message);
+    }
+}
+</script></div>
+
+<div class="box why">
+  <span class="lbl">Why 4xx and 5xx are handled separately</span>
+  <p>A 401 (bad key) or a 400 (bad request) will fail exactly the same way if you retry it — you are
+  just wasting time. A 500 or a timeout is usually temporary and worth retrying. Treating them the
+  same is a common mistake and it makes outages last longer than they should.</p>
+</div>
+</section>
+
+<section class="ch" id="s-ai-stream" data-g="ai-service" data-t="Streaming with WebClient">
+<div class="chead"><span class="num">09</span><h2>Streaming — WebClient and SSE</h2></div>
+
+<p>RestTemplate cannot stream. When you set <code class="i">"stream": true</code>, OpenAI keeps the
+connection open and sends lines like this:</p>
+
+<div class="code" data-lang="text" data-file="what the raw stream looks like"><script type="text/plain">
+data: {"choices":[{"delta":{"content":"Most"},"index":0}]}
+
+data: {"choices":[{"delta":{"content":" reviewers"},"index":0}]}
+
+data: {"choices":[{"delta":{"content":" say"},"index":0}]}
+
+data: [DONE]
+</script></div>
+
+<p>So we have to read line by line, strip the <code class="i">data:</code> prefix, stop at
+<code class="i">[DONE]</code>, and pull the small piece of text out of each chunk.</p>
+
+<div class="code" data-lang="java" data-file="ai-service/.../client/OpenAiStreamClient.java"><script type="text/plain">
+package com.reviewiq.ai.client;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reviewiq.ai.config.OpenAiProperties;
+import com.reviewiq.ai.dto.openai.ChatMessage;
+import com.reviewiq.ai.dto.openai.ChatRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+
+import java.util.List;
+
+@Component
+public class OpenAiStreamClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(OpenAiStreamClient.class);
+
+    private final WebClient webClient;
+    private final OpenAiProperties props;
+    private final ObjectMapper objectMapper;
+
+    public OpenAiStreamClient(WebClient openAiWebClient,
+                              OpenAiProperties props,
+                              ObjectMapper objectMapper) {
+        this.webClient = openAiWebClient;
+        this.props = props;
+        this.objectMapper = objectMapper;
+    }
+
+    /**
+     * Streams the answer piece by piece.
+     * This is the manual version of Spring AI's .stream().content().
+     */
+    public Flux<String> streamChat(List<ChatMessage> messages) {
+
+        ChatRequest request = new ChatRequest(
+                props.getChatModel(),
+                messages,
+                props.getTemperature(),
+                props.getMaxTokens());
+
+        request.setStream(true);      // this is what turns on SSE
+
+        return webClient.post()
+                .uri("/chat/completions")
+                .bodyValue(request)
+                .retrieve()
+                // bodyToFlux(String.class) gives us one item per "data:" line,
+                // and Spring already strips the "data: " prefix for us
+                .bodyToFlux(String.class)
+                .filter(line -> !line.isBlank())
+                .takeUntil(line -> line.equals("[DONE]"))    // stop at the end marker
+                .filter(line -> !line.equals("[DONE]"))
+                .map(this::extractContent)
+                .filter(text -> !text.isEmpty())
+                .doOnError(e -> logger.error("Streaming failed", e))
+                .onErrorReturn("\n[the AI service had a problem, please try again]");
+    }
+
+    /**
+     * Each chunk looks like:
+     *   {"choices":[{"delta":{"content":"Hello"},"index":0}]}
+     *
+     * We only want the "content" inside "delta". Some chunks have no
+     * content at all (the very first one only has the role), so we
+     * return an empty string and filter it out above.
+     */
+    private String extractContent(String json) {
+        try {
+            JsonNode node = objectMapper.readTree(json);
+            JsonNode content = node.path("choices").path(0).path("delta").path("content");
+
+            return content.isMissingNode() || content.isNull() ? "" : content.asText();
+
+        } catch (Exception e) {
+            logger.warn("Could not read stream chunk: {}", json);
+            return "";
+        }
+    }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Why the stream ends with [DONE]</span>
+  <p>OpenAI sends the literal text <code class="i">data: [DONE]</code> as the last line. It is not JSON, so
+  if you try to parse every line you get an exception at the very end of every request.
+  <code class="i">takeUntil</code> closes the stream cleanly instead.</p>
+</div>
+</section>
+
+<section class="ch" id="s-ai-memory" data-g="ai-service" data-t="Chat memory in Redis">
+<div class="chead"><span class="num">10</span><h2>Chat memory — by hand</h2></div>
+
+<p>The model is stateless. It remembers nothing. So to make a conversation work we store the past
+messages ourselves and send them again with every request.</p>
+
+<div class="flow">
+  <span class="n">load past messages</span><span class="ar">→</span>
+  <span class="n hl">system + history + new question</span><span class="ar">→</span>
+  <span class="n">OpenAI</span><span class="ar">→</span>
+  <span class="n">save question + answer</span>
+</div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../service/ChatMemoryService.java"><script type="text/plain">
+package com.reviewiq.ai.service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reviewiq.ai.dto.openai.ChatMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Stores the conversation in Redis as a JSON list.
+ *
+ * This is the manual version of Spring AI's MessageChatMemoryAdvisor.
+ * We keep only the last N messages, because everything we keep gets
+ * re-sent on the next request and we pay for it again.
+ */
+@Service
+public class ChatMemoryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChatMemoryService.class);
+
+    private final StringRedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper;
+
+    @Value("${app.memory.max-messages:10}")
+    private int maxMessages;
+
+    @Value("${app.memory.ttl-hours:24}")
+    private int ttlHours;
+
+    public ChatMemoryService(StringRedisTemplate redisTemplate, ObjectMapper objectMapper) {
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+    }
+
+    /** Returns the past messages, oldest first. Empty list if this is a new chat. */
+    public List<ChatMessage> getHistory(String conversationId) {
+        try {
+            String json = redisTemplate.opsForValue().get(key(conversationId));
+
+            if (json == null) {
+                return new ArrayList<>();
+            }
+
+            return objectMapper.readValue(json, new TypeReference<List<ChatMessage>>() {});
+
+        } catch (Exception e) {
+            // If memory breaks, the chat should still work - just without history
+            logger.warn("Could not read chat memory for {}", conversationId, e);
+            return new ArrayList<>();
+        }
+    }
+
+    /** Saves the user's question and the model's answer at the end of the list. */
+    public void addExchange(String conversationId, String question, String answer) {
+        try {
+            List<ChatMessage> history = getHistory(conversationId);
+
+            history.add(ChatMessage.user(question));
+            history.add(ChatMessage.assistant(answer));
+
+            // keep only the newest N messages
+            while (history.size() > maxMessages) {
+                history.remove(0);
+            }
+
+            redisTemplate.opsForValue().set(
+                    key(conversationId),
+                    objectMapper.writeValueAsString(history),
+                    Duration.ofHours(ttlHours));
+
+        } catch (Exception e) {
+            logger.warn("Could not save chat memory for {}", conversationId, e);
+        }
+    }
+
+    public void clear(String conversationId) {
+        redisTemplate.delete(key(conversationId));
+    }
+
+    private String key(String conversationId) {
+        return "chat:memory:" + conversationId;
+    }
+}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Why the window is small</span>
+  <p>Every message in the history is sent again on the next request, and you are billed for it every
+  time. A window of 50 messages sounds generous until you see the prompt token count triple. Ten is
+  usually plenty for a product Q&amp;A.</p>
+</div>
+</section>
+
+<section class="ch" id="s-ai-service" data-g="ai-service" data-t="ChatService + structured output">
+<div class="chead"><span class="num">11</span><h2>ChatService — putting it together</h2></div>
+
+<p>This service builds the message list (system, then history, then the new question), calls the
+client, and saves the result to memory.</p>
+
+<div class="code" data-lang="java" data-file="ai-service/.../service/ChatService.java"><script type="text/plain">
+package com.reviewiq.ai.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.reviewiq.ai.client.OpenAiClient;
+import com.reviewiq.ai.client.OpenAiStreamClient;
+import com.reviewiq.ai.dto.*;
+import com.reviewiq.ai.dto.openai.ChatMessage;
+import com.reviewiq.ai.dto.openai.ChatResponse;
+import com.reviewiq.ai.exception.OpenAiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class ChatService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
+
+    private final OpenAiClient openAiClient;
+    private final OpenAiStreamClient streamClient;
+    private final ChatMemoryService memoryService;
+    private final ObjectMapper objectMapper;
+
+    public ChatService(OpenAiClient openAiClient,
+                       OpenAiStreamClient streamClient,
+                       ChatMemoryService memoryService,
+                       ObjectMapper objectMapper) {
+        this.openAiClient = openAiClient;
+        this.streamClient = streamClient;
+        this.memoryService = memoryService;
+        this.objectMapper = objectMapper;
+    }
+
+    /**
+     * A normal question with optional memory.
+     *
+     * The order of the messages matters:
+     *   1. system  - the rules
+     *   2. history - what we said before
+     *   3. user    - the new question
+     */
+    public AiChatResponse chat(AiChatRequest request) {
+
+        List<ChatMessage> messages = new ArrayList<>();
+
+        if (request.getSystemPrompt() != null && !request.getSystemPrompt().isBlank()) {
+            messages.add(ChatMessage.system(request.getSystemPrompt()));
+        }
+
+        if (request.getConversationId() != null) {
+            messages.addAll(memoryService.getHistory(request.getConversationId()));
+        }
+
+        messages.add(ChatMessage.user(request.getUserPrompt()));
+
+        ChatResponse response = openAiClient.chat(messages);
+        String answer = response.getFirstMessageContent();
+
+        if (request.getConversationId() != null) {
+            memoryService.addExchange(
+                    request.getConversationId(), request.getUserPrompt(), answer);
+        }
+
+        return new AiChatResponse(answer, response.getTotalTokens());
+    }
+
+    /**
+     * Structured output, done manually.
+     *
+     * Spring AI would do this with .entity(MyClass.class). Without it we:
+     *   1. describe the exact JSON we want in the prompt
+     *   2. turn on JSON mode so the reply is always valid JSON
+     *   3. parse it with Jackson
+     */
+    public <T> T chatAsObject(String systemPrompt, String userPrompt, Class<T> targetType) {
+
+        List<ChatMessage> messages = List.of(
+                ChatMessage.system(systemPrompt),
+                ChatMessage.user(userPrompt));
+
+        ChatResponse response = openAiClient.chatAsJson(messages);
+        String json = response.getFirstMessageContent();
+
+        try {
+            return objectMapper.readValue(json, targetType);
+
+        } catch (Exception e) {
+            // JSON mode guarantees valid JSON, but not that the fields
+            // match our class. So we still have to handle this.
+            logger.error("Model returned JSON we could not map. json={}", json, e);
+            throw new OpenAiException("The AI returned an unexpected format");
+        }
+    }
+
+    /** Streaming version - returns pieces of text as they arrive. */
+    public Flux<String> streamChat(AiChatRequest request) {
+
+        List<ChatMessage> messages = new ArrayList<>();
+
+        if (request.getSystemPrompt() != null) {
+            messages.add(ChatMessage.system(request.getSystemPrompt()));
+        }
+        if (request.getConversationId() != null) {
+            messages.addAll(memoryService.getHistory(request.getConversationId()));
+        }
+        messages.add(ChatMessage.user(request.getUserPrompt()));
+
+        return streamClient.streamChat(messages);
+    }
+
+    /** Used by review-service when it needs a vector for a piece of text. */
+    public float[] embed(String text) {
+        return openAiClient.createEmbedding(text);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../dto/AiChatRequest.java + AiChatResponse.java"><script type="text/plain">
+package com.reviewiq.ai.dto;
+
+import jakarta.validation.constraints.NotBlank;
+
+/** Our own API shape - not OpenAI's. This is what review-service sends us. */
+public class AiChatRequest {
+
+    private String systemPrompt;
+
+    @NotBlank(message = "userPrompt is required")
+    private String userPrompt;
+
+    /** Optional. If set, we load and save chat memory under this id. */
+    private String conversationId;
+
+    public AiChatRequest() {
+    }
+
+    public AiChatRequest(String systemPrompt, String userPrompt, String conversationId) {
+        this.systemPrompt = systemPrompt;
+        this.userPrompt = userPrompt;
+        this.conversationId = conversationId;
+    }
+
+    public String getSystemPrompt() { return systemPrompt; }
+    public void setSystemPrompt(String systemPrompt) { this.systemPrompt = systemPrompt; }
+
+    public String getUserPrompt() { return userPrompt; }
+    public void setUserPrompt(String userPrompt) { this.userPrompt = userPrompt; }
+
+    public String getConversationId() { return conversationId; }
+    public void setConversationId(String conversationId) { this.conversationId = conversationId; }
+}
+
+// ---------------------------------------------------------------
+
+package com.reviewiq.ai.dto;
+
+public class AiChatResponse {
+
+    private String answer;
+    private int tokensUsed;
+
+    public AiChatResponse() {
+    }
+
+    public AiChatResponse(String answer, int tokensUsed) {
+        this.answer = answer;
+        this.tokensUsed = tokensUsed;
+    }
+
+    public String getAnswer() { return answer; }
+    public void setAnswer(String answer) { this.answer = answer; }
+
+    public int getTokensUsed() { return tokensUsed; }
+    public void setTokensUsed(int tokensUsed) { this.tokensUsed = tokensUsed; }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Why we expose our own DTO instead of OpenAI's</span>
+  <p><code class="i">AiChatRequest</code> is our contract. If we ever swap OpenAI for Anthropic, only
+  <code class="i">OpenAiClient</code> changes — review-service does not notice. This is exactly the same
+  idea as Spring AI's abstraction, just written by us at a smaller scale.</p>
+</div>
+</section>
+
+<section class="ch" id="s-ai-controller" data-g="ai-service" data-t="Controller + error handling">
+<div class="chead"><span class="num">12</span><h2>The AI controller</h2></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../web/AiController.java"><script type="text/plain">
+package com.reviewiq.ai.web;
+
+import com.reviewiq.ai.dto.AiChatRequest;
+import com.reviewiq.ai.dto.AiChatResponse;
+import com.reviewiq.ai.dto.EmbedRequest;
+import com.reviewiq.ai.service.ChatMemoryService;
+import com.reviewiq.ai.service.ChatService;
+import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1/ai")
+public class AiController {
+
+    private final ChatService chatService;
+    private final ChatMemoryService memoryService;
+
+    public AiController(ChatService chatService, ChatMemoryService memoryService) {
+        this.chatService = chatService;
+        this.memoryService = memoryService;
+    }
+
+    @PostMapping("/chat")
+    public ResponseEntity<AiChatResponse> chat(@Valid @RequestBody AiChatRequest request) {
+        return ResponseEntity.ok(chatService.chat(request));
+    }
+
+    /**
+     * produces = TEXT_EVENT_STREAM_VALUE is what makes the browser
+     * treat this as a live stream instead of waiting for the full body.
+     */
+    @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> streamChat(@Valid @RequestBody AiChatRequest request) {
+        return chatService.streamChat(request);
+    }
+
+    /** review-service calls this to turn a review into a vector. */
+    @PostMapping("/embed")
+    public ResponseEntity<Map<String, float[]>> embed(@Valid @RequestBody EmbedRequest request) {
+        float[] vector = chatService.embed(request.getText());
+        return ResponseEntity.ok(Map.of("embedding", vector));
+    }
+
+    @DeleteMapping("/memory/{conversationId}")
+    public ResponseEntity<Void> clearMemory(@PathVariable String conversationId) {
+        memoryService.clear(conversationId);
+        return ResponseEntity.noContent().build();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-service/.../web/GlobalExceptionHandler.java"><script type="text/plain">
+package com.reviewiq.ai.web;
+
+import com.reviewiq.ai.exception.OpenAiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * We return 503 for AI problems, not 500.
+     * 503 tells the caller "try again later", which is usually true
+     * for a rate limit or a provider outage.
+     */
+    @ExceptionHandler(OpenAiException.class)
+    public ResponseEntity<Map<String, String>> handleAiError(OpenAiException ex) {
+        logger.error("AI error: {}", ex.getMessage());
+        return error(HttpStatus.SERVICE_UNAVAILABLE, "ai_unavailable", ex.getMessage());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .orElse("invalid request");
+        return error(HttpStatus.BAD_REQUEST, "validation_failed", message);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleOther(Exception ex) {
+        logger.error("Unexpected error", ex);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, "server_error", "Something went wrong");
+    }
+
+    private ResponseEntity<Map<String, String>> error(HttpStatus status,
+                                                      String code, String message) {
+        Map<String, String> body = new HashMap<>();
+        body.put("error", code);
+        body.put("message", message);
+        return new ResponseEntity<>(body, status);
+    }
+}
+</script></div>
+</section>
+
+<!-- ============ REVIEW SERVICE ============ -->
+<section class="ch" id="s-rv-setup" data-g="review-service" data-t="pom.xml + calling ai-service">
+<div class="chead"><span class="num">13</span><h2>review-service — setup and inter-service calls</h2></div>
+
+<div class="code" data-lang="xml" data-file="review-service/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.reviewiq</groupId>
+        <artifactId>reviewiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>review-service</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- needed so WebClient understands lb://ai-service -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="review-service/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8082
+
+spring:
+  application:
+    name: review-service
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/reviewiq}
+    username: reviewiq
+    password: reviewiq
+
+  jpa:
+    hibernate:
+      ddl-auto: none        # tables come from schema.sql
+    open-in-view: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+
+app:
+  rag:
+    top-k: 5                    # how many reviews to send as context
+    min-similarity: 0.30        # ignore reviews below this score
+</script></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../config/WebClientConfig.java"><script type="text/plain">
+package com.reviewiq.review.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Configuration
+public class WebClientConfig {
+
+    /**
+     * @LoadBalanced lets us write lb://ai-service instead of a real URL.
+     * Spring asks Eureka where ai-service is and spreads the calls
+     * across all the running copies.
+     */
+    @Bean
+    @LoadBalanced
+    public WebClient.Builder loadBalancedWebClientBuilder() {
+        return WebClient.builder();
+    }
+
+    @Bean
+    public WebClient aiServiceWebClient(WebClient.Builder builder) {
+        return builder.baseUrl("lb://ai-service").build();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../client/AiServiceClient.java"><script type="text/plain">
+package com.reviewiq.review.client;
+
+import com.reviewiq.review.dto.AiChatRequest;
+import com.reviewiq.review.dto.AiChatResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+
+import java.time.Duration;
+import java.util.Map;
+
+/**
+ * Calls ai-service. Nothing in review-service knows that OpenAI exists.
+ */
+@Component
+public class AiServiceClient {
+
+    private static final Logger logger = LoggerFactory.getLogger(AiServiceClient.class);
+
+    private final WebClient webClient;
+
+    public AiServiceClient(WebClient aiServiceWebClient) {
+        this.webClient = aiServiceWebClient;
+    }
+
+    public AiChatResponse chat(AiChatRequest request) {
+        return webClient.post()
+                .uri("/api/v1/ai/chat")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(AiChatResponse.class)
+                // block() turns the reactive call into a normal one.
+                // Fine here because this method is called from a normal
+                // servlet controller, not from a reactive chain.
+                .block(Duration.ofSeconds(90));
+    }
+
+    public Flux<String> streamChat(AiChatRequest request) {
+        return webClient.post()
+                .uri("/api/v1/ai/chat/stream")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToFlux(String.class);
+    }
+
+    /** Turns a review into a vector so we can search by meaning later. */
+    public float[] embed(String text) {
+        Map<String, float[]> response = webClient.post()
+                .uri("/api/v1/ai/embed")
+                .bodyValue(Map.of("text", text))
+                .retrieve()
+                .bodyToMono(new org.springframework.core.ParameterizedTypeReference<Map<String, float[]>>() {})
+                .block(Duration.ofSeconds(30));
+
+        if (response == null || response.get("embedding") == null) {
+            logger.warn("Embedding call returned nothing");
+            return new float[0];
+        }
+        return response.get("embedding");
+    }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-rv-entity" data-g="review-service" data-t="Entities + repositories">
+<div class="chead"><span class="num">14</span><h2>Entities and repositories</h2></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../entity/Review.java"><script type="text/plain">
+package com.reviewiq.review.entity;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "reviews")
+public class Review {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
+
+    @Column(name = "user_id", nullable = false)
+    private String userId;
+
+    @Column(nullable = false)
+    private Integer rating;
+
+    @Column(name = "review_text", nullable = false, columnDefinition = "text")
+    private String reviewText;
+
+    /**
+     * The embedding stored as "0.12,0.87,-0.34,..."
+     * We convert it back to float[] when we need to compare.
+     */
+    @Column(columnDefinition = "text")
+    private String embedding;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void beforeSave() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // ---- helpers to convert between float[] and the stored string ----
+
+    public void setEmbeddingArray(float[] values) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < values.length; i++) {
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(values[i]);
+        }
+        this.embedding = sb.toString();
+    }
+
+    public float[] getEmbeddingArray() {
+        if (embedding == null || embedding.isBlank()) {
+            return new float[0];
+        }
+        String[] parts = embedding.split(",");
+        float[] values = new float[parts.length];
+        for (int i = 0; i < parts.length; i++) {
+            values[i] = Float.parseFloat(parts[i]);
+        }
+        return values;
+    }
+
+    // ---- getters and setters ----
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+
+    public String getUserId() { return userId; }
+    public void setUserId(String userId) { this.userId = userId; }
+
+    public Integer getRating() { return rating; }
+    public void setRating(Integer rating) { this.rating = rating; }
+
+    public String getReviewText() { return reviewText; }
+    public void setReviewText(String reviewText) { this.reviewText = reviewText; }
+
+    public String getEmbedding() { return embedding; }
+    public void setEmbedding(String embedding) { this.embedding = embedding; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../repository/ReviewRepository.java"><script type="text/plain">
+package com.reviewiq.review.repository;
+
+import com.reviewiq.review.entity.Review;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
+
+public interface ReviewRepository extends JpaRepository<Review, Long> {
+
+    List<Review> findByProductId(Long productId);
+
+    /**
+     * Only reviews that already have an embedding.
+     * A review saved while ai-service was down would have a null
+     * embedding, and we cannot compare against those.
+     */
+    @Query("SELECT r FROM Review r WHERE r.productId = :productId AND r.embedding IS NOT NULL")
+    List<Review> findByProductIdWithEmbedding(@Param("productId") Long productId);
+
+    long countByProductId(Long productId);
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../dto/*.java (API DTOs)"><script type="text/plain">
+package com.reviewiq.review.dto;
+
+import jakarta.validation.constraints.*;
+
+public class CreateReviewRequest {
+
+    @NotNull(message = "productId is required")
+    private Long productId;
+
+    @Min(value = 1, message = "rating must be 1 to 5")
+    @Max(value = 5, message = "rating must be 1 to 5")
+    private Integer rating;
+
+    @NotBlank(message = "text is required")
+    @Size(max = 5000, message = "review is too long")
+    private String text;
+
+    // getters and setters ...
+}
+
+// ---------------------------------------------------------------
+
+package com.reviewiq.review.dto;
+
+import jakarta.validation.constraints.NotBlank;
+
+public class AskRequest {
+
+    @NotBlank(message = "question is required")
+    private String question;
+
+    public String getQuestion() { return question; }
+    public void setQuestion(String question) { this.question = question; }
+}
+
+// ---------------------------------------------------------------
+
+package com.reviewiq.review.dto;
+
+import java.util.List;
+
+/** What we return for an AI answer, including which reviews were used. */
+public class AskResponse {
+
+    private String answer;
+    private List<String> sourceReviews;
+    private int tokensUsed;
+
+    public AskResponse(String answer, List<String> sourceReviews, int tokensUsed) {
+        this.answer = answer;
+        this.sourceReviews = sourceReviews;
+        this.tokensUsed = tokensUsed;
+    }
+
+    public String getAnswer() { return answer; }
+    public List<String> getSourceReviews() { return sourceReviews; }
+    public int getTokensUsed() { return tokensUsed; }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-rv-rag" data-g="review-service" data-t="RAG by hand (cosine similarity)">
+<div class="chead"><span class="num">15</span><h2>RAG — written by hand</h2></div>
+
+<p>This is the piece Spring AI's <code class="i">VectorStore</code> normally does. We embed the question,
+compare it to every stored review with cosine similarity, and keep the best few.</p>
+
+<div class="flow">
+  <span class="n">question</span><span class="ar">→</span>
+  <span class="n">embed it</span><span class="ar">→</span>
+  <span class="n hl">cosine similarity vs every review</span><span class="ar">→</span>
+  <span class="n">top 5</span><span class="ar">→</span>
+  <span class="n">build prompt</span><span class="ar">→</span>
+  <span class="n">answer</span>
+</div>
+
+<div class="code" data-lang="java" data-file="review-service/.../service/RagService.java"><script type="text/plain">
+package com.reviewiq.review.service;
+
+import com.reviewiq.review.client.AiServiceClient;
+import com.reviewiq.review.entity.Review;
+import com.reviewiq.review.repository.ReviewRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * Finds the reviews that are most related to a question.
+ *
+ * This replaces vectorStore.similaritySearch() from Spring AI.
+ */
+@Service
+public class RagService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RagService.class);
+
+    private final ReviewRepository reviewRepository;
+    private final AiServiceClient aiServiceClient;
+
+    @Value("${app.rag.top-k:5}")
+    private int topK;
+
+    @Value("${app.rag.min-similarity:0.30}")
+    private double minSimilarity;
+
+    public RagService(ReviewRepository reviewRepository, AiServiceClient aiServiceClient) {
+        this.reviewRepository = reviewRepository;
+        this.aiServiceClient = aiServiceClient;
+    }
+
+    public List<Review> findRelevantReviews(Long productId, String question) {
+
+        // 1. turn the question into a vector, using the SAME model
+        //    that was used for the reviews - otherwise the numbers
+        //    are not comparable at all
+        float[] questionVector = aiServiceClient.embed(question);
+
+        if (questionVector.length == 0) {
+            logger.warn("Could not embed the question, returning no context");
+            return List.of();
+        }
+
+        // 2. load the reviews (only ones that have an embedding)
+        List<Review> reviews = reviewRepository.findByProductIdWithEmbedding(productId);
+
+        // 3. score every review
+        List<ScoredReview> scored = new ArrayList<>();
+
+        for (Review review : reviews) {
+            double score = cosineSimilarity(questionVector, review.getEmbeddingArray());
+
+            if (score >= minSimilarity) {
+                scored.add(new ScoredReview(review, score));
+            }
+        }
+
+        // 4. best first, keep only the top few
+        scored.sort(Comparator.comparingDouble(ScoredReview::getScore).reversed());
+
+        List<Review> result = new ArrayList<>();
+        for (int i = 0; i < Math.min(topK, scored.size()); i++) {
+            result.add(scored.get(i).getReview());
+        }
+
+        logger.info("RAG: checked {} reviews, using {} for the answer",
+                reviews.size(), result.size());
+
+        return result;
+    }
+
+    /**
+     * Cosine similarity: measures the angle between two vectors.
+     *
+     *   1.0  = same meaning
+     *   0.0  = unrelated
+     *
+     * Formula: dot(a, b) / (length(a) * length(b))
+     */
+    private double cosineSimilarity(float[] a, float[] b) {
+
+        if (a.length == 0 || b.length == 0 || a.length != b.length) {
+            return 0.0;
+        }
+
+        double dotProduct = 0.0;
+        double lengthA = 0.0;
+        double lengthB = 0.0;
+
+        for (int i = 0; i < a.length; i++) {
+            dotProduct += a[i] * b[i];
+            lengthA += a[i] * a[i];
+            lengthB += b[i] * b[i];
+        }
+
+        if (lengthA == 0 || lengthB == 0) {
+            return 0.0;
+        }
+
+        return dotProduct / (Math.sqrt(lengthA) * Math.sqrt(lengthB));
+    }
+
+    /** Small holder so we can sort reviews by score. */
+    private static class ScoredReview {
+
+        private final Review review;
+        private final double score;
+
+        ScoredReview(Review review, double score) {
+            this.review = review;
+            this.score = score;
+        }
+
+        Review getReview() { return review; }
+        double getScore() { return score; }
+    }
+}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Where this approach stops working</span>
+  <p>We load every review into memory and compare them one by one. That is fine for a few thousand
+  reviews. At a million it is too slow and uses too much memory, and you would move to
+  <code class="i">pgvector</code> so PostgreSQL does the search with a proper index.</p>
+  <p>Worth saying out loud in an interview: <em>"I did it in Java to keep the maths visible, but for
+  real scale I would use pgvector."</em></p>
+</div>
+</section>
+
+<section class="ch" id="s-rv-service" data-g="review-service" data-t="ReviewService + prompts">
+<div class="chead"><span class="num">16</span><h2>ReviewService — the business logic</h2></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../service/ReviewService.java"><script type="text/plain">
+package com.reviewiq.review.service;
+
+import com.reviewiq.review.client.AiServiceClient;
+import com.reviewiq.review.dto.*;
+import com.reviewiq.review.entity.Review;
+import com.reviewiq.review.repository.ReviewRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class ReviewService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
+
+    private final ReviewRepository reviewRepository;
+    private final AiServiceClient aiServiceClient;
+    private final RagService ragService;
+
+    public ReviewService(ReviewRepository reviewRepository,
+                         AiServiceClient aiServiceClient,
+                         RagService ragService) {
+        this.reviewRepository = reviewRepository;
+        this.aiServiceClient = aiServiceClient;
+        this.ragService = ragService;
+    }
+
+    /**
+     * Saves a review and creates its embedding.
+     *
+     * If ai-service is down we still save the review, just without
+     * the embedding. Losing a customer's review because our AI
+     * service is having a bad day would be much worse.
+     */
+    @Transactional
+    public Review addReview(CreateReviewRequest request, String userId) {
+
+        Review review = new Review();
+        review.setProductId(request.getProductId());
+        review.setUserId(userId);
+        review.setRating(request.getRating());
+        review.setReviewText(request.getText());
+
+        try {
+            float[] vector = aiServiceClient.embed(request.getText());
+            if (vector.length > 0) {
+                review.setEmbeddingArray(vector);
+            }
+        } catch (Exception e) {
+            logger.warn("Could not create embedding, saving review without it", e);
+        }
+
+        return reviewRepository.save(review);
+    }
+
+    /**
+     * Answers a question using only the real reviews (RAG).
+     */
+    public AskResponse askAboutProduct(Long productId, String question, String userId) {
+
+        List<Review> relevant = ragService.findRelevantReviews(productId, question);
+
+        if (relevant.isEmpty()) {
+            return new AskResponse(
+                    "There are not enough reviews about this yet.",
+                    List.of(), 0);
+        }
+
+        // build the context block that goes into the prompt
+        StringBuilder context = new StringBuilder();
+        List<String> sources = new ArrayList<>();
+
+        for (Review review : relevant) {
+            context.append("- (")
+                   .append(review.getRating())
+                   .append(" stars) ")
+                   .append(review.getReviewText())
+                   .append("\n");
+
+            sources.add(review.getReviewText());
+        }
+
+        String systemPrompt = """
+                You answer shopper questions about a product using ONLY the
+                customer reviews below.
+
+                Rules:
+                - Never invent anything that is not in the reviews.
+                - If the reviews do not answer the question, say so honestly.
+                - Mention if opinions are mixed.
+                - Keep it under 100 words and stay neutral.
+
+                CUSTOMER REVIEWS:
+                %s
+                """.formatted(context.toString());
+
+        // conversationId = user + product, so each shopper has their own
+        // thread per product and follow-up questions make sense
+        String conversationId = "user-" + userId + "-product-" + productId;
+
+        AiChatRequest aiRequest = new AiChatRequest(systemPrompt, question, conversationId);
+        AiChatResponse aiResponse = aiServiceClient.chat(aiRequest);
+
+        return new AskResponse(aiResponse.getAnswer(), sources, aiResponse.getTokensUsed());
+    }
+
+    /** Same thing but streamed, so the UI can show the answer as it is written. */
+    public Flux<String> askStreaming(Long productId, String question, String userId) {
+
+        List<Review> relevant = ragService.findRelevantReviews(productId, question);
+
+        if (relevant.isEmpty()) {
+            return Flux.just("There are not enough reviews about this yet.");
+        }
+
+        StringBuilder context = new StringBuilder();
+        for (Review review : relevant) {
+            context.append("- (").append(review.getRating()).append(" stars) ")
+                   .append(review.getReviewText()).append("\n");
+        }
+
+        String systemPrompt = "Answer using ONLY these customer reviews. "
+                + "Do not invent anything.\n\n" + context;
+
+        String conversationId = "user-" + userId + "-product-" + productId;
+
+        return aiServiceClient.streamChat(
+                new AiChatRequest(systemPrompt, question, conversationId));
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../service/SummaryService.java"><script type="text/plain">
+package com.reviewiq.review.service;
+
+import com.reviewiq.review.client.AiServiceClient;
+import com.reviewiq.review.dto.*;
+import com.reviewiq.review.entity.Review;
+import com.reviewiq.review.repository.ReviewRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * Structured output done by hand.
+ *
+ * We describe the exact JSON we want in the prompt, ask ai-service
+ * to run in JSON mode, then map it with Jackson.
+ */
+@Service
+public class SummaryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SummaryService.class);
+
+    private final ReviewRepository reviewRepository;
+    private final AiServiceClient aiServiceClient;
+    private final ObjectMapper objectMapper;
+
+    public SummaryService(ReviewRepository reviewRepository,
+                          AiServiceClient aiServiceClient,
+                          ObjectMapper objectMapper) {
+        this.reviewRepository = reviewRepository;
+        this.aiServiceClient = aiServiceClient;
+        this.objectMapper = objectMapper;
+    }
+
+    public ProductSummary summarise(Long productId) {
+
+        List<Review> reviews = reviewRepository.findByProductId(productId);
+
+        if (reviews.isEmpty()) {
+            throw new NotFoundException("No reviews found for product " + productId);
+        }
+
+        StringBuilder allReviews = new StringBuilder();
+        for (Review review : reviews) {
+            allReviews.append(review.getRating()).append(" stars: ")
+                      .append(review.getReviewText()).append("\n");
+        }
+
+        // Describing the exact shape is what makes JSON mode useful.
+        // Without this the model returns valid JSON, but with whatever
+        // field names it feels like using.
+        String systemPrompt = """
+                You summarise product reviews.
+
+                Reply with JSON in exactly this shape and nothing else:
+                {
+                  "sentiment": "POSITIVE" | "MIXED" | "NEGATIVE",
+                  "summary": "two sentences about what customers think",
+                  "topComplaints": ["complaint 1", "complaint 2", "complaint 3"],
+                  "topPraises": ["praise 1", "praise 2", "praise 3"]
+                }
+
+                Base everything only on the reviews given. If there are
+                fewer than three complaints or praises, return fewer items.
+                """;
+
+        AiChatRequest request = new AiChatRequest(
+                systemPrompt,
+                "Summarise these reviews:\n\n" + allReviews,
+                null);           // no memory needed for a one-off summary
+
+        AiChatResponse response = aiServiceClient.chat(request);
+
+        try {
+            ProductSummary summary =
+                    objectMapper.readValue(response.getAnswer(), ProductSummary.class);
+
+            summary.setReviewCount(reviews.size());
+            summary.setTokensUsed(response.getTokensUsed());
+
+            return summary;
+
+        } catch (Exception e) {
+            logger.error("Could not parse summary JSON: {}", response.getAnswer(), e);
+            throw new AiFormatException("The AI returned an unexpected format");
+        }
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../dto/ProductSummary.java"><script type="text/plain">
+package com.reviewiq.review.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class ProductSummary {
+
+    private String sentiment;          // POSITIVE, MIXED or NEGATIVE
+    private String summary;
+    private List<String> topComplaints;
+    private List<String> topPraises;
+
+    // filled in by us, not by the AI
+    private int reviewCount;
+    private int tokensUsed;
+
+    public ProductSummary() {
+    }
+
+    public String getSentiment() { return sentiment; }
+    public void setSentiment(String sentiment) { this.sentiment = sentiment; }
+
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
+
+    public List<String> getTopComplaints() { return topComplaints; }
+    public void setTopComplaints(List<String> topComplaints) { this.topComplaints = topComplaints; }
+
+    public List<String> getTopPraises() { return topPraises; }
+    public void setTopPraises(List<String> topPraises) { this.topPraises = topPraises; }
+
+    public int getReviewCount() { return reviewCount; }
+    public void setReviewCount(int reviewCount) { this.reviewCount = reviewCount; }
+
+    public int getTokensUsed() { return tokensUsed; }
+    public void setTokensUsed(int tokensUsed) { this.tokensUsed = tokensUsed; }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-rv-controller" data-g="review-service" data-t="Controller">
+<div class="chead"><span class="num">17</span><h2>The review controller</h2></div>
+
+<div class="code" data-lang="java" data-file="review-service/.../web/ReviewController.java"><script type="text/plain">
+package com.reviewiq.review.web;
+
+import com.reviewiq.review.dto.*;
+import com.reviewiq.review.entity.Review;
+import com.reviewiq.review.service.ReviewService;
+import com.reviewiq.review.service.SummaryService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+
+@RestController
+@RequestMapping("/api/v1")
+public class ReviewController {
+
+    private final ReviewService reviewService;
+    private final SummaryService summaryService;
+
+    public ReviewController(ReviewService reviewService, SummaryService summaryService) {
+        this.reviewService = reviewService;
+        this.summaryService = summaryService;
+    }
+
+    /**
+     * X-User-Id is added by the gateway after it checks the token.
+     * We never see or validate a JWT here.
+     */
+    @PostMapping("/reviews")
+    public ResponseEntity<Review> addReview(
+            @Valid @RequestBody CreateReviewRequest request,
+            @RequestHeader("X-User-Id") String userId) {
+
+        Review saved = reviewService.addReview(request, userId);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+
+    /** AI summary of every review for this product. */
+    @GetMapping("/products/{productId}/summary")
+    public ResponseEntity<ProductSummary> getSummary(@PathVariable Long productId) {
+        return ResponseEntity.ok(summaryService.summarise(productId));
+    }
+
+    /** Ask a question, answered from real reviews only. */
+    @PostMapping("/products/{productId}/ask")
+    public ResponseEntity<AskResponse> ask(
+            @PathVariable Long productId,
+            @Valid @RequestBody AskRequest request,
+            @RequestHeader("X-User-Id") String userId) {
+
+        return ResponseEntity.ok(
+                reviewService.askAboutProduct(productId, request.getQuestion(), userId));
+    }
+
+    /** Same question, streamed word by word. */
+    @PostMapping(value = "/products/{productId}/ask/stream",
+                 produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> askStream(
+            @PathVariable Long productId,
+            @Valid @RequestBody AskRequest request,
+            @RequestHeader("X-User-Id") String userId) {
+
+        return reviewService.askStreaming(productId, request.getQuestion(), userId);
+    }
+}
+</script></div>
+</section>
+
+<!-- ============ RUN ============ -->
+<section class="ch" id="s-run" data-g="Running it" data-t="How to run + test">
+<div class="chead"><span class="num">18</span><h2>Running the project</h2></div>
+
+<div class="code" data-lang="bash" data-file="start everything"><script type="text/plain">
+# 1. secrets
+export OPENAI_API_KEY=sk-...
+export JWT_SECRET=this-secret-must-be-at-least-32-characters-long
+
+# 2. postgres + redis
+docker compose up -d
+
+# 3. build
+mvn clean install -DskipTests
+
+# 4. start in this order (each in its own terminal)
+cd discovery-server && mvn spring-boot:run     # must be first
+cd ai-service       && mvn spring-boot:run
+cd review-service   && mvn spring-boot:run
+cd api-gateway      && mvn spring-boot:run     # last
+
+# 5. check all four registered
+open http://localhost:8761
+</script></div>
+
+<div class="code" data-lang="bash" data-file="try it end to end"><script type="text/plain">
+TOKEN="eyJhbGciOiJIUzI1NiJ9..."     # any HS256 token signed with $JWT_SECRET
+
+# add a few reviews
+curl -X POST http://localhost:8080/api/v1/reviews \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"productId":1,"rating":2,"text":"Battery only lasts 3 hours. Camera is excellent."}'
+
+curl -X POST http://localhost:8080/api/v1/reviews \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"productId":1,"rating":5,"text":"Screen is bright and sharp. Battery is fine for me."}'
+
+# AI summary (structured output)
+curl http://localhost:8080/api/v1/products/1/summary \
+  -H "Authorization: Bearer $TOKEN" | jq
+
+# RAG question
+curl -X POST http://localhost:8080/api/v1/products/1/ask \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"question":"How is the battery life?"}' | jq
+
+# follow-up - proves memory works
+curl -X POST http://localhost:8080/api/v1/products/1/ask \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"question":"And what about the camera?"}' | jq
+
+# streaming
+curl -N -X POST http://localhost:8080/api/v1/products/1/ask/stream \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"question":"Should I buy this phone?"}'
+</script></div>
+
+<h3>What each response looks like</h3>
+<div class="code" data-lang="json" data-file="GET /products/1/summary"><script type="text/plain">
+{
+  "sentiment": "MIXED",
+  "summary": "Customers praise the camera and display quality, but battery life is a common complaint.",
+  "topComplaints": ["Battery drains quickly", "Only lasts about 3 hours"],
+  "topPraises": ["Excellent camera", "Bright and sharp screen"],
+  "reviewCount": 2,
+  "tokensUsed": 412
+}
+</script></div>
+
+<div class="code" data-lang="json" data-file="POST /products/1/ask"><script type="text/plain">
+{
+  "answer": "Opinions are mixed. One reviewer says the battery only lasts about three hours, while another found it fine for their use. Nobody reported it lasting a full day.",
+  "sourceReviews": [
+    "Battery only lasts 3 hours. Camera is excellent.",
+    "Screen is bright and sharp. Battery is fine for me."
+  ],
+  "tokensUsed": 287
+}
+</script></div>
+
+<h3>Things that will break, and why</h3>
+<table>
+<tr><th>Problem</th><th>Cause and fix</th></tr>
+<tr><td>401 from OpenAI</td><td><code class="i">OPENAI_API_KEY</code> not exported before starting ai-service.</td></tr>
+<tr><td>400 "Invalid value: null"</td><td>Missing <code class="i">@JsonInclude(NON_NULL)</code> on <code class="i">ChatRequest</code>, so nulls get serialised.</td></tr>
+<tr><td>Parsing error at the end of every stream</td><td>You are trying to parse <code class="i">[DONE]</code> as JSON. Use <code class="i">takeUntil</code>.</td></tr>
+<tr><td>Threads stuck, app stops responding</td><td>No timeout on RestTemplate. Always set connect and read timeouts.</td></tr>
+<tr><td>Cosine similarity always 0.0</td><td>Reviews embedded with one model, question with another. Both must use the same model.</td></tr>
+<tr><td><code class="i">lb://ai-service</code> not found</td><td>discovery-server was not started first, or the <code class="i">loadbalancer</code> dependency is missing.</td></tr>
+<tr><td>Unknown field exception after a while</td><td>OpenAI added a response field. Add <code class="i">@JsonIgnoreProperties(ignoreUnknown = true)</code>.</td></tr>
+</table>
+</section>
+
+<section class="ch" id="s-compare" data-g="Running it" data-t="Compared to Spring AI">
+<div class="chead"><span class="num">19</span><h2>What Spring AI would have done for us</h2></div>
+
+<p>Now that everything is written by hand, the comparison is concrete.</p>
+
+<table>
+<tr><th>Feature</th><th>Spring AI</th><th>What we wrote</th></tr>
+<tr><td>Basic chat</td>
+    <td><code class="i">chatClient.prompt(q).call().content()</code></td>
+    <td><code class="i">OpenAiClient</code> + 3 DTO classes</td></tr>
+<tr><td>Message roles</td>
+    <td><code class="i">.system() .user()</code></td>
+    <td>Build the <code class="i">List&lt;ChatMessage&gt;</code> in the right order</td></tr>
+<tr><td>Structured output</td>
+    <td><code class="i">.entity(Foo.class)</code></td>
+    <td>Describe the JSON in the prompt + JSON mode + <code class="i">readValue()</code></td></tr>
+<tr><td>Chat memory</td>
+    <td>One advisor + a <code class="i">conversationId</code> param</td>
+    <td><code class="i">ChatMemoryService</code>, a Redis list, manual trimming</td></tr>
+<tr><td>Embeddings</td>
+    <td><code class="i">embeddingModel.embed(text)</code></td>
+    <td>Two DTOs + a REST call</td></tr>
+<tr><td>Vector search</td>
+    <td><code class="i">vectorStore.similaritySearch(...)</code></td>
+    <td>Cosine similarity written out, sort, take top K</td></tr>
+<tr><td>Streaming</td>
+    <td><code class="i">.stream().content()</code></td>
+    <td>WebClient + parse <code class="i">data:</code> lines + handle <code class="i">[DONE]</code></td></tr>
+<tr><td>Retry &amp; errors</td>
+    <td>Mostly handled</td>
+    <td>Separate 4xx / 5xx handling, Resilience4j by hand</td></tr>
+<tr><td>Swapping provider</td>
+    <td>Change one dependency</td>
+    <td>Rewrite the DTOs and the client</td></tr>
+</table>
+
+<div class="box why">
+  <span class="lbl">Which should you actually use?</span>
+  <p><strong>Use Spring AI</strong> for a new project on a current Spring Boot version. It is less code,
+  fewer bugs, and provider switching is genuinely one line.</p>
+  <p><strong>Do it manually</strong> when you are on an old Spring Boot, when your company routes AI calls
+  through an internal gateway with a custom API, or when you need a brand-new provider feature the
+  abstraction has not caught up with yet.</p>
+  <p>Either way, having written it once means you know what the abstraction is hiding — which is
+  exactly what an interviewer is checking when they ask "how does Spring AI work underneath?"</p>
+</div>
+
+<h3>What I would add next</h3>
+<ul>
+  <li><strong>pgvector</strong> instead of comparing in Java, once the review count grows.</li>
+  <li><strong>Cache the summary</strong> in the <code class="i">product_summaries</code> table and only regenerate
+      when new reviews arrive — right now we pay for the same summary every time.</li>
+  <li><strong>Token budget per user</strong>, counting <code class="i">tokensUsed</code> into Redis so one user
+      cannot spend the whole monthly budget.</li>
+  <li><strong>Async embedding</strong> — creating the embedding on the request thread makes posting a
+      review slower than it needs to be. A queue would fix that.</li>
+  <li><strong>Tests</strong> with WireMock standing in for the OpenAI API, so tests do not cost money.</li>
+</ul>
+</section>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  const KW = new Set(("public private protected class interface enum record extends implements new return void "+
+    "static final import package if else for while do try catch finally throw throws this super null true false "+
+    "var instanceof synchronized abstract default break continue switch case yield transient volatile assert "+
+    "const let function async await export from of in typeof select insert update delete create table alter "+
+    "drop index primary key references on check between not and or").split(" "));
+
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function sp(cls,txt){return '<span class="'+cls+'">'+esc(txt)+"</span>";}
+
+  function hiCode(src,lang){
+    const lineCmt=(lang==="sql")?"--":"//";
+    let out="",i=0;const n=src.length;
+    while(i<n){
+      const two=src.substr(i,2),ch=src[i];
+      if(two===lineCmt||two==="//"){let j=src.indexOf("\n",i);if(j<0)j=n;out+=sp("c",src.slice(i,j));i=j;continue;}
+      if(two==="/*"){let j=src.indexOf("*/",i+2);j=(j<0)?n:j+2;out+=sp("c",src.slice(i,j));i=j;continue;}
+      if(ch==="#"&&(i===0||/\s/.test(src[i-1]))){let j=src.indexOf("\n",i);if(j<0)j=n;out+=sp("c",src.slice(i,j));i=j;continue;}
+      if(ch==='"'||ch==="'"||ch==="`"){
+        let j=i+1;
+        while(j<n){if(src[j]==="\\"){j+=2;continue;}if(src[j]===ch){j++;break;}if(ch!=="`"&&src[j]==="\n")break;j++;}
+        j=Math.min(j,n);out+=sp("s",src.slice(i,j));i=j;continue;
+      }
+      if(ch==="@"&&/[A-Za-z]/.test(src[i+1]||"")){
+        let j=i+1;while(j<n&&/[\w.]/.test(src[j]))j++;out+=sp("a",src.slice(i,j));i=j;continue;
+      }
+      if(/[A-Za-z_$]/.test(ch)){
+        let j=i;while(j<n&&/[\w$]/.test(src[j]))j++;
+        const w=src.slice(i,j);let k=j;while(k<n&&(src[k]===" "||src[k]==="\t"))k++;
+        if(KW.has(w))out+=sp("k",w);
+        else if(/^[A-Z]/.test(w))out+=sp("t",w);
+        else if(src[k]==="(")out+=sp("f",w);
+        else out+=esc(w);
+        i=j;continue;
+      }
+      out+=esc(ch);i++;
+    }
+    return out;
+  }
+
+  function hiXml(src){
+    let out="",i=0;const n=src.length;
+    while(i<n){
+      if(src.startsWith("<!--",i)){let j=src.indexOf("-->",i);j=(j<0)?n:j+3;out+=sp("c",src.slice(i,j));i=j;continue;}
+      if(src[i]==="<"){
+        let j=src.indexOf(">",i);j=(j<0)?n:j+1;
+        let tag=esc(src.slice(i,j));
+        tag=tag.replace(/^(&lt;[\/?]?)([\w.:-]+)/,function(m,a,b){return a+'<span class="t">'+b+"</span>";});
+        tag=tag.replace(/([\w.:-]+)=("[^"]*")/g,function(m,a,b){
+          return '<span class="nm">'+a+'</span>=<span class="s">'+b+"</span>";});
+        out+=tag;i=j;continue;
+      }
+      out+=esc(src[i]);i++;
+    }
+    return out;
+  }
+
+  function hiConf(src){
+    return src.split("\n").map(function(line){
+      if(line.trim().indexOf("#")===0)return sp("c",line);
+      const m=line.match(/^([\s\-]*)([A-Za-z0-9_.\[\]$-]+)(\s*[:=])([\s\S]*)$/);
+      if(!m)return esc(line);
+      const val=esc(m[4]).replace(/(\$\{[^}]*\})/g,'<span class="a">$1</span>');
+      return esc(m[1])+'<span class="nm">'+esc(m[2])+"</span>"+esc(m[3])+val;
+    }).join("\n");
+  }
+
+  function hi(src,lang){
+    if(lang==="xml")return hiXml(src);
+    if(lang==="yaml"||lang==="properties")return hiConf(src);
+    if(lang==="tree"||lang==="text")return esc(src);
+    return hiCode(src,lang);
+  }
+
+  document.querySelectorAll(".code").forEach(function(box){
+    const holder=box.querySelector('script[type="text/plain"]');
+    if(!holder)return;
+    const raw=holder.textContent.replace(/^\n/,"").replace(/\s+$/,"");
+    const lang=box.dataset.lang||"java";
+    const file=box.dataset.file||lang;
+    holder.remove();
+    box.insertAdjacentHTML("afterbegin",
+      '<div class="bar"><span class="fn">'+esc(file)+'</span><button class="cp">copy</button></div>'+
+      "<pre><code>"+hi(raw,lang)+"</code></pre>");
+    box.querySelector(".cp").addEventListener("click",function(){
+      navigator.clipboard.writeText(raw);
+      const b=this;b.textContent="copied";setTimeout(function(){b.textContent="copy";},1200);
+    });
+  });
+
+  const toc=document.getElementById("toc");
+  const secs=[].slice.call(document.querySelectorAll("section.ch"));
+  let lastGroup=null;
+  secs.forEach(function(s){
+    if(s.dataset.g!==lastGroup){
+      lastGroup=s.dataset.g;
+      const g=document.createElement("li");
+      g.className="grp";g.textContent=lastGroup;
+      toc.appendChild(g);
+    }
+    const li=document.createElement("li");
+    li.innerHTML='<a href="#'+s.id+'"><span class="f">'+s.dataset.t+"</span></a>";
+    toc.appendChild(li);
+  });
+
+  document.getElementById("q").addEventListener("input",function(e){
+    const v=e.target.value.toLowerCase();
+    [].slice.call(toc.children).forEach(function(li){
+      if(li.className==="grp"){li.style.display=v?"none":"";return;}
+      li.style.display=li.textContent.toLowerCase().indexOf(v)>-1?"":"none";
+    });
+  });
+
+  const links=[].slice.call(toc.querySelectorAll("a"));
+  const io=new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if(!en.isIntersecting)return;
+      links.forEach(function(a){a.classList.remove("on");});
+      const a=links.filter(function(x){return x.getAttribute("href")==="#"+en.target.id;})[0];
+      if(a){a.classList.add("on");a.scrollIntoView({block:"nearest"});}
+    });
+  },{rootMargin:"-12% 0px -78% 0px"});
+  secs.forEach(function(s){io.observe(s);});
+})();
+</script>
+</body>
+</html>

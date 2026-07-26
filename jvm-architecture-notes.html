@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JVM Architecture — Deep Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #1f2d45;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --code-bg: #0d1117;
+    --heap: #10b981;
+    --stack: #f59e0b;
+    --method: #7c3aed;
+    --pc: #ef4444;
+    --native: #00d4ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0a0e1a 0%, #111827 50%, #0f172a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    top: -30%;
+    right: 10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 16px;
+  }
+  .header-sub {
+    color: var(--muted);
+    font-size: 14px;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+  .header-badges {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .badge-blue { background: rgba(0,212,255,0.12); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
+  .badge-purple { background: rgba(124,58,237,0.12); color: #a78bfa; border: 1px solid rgba(124,58,237,0.25); }
+  .badge-green { background: rgba(16,185,129,0.12); color: var(--accent3); border: 1px solid rgba(16,185,129,0.25); }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav a {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 14px 16px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 50px 40px; }
+
+  /* ── SECTIONS ── */
+  .section { margin-bottom: 70px; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .section h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 28px 0 12px;
+    color: var(--accent);
+  }
+  .section h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 20px 0 8px;
+    color: #c4d0e3;
+  }
+  p { margin-bottom: 14px; color: #c4d0e3; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .card-accent-blue { border-left: 3px solid var(--accent); }
+  .card-accent-purple { border-left: 3px solid var(--accent2); }
+  .card-accent-green { border-left: 3px solid var(--accent3); }
+  .card-accent-yellow { border-left: 3px solid var(--accent4); }
+  .card-accent-red { border-left: 3px solid var(--accent5); }
+  .card h4 { margin-top: 0; }
+  .card p { margin-bottom: 6px; font-size: 14px; }
+
+  /* ── CODE ── */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(0,212,255,0.08);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+  pre code { background: none; color: #e2e8f0; padding: 0; font-size: inherit; }
+  .kw { color: #c792ea; }
+  .str { color: #c3e88d; }
+  .cm { color: #546e7a; font-style: italic; }
+  .fn { color: #82aaff; }
+  .num { color: #f78c6c; }
+  .cls { color: #ffcb6b; }
+
+  /* ── CALLOUT ── */
+  .callout {
+    background: rgba(0,212,255,0.06);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 13.5px;
+  }
+  .callout-warn {
+    background: rgba(245,158,11,0.06);
+    border-color: rgba(245,158,11,0.25);
+  }
+  .callout-green {
+    background: rgba(16,185,129,0.06);
+    border-color: rgba(16,185,129,0.25);
+  }
+  .callout-red {
+    background: rgba(239,68,68,0.06);
+    border-color: rgba(239,68,68,0.25);
+  }
+  .callout strong { color: var(--accent); }
+  .callout-warn strong { color: var(--accent4); }
+  .callout-green strong { color: var(--accent3); }
+  .callout-red strong { color: var(--accent5); }
+
+  /* ── DIAGRAMS ── */
+  .diagram {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+  .diagram-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* SVG Diagrams */
+  svg text { font-family: 'Inter', sans-serif; }
+
+  /* ── TABLE ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13.5px;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(31,45,69,0.6);
+    color: #c4d0e3;
+    vertical-align: top;
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* ── Q&A ── */
+  .qa-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .qa-q {
+    padding: 18px 22px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    transition: background 0.2s;
+  }
+  .qa-q:hover { background: var(--surface2); }
+  .qa-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(0,212,255,0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .qa-text { font-weight: 600; font-size: 14.5px; color: #e2e8f0; flex: 1; }
+  .qa-toggle { color: var(--muted); flex-shrink: 0; font-size: 18px; transition: transform 0.3s; }
+  .qa-a {
+    display: none;
+    padding: 0 22px 20px;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+    font-size: 14px;
+    color: #b0bec5;
+    line-height: 1.75;
+  }
+  .qa-a.open { display: block; }
+  .qa-a p { color: #b0bec5; margin-bottom: 10px; font-size: 14px; }
+  .qa-a pre { font-size: 12px; }
+
+  /* ── FLOW ── */
+  .flow-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .flow-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    min-width: 110px;
+  }
+  .flow-arrow {
+    color: var(--muted);
+    font-size: 18px;
+    padding: 0 8px;
+  }
+  .flow-blue { border-color: rgba(0,212,255,0.35); color: var(--accent); }
+  .flow-purple { border-color: rgba(124,58,237,0.35); color: #a78bfa; }
+  .flow-green { border-color: rgba(16,185,129,0.35); color: var(--accent3); }
+  .flow-yellow { border-color: rgba(245,158,11,0.35); color: var(--accent4); }
+
+  /* ── LIST ── */
+  ul.styled, ol.styled {
+    padding-left: 20px;
+    margin: 12px 0 16px;
+    color: #c4d0e3;
+    font-size: 14px;
+  }
+  ul.styled li, ol.styled li { margin-bottom: 7px; }
+  ul.styled li::marker { color: var(--accent); }
+
+  /* ── MEMORY VISUAL ── */
+  .mem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .mem-block {
+    border-radius: 8px;
+    padding: 18px 14px;
+    text-align: center;
+    border: 1px solid;
+  }
+  .mem-block .mem-icon { font-size: 24px; margin-bottom: 8px; }
+  .mem-block .mem-name { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .mem-block .mem-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .mem-heap { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.3); color: var(--heap); }
+  .mem-stack { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.3); color: var(--stack); }
+  .mem-method { background: rgba(124,58,237,0.08); border-color: rgba(124,58,237,0.3); color: var(--method); }
+  .mem-pc { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.3); color: var(--pc); }
+  .mem-native { background: rgba(0,212,255,0.08); border-color: rgba(0,212,255,0.3); color: var(--native); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 50px 0;
+  }
+
+  /* ── VERSION COMPARE ── */
+  .ver-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  @media (max-width: 600px) { .ver-compare { grid-template-columns: 1fr; } }
+  .ver-old { background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 16px; }
+  .ver-new { background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); border-radius: 8px; padding: 16px; }
+  .ver-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .ver-old .ver-label { color: var(--accent5); }
+  .ver-new .ver-label { color: var(--accent3); }
+  .ver-old p, .ver-new p { font-size: 13px; margin-bottom: 6px; }
+
+  /* ── JIT PIPELINE ── */
+  .jit-stage {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 20px 0;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .jit-step {
+    flex: 1;
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 12px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+  }
+  .jit-step:last-child { border-right: none; }
+  .jit-step .step-icon { font-size: 20px; margin-bottom: 6px; }
+  .jit-step .step-name { font-weight: 700; font-size: 11px; color: var(--accent); margin-bottom: 4px; font-family: 'JetBrains Mono', monospace; }
+  .jit-step .step-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* ── SCROLL-TOP ── */
+  .scroll-top {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--accent2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .scroll-top.visible { opacity: 1; }
+
+  @media (max-width: 768px) {
+    header { padding: 40px 20px 36px; }
+    nav { padding: 0 20px; }
+    .container { padding: 36px 20px; }
+    .jit-stage { flex-direction: column; }
+    .jit-step { border-right: none; border-bottom: 1px solid var(--border); }
+    .jit-step:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Java Internals · Deep Notes</div>
+  <h1>JVM Architecture</h1>
+  <p class="header-sub">A comprehensive reference covering Class Loading, Memory Areas, Execution Engine, JIT compilation internals, and 20 most-asked interview questions — with examples.</p>
+  <div class="header-badges">
+    <span class="badge badge-blue">Java 8+</span>
+    <span class="badge badge-purple">Java 9+ Module System</span>
+    <span class="badge badge-green">Interview Ready</span>
+  </div>
+</header>
+
+<nav>
+  <a class="nav-back" href="index.html">← Back to Hub</a>
+  <a href="#overview">Overview</a>
+  <a href="#how-java-runs">How Java Runs</a>
+  <a href="#class-loader">Class Loader</a>
+  <a href="#linking">Linking & Init</a>
+  <a href="#memory">Memory Areas</a>
+  <a href="#execution">Execution Engine</a>
+  <a href="#jit">JIT Deep Dive</a>
+  <a href="#gc">Garbage Collector</a>
+  <a href="#jni">JNI</a>
+  <a href="#interview">Interview Q&A</a>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 1 — OVERVIEW
+═══════════════════════════════════════════════ -->
+<section class="section" id="overview">
+  <div class="section-label">Section 01</div>
+  <h2>JVM — The Big Picture</h2>
+  <p>The <strong>Java Virtual Machine (JVM)</strong> is an abstract computing machine — a software layer that provides a runtime environment in which Java bytecode can be executed. Because it is <em>virtual</em>, it isn't tied to any physical hardware; rather, it is a specification. The actual implementation of that specification is delivered by <strong>JRE (Java Runtime Environment)</strong>.</p>
+
+  <div class="card-grid">
+    <div class="card card-accent-blue">
+      <h4>🔷 JVM</h4>
+      <p>Abstract specification. Defines the rules for loading, verifying, and executing bytecode.</p>
+    </div>
+    <div class="card card-accent-green">
+      <h4>🟢 JRE</h4>
+      <p>JVM implementation + standard libraries. What you install to <em>run</em> Java programs.</p>
+    </div>
+    <div class="card card-accent-purple">
+      <h4>🟣 JDK</h4>
+      <p>JRE + compiler (javac) + dev tools. What you install to <em>develop</em> Java programs.</p>
+    </div>
+  </div>
+
+  <h3>Three Pillars of JVM</h3>
+  <div class="card-grid">
+    <div class="card card-accent-blue">
+      <h4>1. Class Loader</h4>
+      <p>Loads <code>.class</code> files (bytecode) into JVM memory from disk, network, or other sources. Handles loading → linking → initialization.</p>
+    </div>
+    <div class="card card-accent-purple">
+      <h4>2. Memory Areas (Runtime Data Areas)</h4>
+      <p>Organized memory regions: Heap, Stack, Method Area, PC Registers, Native Method Stack.</p>
+    </div>
+    <div class="card card-accent-green">
+      <h4>3. Execution Engine</h4>
+      <p>Reads bytecode and executes it using Interpreter, JIT Compiler, Garbage Collector, and JNI.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 2 — HOW JAVA RUNS
+═══════════════════════════════════════════════ -->
+<section class="section" id="how-java-runs">
+  <div class="section-label">Section 02</div>
+  <h2>How a Java Program Runs</h2>
+
+  <div class="flow-row">
+    <div class="flow-box flow-blue">📝 Source Code<br><small>.java file</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-purple">⚙️ javac<br><small>compiler</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-yellow">🗜️ Bytecode<br><small>.class file</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-green">🖥️ JVM<br><small>java cmd</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-blue">✅ Output<br><small>machine exec</small></div>
+  </div>
+
+  <div class="diagram">
+    <div class="diagram-title">Java Execution Pipeline</div>
+    <svg viewBox="0 0 900 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:900px;display:block;margin:0 auto;">
+      <!-- Source -->
+      <rect x="10" y="60" width="130" height="80" rx="8" fill="#1a2235" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="75" y="94" fill="#00d4ff" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter">Source Code</text>
+      <text x="75" y="112" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">HelloWorld.java</text>
+      <text x="75" y="128" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">class ABC {}</text>
+
+      <!-- Arrow 1 -->
+      <line x1="140" y1="100" x2="190" y2="100" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="165" y="92" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">javac</text>
+
+      <!-- Bytecode -->
+      <rect x="190" y="60" width="130" height="80" rx="8" fill="#1a2235" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="255" y="94" fill="#a78bfa" font-size="12" font-weight="700" text-anchor="middle" font-family="Inter">Bytecode</text>
+      <text x="255" y="112" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">ABC.class</text>
+      <text x="255" y="128" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Platform-independent</text>
+
+      <!-- Arrow 2 -->
+      <line x1="320" y1="100" x2="370" y2="100" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="345" y="92" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">java</text>
+
+      <!-- JVM box -->
+      <rect x="370" y="20" width="380" height="160" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+      <text x="560" y="44" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono" letter-spacing="2">JVM</text>
+
+      <!-- CL -->
+      <rect x="385" y="55" width="100" height="50" rx="6" fill="#1a2235" stroke="#00d4ff" stroke-width="1"/>
+      <text x="435" y="78" fill="#00d4ff" font-size="10" text-anchor="middle" font-weight="600" font-family="Inter">Class</text>
+      <text x="435" y="93" fill="#00d4ff" font-size="10" text-anchor="middle" font-weight="600" font-family="Inter">Loader</text>
+      <!-- MA -->
+      <rect x="500" y="55" width="100" height="50" rx="6" fill="#1a2235" stroke="#7c3aed" stroke-width="1"/>
+      <text x="550" y="78" fill="#a78bfa" font-size="10" text-anchor="middle" font-weight="600" font-family="Inter">Memory</text>
+      <text x="550" y="93" fill="#a78bfa" font-size="10" text-anchor="middle" font-weight="600" font-family="Inter">Areas</text>
+      <!-- EE -->
+      <rect x="615" y="55" width="120" height="50" rx="6" fill="#1a2235" stroke="#10b981" stroke-width="1"/>
+      <text x="675" y="78" fill="#10b981" font-size="10" text-anchor="middle" font-weight="600" font-family="Inter">Execution</text>
+      <text x="675" y="93" fill="#10b981" font-size="10" text-anchor="middle" font-weight="600" font-family="Inter">Engine</text>
+
+      <!-- Inner arrows -->
+      <line x1="485" y1="80" x2="500" y2="80" stroke="#334155" stroke-width="1" marker-end="url(#arr2)"/>
+      <line x1="600" y1="80" x2="615" y2="80" stroke="#334155" stroke-width="1" marker-end="url(#arr2)"/>
+
+      <!-- OS/Hardware -->
+      <rect x="370" y="120" width="380" height="45" rx="6" fill="#0d1117" stroke="#1f2d45" stroke-width="1"/>
+      <text x="560" y="147" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">Native OS / Hardware (Machine Code Executed Here)</text>
+
+      <!-- Arrow down -->
+      <line x1="560" y1="105" x2="560" y2="120" stroke="#334155" stroke-width="1" marker-end="url(#arr2)"/>
+
+      <!-- Arrow 3 -->
+      <line x1="750" y1="100" x2="800" y2="100" stroke="#334155" stroke-width="1.5" marker-end="url(#arr)"/>
+
+      <!-- Output -->
+      <rect x="800" y="70" width="90" height="60" rx="8" fill="#1a2235" stroke="#10b981" stroke-width="1.5"/>
+      <text x="845" y="97" fill="#10b981" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter">Output</text>
+      <text x="845" y="114" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">✅ Result</text>
+
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0,0 L8,4 L0,8 Z" fill="#334155"/>
+        </marker>
+        <marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L6,3 L0,6 Z" fill="#334155"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <div class="callout">
+    <strong>Key Insight:</strong> Java compiles to <em>platform-independent bytecode</em>, not machine code. The JVM then translates that bytecode at runtime for whatever OS/hardware it is running on. This is the essence of <em>"Write Once, Run Anywhere."</em>
+  </div>
+
+  <pre><code><span class="cm">// Step 1: Write Java source</span>
+<span class="kw">public class</span> <span class="cls">HelloWorld</span> {
+    <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+        System.out.<span class="fn">println</span>(<span class="str">"Hello, JVM!"</span>);
+    }
+}
+
+<span class="cm">// Step 2: Compile → produces HelloWorld.class (bytecode)</span>
+$ javac HelloWorld.java
+
+<span class="cm">// Step 3: Run → JVM loads, verifies, executes bytecode</span>
+$ java HelloWorld</code></pre>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 3 — CLASS LOADER
+═══════════════════════════════════════════════ -->
+<section class="section" id="class-loader">
+  <div class="section-label">Section 03</div>
+  <h2>Class Loader Subsystem</h2>
+  <p>The Class Loader is the <strong>gatekeeper</strong> of the JVM. Its job is to find <code>.class</code> files and load the bytecode into JVM memory. Think of it as the security checkpoint at the JVM's entrance.</p>
+
+  <h3>Three Types of Class Loaders</h3>
+
+  <div class="diagram">
+    <div class="diagram-title">Class Loader Hierarchy (Parent Delegation Model)</div>
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto;">
+      <!-- Bootstrap -->
+      <rect x="220" y="10" width="260" height="62" rx="8" fill="#1a2235" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="350" y="36" fill="#00d4ff" font-size="13" font-weight="700" text-anchor="middle" font-family="Inter">Bootstrap Class Loader</text>
+      <text x="350" y="55" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">java.base module / rt.jar (pre-Java 9)</text>
+
+      <!-- Line -->
+      <line x1="350" y1="72" x2="350" y2="108" stroke="#334155" stroke-width="1.5"/>
+
+      <!-- Platform -->
+      <rect x="220" y="108" width="260" height="62" rx="8" fill="#1a2235" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="350" y="134" fill="#a78bfa" font-size="13" font-weight="700" text-anchor="middle" font-family="Inter">Platform Class Loader</text>
+      <text x="350" y="153" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">formerly: Extension Class Loader (Java &lt; 9)</text>
+
+      <!-- Line -->
+      <line x1="350" y1="170" x2="350" y2="206" stroke="#334155" stroke-width="1.5"/>
+
+      <!-- App -->
+      <rect x="220" y="206" width="260" height="62" rx="8" fill="#1a2235" stroke="#10b981" stroke-width="1.5"/>
+      <text x="350" y="232" fill="#10b981" font-size="13" font-weight="700" text-anchor="middle" font-family="Inter">Application Class Loader</text>
+      <text x="350" y="251" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono">classpath / modulepath</text>
+
+      <!-- Priority label -->
+      <text x="30" y="45" fill="#64748b" font-size="9" text-anchor="start" font-family="JetBrains Mono">HIGHEST</text>
+      <text x="30" y="55" fill="#64748b" font-size="9" text-anchor="start" font-family="JetBrains Mono">PRIORITY</text>
+      <line x1="75" y1="41" x2="220" y2="41" stroke="#334155" stroke-width="1" stroke-dasharray="3,3"/>
+      <text x="30" y="235" fill="#64748b" font-size="9" text-anchor="start" font-family="JetBrains Mono">LOWEST</text>
+      <text x="30" y="245" fill="#64748b" font-size="9" text-anchor="start" font-family="JetBrains Mono">PRIORITY</text>
+      <line x1="75" y1="237" x2="220" y2="237" stroke="#334155" stroke-width="1" stroke-dasharray="3,3"/>
+
+      <!-- "Child asks Parent first" arrow on right -->
+      <text x="640" y="80" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Delegation</text>
+      <text x="640" y="92" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Direction</text>
+      <line x1="640" y1="200" x2="640" y2="100" stroke="#334155" stroke-width="1.5" marker-end="url(#up)"/>
+      <defs>
+        <marker id="up" markerWidth="8" markerHeight="8" refX="4" refY="8" orient="auto">
+          <path d="M0,8 L4,0 L8,8 Z" fill="#334155"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Class Loader</th>
+        <th>Java &lt; 9</th>
+        <th>Java 9+</th>
+        <th>What it loads</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>Bootstrap</code></td>
+        <td>Loads <code>rt.jar</code></td>
+        <td>Loads <code>java.base</code> module</td>
+        <td>Core JDK classes: <code>java.lang.*</code>, <code>java.util.*</code></td>
+      </tr>
+      <tr>
+        <td><code>Platform</code></td>
+        <td>Extension CL — loads <code>$JAVA_HOME/lib/ext</code></td>
+        <td>Platform CL — replaces Extension CL</td>
+        <td>Platform-specific modules (java.sql, java.desktop…)</td>
+      </tr>
+      <tr>
+        <td><code>Application</code></td>
+        <td>System CL</td>
+        <td>Same, also reads module path</td>
+        <td>Your application's <code>.class</code> files, 3rd-party jars</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Parent Delegation Model</h3>
+  <p>When a class needs to be loaded, the request is <strong>always delegated to the parent first</strong>. Only if the parent cannot find the class does the child try to load it. This ensures that core JDK classes can never be overridden by malicious user code.</p>
+
+  <pre><code><span class="cm">// Custom Class Loader example</span>
+<span class="kw">public class</span> <span class="cls">MyClassLoader</span> <span class="kw">extends</span> <span class="cls">ClassLoader</span> {
+
+    <span class="fn">@Override</span>
+    <span class="kw">protected</span> <span class="cls">Class</span>&lt;?&gt; <span class="fn">findClass</span>(String name) <span class="kw">throws</span> <span class="cls">ClassNotFoundException</span> {
+        <span class="cm">// 1. Parent (AppCL) is asked first — automatically via loadClass()</span>
+        <span class="cm">// 2. Only if parent fails, findClass() here is called</span>
+        <span class="kw">byte</span>[] bytecode = <span class="fn">loadBytesFromCustomLocation</span>(name);
+        <span class="kw">return</span> <span class="fn">defineClass</span>(name, bytecode, <span class="num">0</span>, bytecode.length);
+    }
+}</code></pre>
+
+  <div class="callout-warn callout">
+    <strong>Interview Trap:</strong> Bootstrap ClassLoader is implemented in <strong>native code</strong> (C/C++), not Java. So <code>String.class.getClassLoader()</code> returns <code>null</code> — because Bootstrap has no Java representation.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 4 — LINKING & INITIALIZATION
+═══════════════════════════════════════════════ -->
+<section class="section" id="linking">
+  <div class="section-label">Section 04</div>
+  <h2>Class Loading Lifecycle</h2>
+  <p>After loading, a class goes through <strong>Linking</strong> then <strong>Initialization</strong> before it can be used.</p>
+
+  <div class="flow-row">
+    <div class="flow-box flow-blue">📥 Loading</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-purple">✅ Verification</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-yellow">🧱 Preparation</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-blue">🔗 Resolution</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box flow-green">🚀 Initialization</div>
+  </div>
+
+  <div class="card-grid">
+    <div class="card card-accent-blue">
+      <h4>1️⃣ Loading</h4>
+      <p>The ClassLoader reads the <code>.class</code> file's bytecode into memory. A <code>Class&lt;?&gt;</code> object is created in the heap to represent the loaded class.</p>
+    </div>
+    <div class="card card-accent-purple">
+      <h4>2️⃣ Verification</h4>
+      <p>The <strong>Bytecode Verifier</strong> checks that the bytecode is structurally valid and follows JVM spec. Prevents malicious / malformed bytecode from crashing the JVM. Throws <code>VerifyError</code> on failure.</p>
+    </div>
+    <div class="card card-accent-yellow">
+      <h4>3️⃣ Preparation</h4>
+      <p>Memory for <strong>static variables</strong> is allocated and set to <strong>default values</strong> (0, null, false). No actual code runs yet — just memory reservation.</p>
+    </div>
+    <div class="card card-accent-blue">
+      <h4>4️⃣ Resolution</h4>
+      <p><strong>Symbolic references</strong> (e.g., class names as strings in the constant pool) are replaced with <strong>direct references</strong> (actual memory pointers). This is sometimes done lazily.</p>
+    </div>
+    <div class="card card-accent-green">
+      <h4>5️⃣ Initialization</h4>
+      <p>Static variables are assigned their <strong>actual values</strong>. <code>static {}</code> blocks are executed. This is the first time user code runs during class loading.</p>
+    </div>
+  </div>
+
+  <pre><code><span class="kw">public class</span> <span class="cls">Demo</span> {
+    <span class="cm">// Preparation: x = 0 (default)
+    // Initialization: x = 42 (actual value)</span>
+    <span class="kw">static int</span> x = <span class="num">42</span>;
+
+    <span class="kw">static</span> {
+        <span class="cm">// This static block runs during Initialization phase</span>
+        System.out.<span class="fn">println</span>(<span class="str">"Class initialized! x = "</span> + x);
+    }
+}</code></pre>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 5 — MEMORY AREAS
+═══════════════════════════════════════════════ -->
+<section class="section" id="memory">
+  <div class="section-label">Section 05</div>
+  <h2>Runtime Memory Areas</h2>
+  <p>The JVM divides its memory into distinct regions, each serving a specific purpose. Understanding which data lives where is critical for debugging memory issues and acing interviews.</p>
+
+  <div class="mem-grid">
+    <div class="mem-block mem-method">
+      <div class="mem-icon">📚</div>
+      <div class="mem-name">Method Area</div>
+      <div class="mem-desc">Class metadata, bytecode, constant pool. Implemented as Metaspace (Java 8+)</div>
+    </div>
+    <div class="mem-block mem-heap">
+      <div class="mem-icon">🏗️</div>
+      <div class="mem-name">Heap</div>
+      <div class="mem-desc">All objects & instance variables. Shared across threads. GC manages this.</div>
+    </div>
+    <div class="mem-block mem-stack">
+      <div class="mem-icon">📦</div>
+      <div class="mem-name">Stack</div>
+      <div class="mem-desc">Method frames, local variables, operand stack. One per thread.</div>
+    </div>
+    <div class="mem-block mem-pc">
+      <div class="mem-icon">📍</div>
+      <div class="mem-name">PC Register</div>
+      <div class="mem-desc">Current instruction address. One per thread.</div>
+    </div>
+    <div class="mem-block mem-native">
+      <div class="mem-icon">⚙️</div>
+      <div class="mem-name">Native Method Stack</div>
+      <div class="mem-desc">Stack for native (C/C++) method calls via JNI.</div>
+    </div>
+  </div>
+
+  <!-- Full memory diagram -->
+  <div class="diagram">
+    <div class="diagram-title">JVM Memory Layout</div>
+    <svg viewBox="0 0 820 390" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:820px;display:block;margin:0 auto;">
+
+      <!-- Method Area / Metaspace (shared) -->
+      <rect x="10" y="10" width="800" height="90" rx="8" fill="#1a1030" stroke="#7c3aed" stroke-width="1.5"/>
+      <text x="20" y="34" fill="#a78bfa" font-size="11" font-weight="700" font-family="Inter">Method Area (Metaspace)</text>
+      <text x="20" y="52" fill="#64748b" font-size="9" font-family="JetBrains Mono">Shared across all threads</text>
+
+      <rect x="20" y="58" width="140" height="30" rx="4" fill="#2a1850" stroke="#7c3aed" stroke-width="1"/>
+      <text x="90" y="76" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Class Metadata</text>
+
+      <rect x="170" y="58" width="130" height="30" rx="4" fill="#2a1850" stroke="#7c3aed" stroke-width="1"/>
+      <text x="235" y="76" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Method Bytecode</text>
+
+      <rect x="310" y="58" width="130" height="30" rx="4" fill="#2a1850" stroke="#7c3aed" stroke-width="1"/>
+      <text x="375" y="76" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Constant Pool</text>
+
+      <rect x="450" y="58" width="140" height="30" rx="4" fill="#2a1850" stroke="#7c3aed" stroke-width="1"/>
+      <text x="520" y="76" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Annotations / Interfaces</text>
+
+      <rect x="600" y="58" width="200" height="30" rx="4" fill="#2a1850" stroke="#7c3aed" stroke-width="1"/>
+      <text x="700" y="76" fill="#c4b5fd" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Class&lt;T&gt; objects (heap ref)</text>
+
+      <!-- Heap (shared) -->
+      <rect x="10" y="115" width="800" height="110" rx="8" fill="#0d1f17" stroke="#10b981" stroke-width="1.5"/>
+      <text x="20" y="138" fill="#10b981" font-size="11" font-weight="700" font-family="Inter">Heap Memory</text>
+      <text x="20" y="155" fill="#64748b" font-size="9" font-family="JetBrains Mono">Shared across all threads — managed by Garbage Collector</text>
+
+      <!-- Young Gen -->
+      <rect x="20" y="162" width="380" height="50" rx="5" fill="#0a2e1f" stroke="#10b981" stroke-width="1"/>
+      <text x="30" y="178" fill="#34d399" font-size="9" font-weight="700" font-family="JetBrains Mono">Young Generation</text>
+      <rect x="30" y="183" width="100" height="22" rx="3" fill="#0d3d26" stroke="#059669" stroke-width="1"/>
+      <text x="80" y="197" fill="#6ee7b7" font-size="8" text-anchor="middle" font-family="JetBrains Mono">Eden Space</text>
+      <rect x="140" y="183" width="80" height="22" rx="3" fill="#0d3d26" stroke="#059669" stroke-width="1"/>
+      <text x="180" y="197" fill="#6ee7b7" font-size="8" text-anchor="middle" font-family="JetBrains Mono">Survivor S0</text>
+      <rect x="230" y="183" width="80" height="22" rx="3" fill="#0d3d26" stroke="#059669" stroke-width="1"/>
+      <text x="270" y="197" fill="#6ee7b7" font-size="8" text-anchor="middle" font-family="JetBrains Mono">Survivor S1</text>
+      <rect x="320" y="183" width="72" height="22" rx="3" fill="#0d3d26" stroke="#059669" stroke-width="0.5" stroke-dasharray="3,2"/>
+      <text x="356" y="197" fill="#6ee7b7" font-size="8" text-anchor="middle" font-family="JetBrains Mono">TLAB</text>
+
+      <!-- Old Gen -->
+      <rect x="415" y="162" width="385" height="50" rx="5" fill="#0a2e1f" stroke="#059669" stroke-width="1"/>
+      <text x="425" y="178" fill="#34d399" font-size="9" font-weight="700" font-family="JetBrains Mono">Old Generation (Tenured)</text>
+      <text x="615" y="193" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Long-lived objects · promoted from Young Gen</text>
+
+      <!-- Per-thread section label -->
+      <text x="10" y="248" fill="#64748b" font-size="10" font-family="JetBrains Mono" letter-spacing="1">PER-THREAD AREAS</text>
+
+      <!-- Thread 1 -->
+      <rect x="10" y="258" width="250" height="120" rx="8" fill="#1a1a0f" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="135" y="278" fill="#f59e0b" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter">Thread 1 — Stack</text>
+      <rect x="20" y="284" width="230" height="28" rx="4" fill="#2a2210" stroke="#f59e0b" stroke-width="1"/>
+      <text x="135" y="302" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Frame: main() — local vars, args</text>
+      <rect x="20" y="318" width="230" height="28" rx="4" fill="#2a2210" stroke="#f59e0b" stroke-width="1"/>
+      <text x="135" y="336" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Frame: doWork() — local vars</text>
+      <rect x="20" y="352" width="230" height="18" rx="4" fill="#221e0a" stroke="#78716c" stroke-width="0.5" stroke-dasharray="3,2"/>
+      <text x="135" y="364" fill="#78716c" font-size="8" text-anchor="middle" font-family="JetBrains Mono">…grows downward</text>
+
+      <!-- Thread 1 PC -->
+      <rect x="270" y="258" width="130" height="50" rx="8" fill="#1a0d0d" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="335" y="278" fill="#ef4444" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter">PC Register</text>
+      <text x="335" y="296" fill="#fca5a5" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Thread 1</text>
+
+      <!-- Thread 2 Stack -->
+      <rect x="415" y="258" width="250" height="120" rx="8" fill="#1a1a0f" stroke="#f59e0b" stroke-width="1.5"/>
+      <text x="540" y="278" fill="#f59e0b" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter">Thread 2 — Stack</text>
+      <rect x="425" y="284" width="230" height="28" rx="4" fill="#2a2210" stroke="#f59e0b" stroke-width="1"/>
+      <text x="540" y="302" fill="#fcd34d" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Frame: run() — local vars</text>
+      <rect x="425" y="318" width="230" height="52" rx="4" fill="#221e0a" stroke="#78716c" stroke-width="0.5" stroke-dasharray="3,2"/>
+      <text x="540" y="348" fill="#78716c" font-size="8" text-anchor="middle" font-family="JetBrains Mono">…</text>
+
+      <!-- Thread 2 PC -->
+      <rect x="675" y="258" width="130" height="50" rx="8" fill="#1a0d0d" stroke="#ef4444" stroke-width="1.5"/>
+      <text x="740" y="278" fill="#ef4444" font-size="10" font-weight="700" text-anchor="middle" font-family="Inter">PC Register</text>
+      <text x="740" y="296" fill="#fca5a5" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Thread 2</text>
+
+      <!-- Native stack small -->
+      <rect x="270" y="318" width="130" height="60" rx="8" fill="#0d1a1f" stroke="#00d4ff" stroke-width="1.5"/>
+      <text x="335" y="338" fill="#00d4ff" font-size="9" font-weight="700" text-anchor="middle" font-family="Inter">Native Stack</text>
+      <text x="335" y="354" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">C/C++ native</text>
+      <text x="335" y="368" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">method calls</text>
+    </svg>
+  </div>
+
+  <h3>Method Area / Metaspace (Detailed)</h3>
+
+  <div class="ver-compare">
+    <div class="ver-old">
+      <div class="ver-label">Java &lt; 8 — PermGen</div>
+      <p>Fixed-size region inside the JVM heap</p>
+      <p>Stored: class metadata, method bytecode, interned strings, static variables</p>
+      <p>Problem: could not grow dynamically → frequent <code>OutOfMemoryError: PermGen space</code></p>
+    </div>
+    <div class="ver-new">
+      <div class="ver-label">Java 8+ — Metaspace</div>
+      <p>Lives in <strong>native memory</strong> (outside JVM heap)</p>
+      <p>Stores: class metadata, method bytecode, annotations — but <strong>NOT static variables</strong></p>
+      <p>Grows dynamically. Capped with <code>-XX:MaxMetaspaceSize</code></p>
+    </div>
+  </div>
+
+  <div class="callout-warn callout">
+    <strong>Java 8 Key Change:</strong> Static variables moved from PermGen/Metaspace to the <strong>Heap</strong> — stored inside the <code>Class&lt;T&gt;</code> object that lives in the heap. This is a very common interview question!
+  </div>
+
+  <h3>Heap Memory — Generational Structure</h3>
+  <p>The heap is divided into generations to optimize garbage collection performance:</p>
+  <ul class="styled">
+    <li><strong>Eden Space</strong> — New objects are born here. Minor GC happens here frequently and is fast.</li>
+    <li><strong>Survivor S0 / S1</strong> — Objects that survive Minor GC get moved here. Objects alternate between S0 and S1 across GC cycles.</li>
+    <li><strong>TLAB (Thread-Local Allocation Buffer)</strong> — Each thread has a private slice of Eden for lock-free allocation.</li>
+    <li><strong>Old Generation (Tenured)</strong> — Long-lived objects promoted from Young Gen. Major GC (slower) cleans this.</li>
+  </ul>
+
+  <h3>Stack Memory</h3>
+  <p>Each thread has its own private stack. The stack holds <strong>frames</strong> — one per method call. Each frame contains:</p>
+  <ul class="styled">
+    <li><strong>Local Variable Array</strong> — holds <code>this</code>, method parameters, and local primitives/references</li>
+    <li><strong>Operand Stack</strong> — a working area for the bytecode instruction execution</li>
+    <li><strong>Reference to Constant Pool</strong> — links back to the Method Area</li>
+  </ul>
+
+  <div class="callout-red callout">
+    <strong>StackOverflowError</strong> happens when recursion is too deep and the thread's stack runs out of space. This is a per-thread error, not a heap issue.
+  </div>
+
+  <pre><code><span class="cm">// Where does each variable live?</span>
+<span class="kw">public class</span> <span class="cls">MemoryExample</span> {
+    <span class="kw">static int</span> counter = <span class="num">0</span>;        <span class="cm">// Heap (inside Class&lt;MemoryExample&gt; object) — Java 8+</span>
+    <span class="kw">int</span> id;                           <span class="cm">// Heap (instance variable, part of each object)</span>
+
+    <span class="kw">void</span> <span class="fn">compute</span>(<span class="kw">int</span> x) {
+        <span class="kw">int</span> result = x * <span class="num">2</span>;            <span class="cm">// Stack (local variable in this frame)</span>
+        <span class="cls">String</span> msg = <span class="str">"hello"</span>;          <span class="cm">// msg reference: Stack | "hello" object: Heap (String Pool)</span>
+        <span class="cls">Object</span> obj = <span class="kw">new</span> <span class="cls">Object</span>();    <span class="cm">// obj reference: Stack | Object instance: Heap</span>
+    }
+}</code></pre>
+
+  <table>
+    <thead>
+      <tr><th>What</th><th>Where (Java 8+)</th><th>Thread Shared?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Class metadata</td><td>Metaspace</td><td>Yes</td></tr>
+      <tr><td>Method bytecode</td><td>Metaspace</td><td>Yes</td></tr>
+      <tr><td>Static variables</td><td>Heap (Class object)</td><td>Yes</td></tr>
+      <tr><td>Object instances</td><td>Heap</td><td>Yes</td></tr>
+      <tr><td>Instance variables</td><td>Heap (inside object)</td><td>Yes (if object shared)</td></tr>
+      <tr><td>Local variables</td><td>Stack (thread's frame)</td><td>No</td></tr>
+      <tr><td>Method call references</td><td>Stack</td><td>No</td></tr>
+      <tr><td>Current instruction</td><td>PC Register</td><td>No</td></tr>
+      <tr><td>String literals</td><td>Heap (String Pool)</td><td>Yes</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 6 — EXECUTION ENGINE
+═══════════════════════════════════════════════ -->
+<section class="section" id="execution">
+  <div class="section-label">Section 06</div>
+  <h2>Execution Engine</h2>
+  <p>The Execution Engine is responsible for executing the bytecode that has been loaded into memory. It contains multiple components working in concert.</p>
+
+  <div class="diagram">
+    <div class="diagram-title">Execution Engine Architecture</div>
+    <svg viewBox="0 0 740 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:740px;display:block;margin:0 auto;">
+      <!-- Outer box -->
+      <rect x="10" y="10" width="720" height="180" rx="10" fill="#111827" stroke="#1f2d45" stroke-width="1.5"/>
+      <text x="370" y="32" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono" letter-spacing="2">EXECUTION ENGINE</text>
+
+      <!-- Interpreter -->
+      <rect x="25" y="44" width="150" height="130" rx="8" fill="#1a2235" stroke="#00d4ff" stroke-width="1.2"/>
+      <text x="100" y="68" fill="#00d4ff" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter">Interpreter</text>
+      <text x="100" y="90" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Line-by-line</text>
+      <text x="100" y="104" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">bytecode → machine</text>
+      <text x="100" y="118" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">code translation</text>
+      <text x="100" y="140" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">⚡ Slow (repetitive</text>
+      <text x="100" y="154" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">compilation)</text>
+
+      <!-- JIT -->
+      <rect x="190" y="44" width="200" height="130" rx="8" fill="#1a2235" stroke="#f59e0b" stroke-width="1.2"/>
+      <text x="290" y="68" fill="#f59e0b" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter">JIT Compiler</text>
+      <text x="290" y="90" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Identifies hot spots</text>
+      <text x="290" y="104" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Compiles entire</text>
+      <text x="290" y="118" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">hot methods to</text>
+      <text x="290" y="132" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">native machine code</text>
+      <text x="290" y="154" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">🚀 Caches compiled code</text>
+
+      <!-- GC -->
+      <rect x="405" y="44" width="145" height="130" rx="8" fill="#1a2235" stroke="#10b981" stroke-width="1.2"/>
+      <text x="478" y="68" fill="#10b981" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter">Garbage Collector</text>
+      <text x="478" y="90" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Reclaims heap</text>
+      <text x="478" y="104" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">memory of</text>
+      <text x="478" y="118" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">unreachable objects</text>
+
+      <!-- JNI -->
+      <rect x="565" y="44" width="150" height="130" rx="8" fill="#1a2235" stroke="#a78bfa" stroke-width="1.2"/>
+      <text x="640" y="68" fill="#a78bfa" font-size="11" font-weight="700" text-anchor="middle" font-family="Inter">JNI</text>
+      <text x="640" y="90" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Java Native</text>
+      <text x="640" y="104" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Interface — calls</text>
+      <text x="640" y="118" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">C/C++ native</text>
+      <text x="640" y="132" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">libraries (.dll, .so)</text>
+    </svg>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 7 — JIT DEEP DIVE
+═══════════════════════════════════════════════ -->
+<section class="section" id="jit">
+  <div class="section-label">Section 07</div>
+  <h2>JIT Compiler — Deep Dive</h2>
+  <p>The Just-In-Time compiler is the <strong>performance heart</strong> of the JVM. Without it, Java would be perpetually slow. Here's exactly how it works:</p>
+
+  <h3>The Problem with Pure Interpretation</h3>
+  <pre><code><span class="cm">// This loop runs 1,000,000 times</span>
+<span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">0</span>; i &lt; <span class="num">1_000_000</span>; i++) {
+    result += <span class="fn">computeSomething</span>(i);  <span class="cm">// Without JIT: bytecode retranslated EVERY iteration</span>
+}                                        <span class="cm">// With JIT: compiled once to machine code, runs native</span></code></pre>
+
+  <h3>How JIT Works — The Pipeline</h3>
+  <div class="jit-stage">
+    <div class="jit-step">
+      <div class="step-icon">🏃</div>
+      <div class="step-name">Interpret</div>
+      <div class="step-desc">JVM starts interpreting bytecode. All methods initially run interpreted.</div>
+    </div>
+    <div class="jit-step">
+      <div class="step-icon">📊</div>
+      <div class="step-name">Profile</div>
+      <div class="step-desc">JVM counts invocations. Tracks branch decisions, types, call sites.</div>
+    </div>
+    <div class="jit-step">
+      <div class="step-icon">🔥</div>
+      <div class="step-name">Detect Hot Spot</div>
+      <div class="step-desc">Method exceeds invocation threshold (~10,000). Flagged for compilation.</div>
+    </div>
+    <div class="jit-step">
+      <div class="step-icon">⚙️</div>
+      <div class="step-name">Compile (C1/C2)</div>
+      <div class="step-desc">Background compiler thread compiles method to optimized native code.</div>
+    </div>
+    <div class="jit-step">
+      <div class="step-icon">💾</div>
+      <div class="step-name">Cache</div>
+      <div class="step-desc">Compiled machine code stored in Code Cache. Future calls skip compilation.</div>
+    </div>
+    <div class="jit-step">
+      <div class="step-icon">🚀</div>
+      <div class="step-name">Execute Native</div>
+      <div class="step-desc">Method now runs as native code — near C++ performance.</div>
+    </div>
+  </div>
+
+  <h3>Tiered Compilation (Java 7+)</h3>
+  <p>Modern JVMs (HotSpot) use a <strong>five-tier</strong> compilation strategy:</p>
+
+  <div class="diagram">
+    <div class="diagram-title">Tiered Compilation — 5 Levels</div>
+    <svg viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:760px;display:block;margin:0 auto;">
+      <!-- T0 -->
+      <rect x="10" y="30" width="130" height="100" rx="6" fill="#1a2235" stroke="#64748b" stroke-width="1"/>
+      <text x="75" y="56" fill="#94a3b8" font-size="10" font-weight="700" text-anchor="middle" font-family="JetBrains Mono">TIER 0</text>
+      <text x="75" y="76" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Interpreter</text>
+      <text x="75" y="92" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Pure bytecode</text>
+      <text x="75" y="108" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">interpretation</text>
+      <text x="75" y="124" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">⏱ slowest</text>
+
+      <!-- Arrow -->
+      <line x1="140" y1="80" x2="158" y2="80" stroke="#334155" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- T1 -->
+      <rect x="158" y="30" width="120" height="100" rx="6" fill="#1a2235" stroke="#3b82f6" stroke-width="1"/>
+      <text x="218" y="56" fill="#60a5fa" font-size="10" font-weight="700" text-anchor="middle" font-family="JetBrains Mono">TIER 1</text>
+      <text x="218" y="76" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">C1 Compiled</text>
+      <text x="218" y="92" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Simple fast</text>
+      <text x="218" y="108" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">compilation</text>
+      <text x="218" y="124" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">no profiling</text>
+
+      <!-- Arrow -->
+      <line x1="278" y1="80" x2="296" y2="80" stroke="#334155" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- T2 -->
+      <rect x="296" y="30" width="120" height="100" rx="6" fill="#1a2235" stroke="#6366f1" stroke-width="1"/>
+      <text x="356" y="56" fill="#818cf8" font-size="10" font-weight="700" text-anchor="middle" font-family="JetBrains Mono">TIER 2</text>
+      <text x="356" y="76" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">C1 + limited</text>
+      <text x="356" y="92" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">profiling</text>
+      <text x="356" y="108" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">(invocation</text>
+      <text x="356" y="124" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">counts)</text>
+
+      <!-- Arrow -->
+      <line x1="416" y1="80" x2="434" y2="80" stroke="#334155" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- T3 -->
+      <rect x="434" y="30" width="120" height="100" rx="6" fill="#1a2235" stroke="#8b5cf6" stroke-width="1"/>
+      <text x="494" y="56" fill="#a78bfa" font-size="10" font-weight="700" text-anchor="middle" font-family="JetBrains Mono">TIER 3</text>
+      <text x="494" y="76" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">C1 + full</text>
+      <text x="494" y="92" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">profiling</text>
+      <text x="494" y="108" fill="#64748b" font-size="9" text-anchor="middle" font-family="JetBrains Mono">(branches,</text>
+      <text x="494" y="124" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">types, calls)</text>
+
+      <!-- Arrow -->
+      <line x1="554" y1="80" x2="572" y2="80" stroke="#334155" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- T4 -->
+      <rect x="572" y="10" width="178" height="140" rx="6" fill="#1a1020" stroke="#f59e0b" stroke-width="2"/>
+      <text x="661" y="36" fill="#f59e0b" font-size="11" font-weight="700" text-anchor="middle" font-family="JetBrains Mono">TIER 4 — C2</text>
+      <text x="661" y="58" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="JetBrains Mono">Optimizing Compiler</text>
+      <text x="661" y="76" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">Inlining, escape analysis</text>
+      <text x="661" y="92" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">loop unrolling, vectorization</text>
+      <text x="661" y="108" fill="#64748b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">dead code elim, deoptimize</text>
+      <text x="661" y="128" fill="#f59e0b" font-size="8" text-anchor="middle" font-family="JetBrains Mono">🚀 Peak performance</text>
+      <defs>
+        <marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto">
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="#334155"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+
+  <h3>JIT Optimization Techniques</h3>
+
+  <div class="card-grid">
+    <div class="card card-accent-yellow">
+      <h4>🔗 Method Inlining</h4>
+      <p>Small frequently-called methods are copied directly into the caller — eliminating method call overhead entirely. Most impactful JIT optimization.</p>
+      <pre><code><span class="cm">// Before inlining:</span>
+result = <span class="fn">add</span>(a, b);
+
+<span class="cm">// After inlining (JIT):</span>
+result = a + b; <span class="cm">// no call overhead!</span></code></pre>
+    </div>
+    <div class="card card-accent-blue">
+      <h4>🏃 Escape Analysis</h4>
+      <p>JIT detects if an object "escapes" the method scope. If not, it can allocate the object on the <strong>stack</strong> instead of the heap — zero GC pressure.</p>
+      <pre><code><span class="kw">void</span> <span class="fn">doWork</span>() {
+    <span class="cls">Point</span> p = <span class="kw">new</span> <span class="cls">Point</span>(<span class="num">1</span>, <span class="num">2</span>); <span class="cm">// Doesn't escape!</span>
+    use(p.x + p.y);
+    <span class="cm">// JIT may allocate p on stack</span>
+}</code></pre>
+    </div>
+    <div class="card card-accent-green">
+      <h4>🔄 Loop Unrolling</h4>
+      <p>The JIT expands loop iterations to reduce branch check overhead and enable CPU pipeline optimization.</p>
+      <pre><code><span class="cm">// Before:</span>
+<span class="kw">for</span>(<span class="kw">int</span> i=<span class="num">0</span>; i&lt;<span class="num">4</span>; i++) a[i]++;
+
+<span class="cm">// After unrolling:</span>
+a[<span class="num">0</span>]++; a[<span class="num">1</span>]++; a[<span class="num">2</span>]++; a[<span class="num">3</span>]++;</code></pre>
+    </div>
+    <div class="card card-accent-purple">
+      <h4>🎯 Monomorphic Dispatch</h4>
+      <p>If JIT sees a virtual method always called on the same type, it replaces the virtual dispatch with a direct call (or even inline it).</p>
+    </div>
+    <div class="card card-accent-yellow">
+      <h4>💀 Dead Code Elimination</h4>
+      <p>Code that provably never executes (based on profiling data) is removed, shrinking the hot path.</p>
+    </div>
+    <div class="card card-accent-blue">
+      <h4>↩️ Deoptimization</h4>
+      <p>If JIT made an assumption that turns out to be wrong (e.g., new subclass loaded), it <em>deoptimizes</em> — falls back to interpreter. Safe and transparent.</p>
+    </div>
+  </div>
+
+  <h3>Code Cache</h3>
+  <p>Compiled native code is stored in the <strong>Code Cache</strong> — a fixed-size memory region. If it fills up, JIT stops compiling and performance degrades silently.</p>
+  <pre><code><span class="cm"># Check code cache size</span>
+java -XX:+PrintCodeCache -version
+
+<span class="cm"># Increase code cache (default ~240MB in Java 8+)</span>
+java -XX:ReservedCodeCacheSize=512m MyApp
+
+<span class="cm"># Disable JIT (run pure interpreter — for debugging only)</span>
+java -Xint MyApp
+
+<span class="cm"># Force compilation threshold</span>
+java -XX:CompileThreshold=1000 MyApp  <span class="cm"># compile after 1000 invocations</span></code></pre>
+
+  <h3>JIT vs AOT (Ahead-Of-Time Compilation)</h3>
+  <table>
+    <thead>
+      <tr><th>Aspect</th><th>JIT</th><th>AOT (GraalVM Native Image)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>When compiled</td><td>At runtime, on demand</td><td>Before execution, at build time</td></tr>
+      <tr><td>Startup time</td><td>Slower (warm-up needed)</td><td>Instant (already native)</td></tr>
+      <tr><td>Peak performance</td><td>Higher (profile-guided)</td><td>Lower (static guesses)</td></tr>
+      <tr><td>Memory footprint</td><td>Larger (JVM overhead)</td><td>Much smaller</td></tr>
+      <tr><td>Dynamic features</td><td>Full reflection, dynamic loading</td><td>Limited (needs config)</td></tr>
+      <tr><td>Best for</td><td>Long-running servers (Spring Boot)</td><td>CLI tools, serverless, microservices</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 8 — GARBAGE COLLECTOR
+═══════════════════════════════════════════════ -->
+<section class="section" id="gc">
+  <div class="section-label">Section 08</div>
+  <h2>Garbage Collector</h2>
+  <p>The GC automatically manages heap memory by reclaiming space from objects that are no longer reachable — no manual <code>free()</code> needed.</p>
+
+  <h3>GC Roots — How Reachability Works</h3>
+  <p>An object is <strong>live</strong> if it is reachable from a GC Root. GC Roots are:</p>
+  <ul class="styled">
+    <li>Local variables and parameters in active stack frames</li>
+    <li>Static variables (Class objects in heap)</li>
+    <li>JNI references from native code</li>
+    <li>Active thread objects</li>
+  </ul>
+  <p>Anything not reachable from a root → eligible for garbage collection.</p>
+
+  <h3>GC Algorithms in HotSpot JVM</h3>
+  <table>
+    <thead>
+      <tr><th>Collector</th><th>Java Version</th><th>Strategy</th><th>Best For</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>Serial GC</code></td><td>All</td><td>Single-threaded, stop-the-world</td><td>Single-core, small heaps</td></tr>
+      <tr><td><code>Parallel GC</code></td><td>All (default pre-9)</td><td>Multi-threaded, stop-the-world</td><td>Throughput-focused batch apps</td></tr>
+      <tr><td><code>G1 GC</code></td><td>Java 9+ default</td><td>Region-based, concurrent marking</td><td>Balanced latency + throughput</td></tr>
+      <tr><td><code>ZGC</code></td><td>Java 11+</td><td>Concurrent, scalable, &lt;1ms pauses</td><td>Low-latency, large heaps (&gt;100GB)</td></tr>
+      <tr><td><code>Shenandoah</code></td><td>Java 12+</td><td>Concurrent evacuation</td><td>Low pause time, any heap size</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout-green callout">
+    <strong>Tip for interviews:</strong> G1 GC is the default since Java 9. ZGC is the choice for latency-sensitive applications (trading systems, real-time APIs). Always mention that GC pause = Stop-The-World (STW) pause.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 9 — JNI
+═══════════════════════════════════════════════ -->
+<section class="section" id="jni">
+  <div class="section-label">Section 09</div>
+  <h2>JNI — Java Native Interface</h2>
+  <p>JNI is the bridge between Java bytecode and native code written in C/C++. It allows Java to call OS-specific features and use native libraries.</p>
+
+  <div class="card-grid">
+    <div class="card card-accent-purple">
+      <h4>Why JNI?</h4>
+      <p>Access hardware directly, use legacy C libraries, call OS APIs not exposed in Java, maximize performance-critical code with native routines.</p>
+    </div>
+    <div class="card card-accent-blue">
+      <h4>How it works</h4>
+      <p>Java method declared <code>native</code> → compiled normally → at runtime, JNI looks up the matching C function in a loaded <code>.dll</code> / <code>.so</code> and calls it.</p>
+    </div>
+  </div>
+
+  <pre><code><span class="cm">// Java side</span>
+<span class="kw">public class</span> <span class="cls">NativeExample</span> {
+    <span class="kw">static</span> { System.<span class="fn">loadLibrary</span>(<span class="str">"mylib"</span>); }  <span class="cm">// Load mylib.dll / libmylib.so</span>
+    <span class="kw">public native int</span> <span class="fn">add</span>(<span class="kw">int</span> a, <span class="kw">int</span> b);         <span class="cm">// Declared, implemented in C</span>
+}
+
+<span class="cm">// C side (mylib.c)</span>
+JNIEXPORT jint JNICALL Java_NativeExample_add(JNIEnv *env, jobject obj, jint a, jint b) {
+    return a + b;  // C implementation
+}</code></pre>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════════
+     SECTION 10 — INTERVIEW Q&A
+═══════════════════════════════════════════════ -->
+<section class="section" id="interview">
+  <div class="section-label">Section 10</div>
+  <h2>Top 20 Interview Questions</h2>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q01</span>
+      <span class="qa-text">What is the JVM and why is Java called "platform-independent"?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>JVM (Java Virtual Machine) is an abstract computing machine that provides a runtime environment for executing Java bytecode. Java is platform-independent at the <em>source/bytecode</em> level — the same <code>.class</code> file runs on any OS that has a JVM installed. However, the JVM itself is platform-dependent (you install a different JVM for Windows vs Linux). So the phrase is "Write Once, Run Anywhere" because the bytecode is universal, and the JVM translates it to platform-specific machine code at runtime.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q02</span>
+      <span class="qa-text">Explain the three main components of the JVM.</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>1. Class Loader Subsystem</strong> — Loads <code>.class</code> files into memory. Performs Loading → Linking (Verification, Preparation, Resolution) → Initialization.</p>
+      <p><strong>2. Runtime Memory Areas</strong> — Organizes JVM memory: Method Area (Metaspace), Heap, Java Stack, PC Register, Native Method Stack.</p>
+      <p><strong>3. Execution Engine</strong> — Executes bytecode via Interpreter (line-by-line) and JIT Compiler (hot-path native compilation). Also includes Garbage Collector and JNI.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q03</span>
+      <span class="qa-text">What is the Parent Delegation Model in class loading?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>When a class loader is asked to load a class, it first delegates the request to its <strong>parent class loader</strong>. Only if the parent fails (class not found) does the child try to load it itself. The hierarchy is: Application CL → Platform CL → Bootstrap CL → (null — can't go higher).</p>
+      <p>This prevents user code from replacing core Java classes like <code>java.lang.String</code> with malicious versions — Bootstrap always loads them first and the request never reaches the Application CL.</p>
+      <pre><code><span class="cm">// Bootstrap is "parent" of all, has no Java parent → returns null</span>
+System.out.<span class="fn">println</span>(String.class.<span class="fn">getClassLoader</span>()); <span class="cm">// null</span>
+System.out.<span class="fn">println</span>(MyClass.class.<span class="fn">getClassLoader</span>()); <span class="cm">// jdk.internal.loader.ClassLoaders$AppClassLoader</span></code></pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q04</span>
+      <span class="qa-text">What is the difference between JVM, JRE, and JDK?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>JVM</strong> — The specification and engine that executes bytecode. Abstract; the same spec is implemented differently on each platform.</p>
+      <p><strong>JRE (Java Runtime Environment)</strong> — JVM implementation + standard class libraries. Required to <em>run</em> Java programs. End-users install this.</p>
+      <p><strong>JDK (Java Development Kit)</strong> — JRE + compiler (javac) + debugger + javadoc + other tools. Developers install this. JDK ⊃ JRE ⊃ JVM.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q05</span>
+      <span class="qa-text">Where are static variables stored in Java 8 vs earlier versions?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>Before Java 8 (PermGen era):</strong> Static variables were stored in the <em>PermGen</em> (Permanent Generation), which was a fixed-size region inside the JVM heap.</p>
+      <p><strong>Java 8+ (Metaspace era):</strong> Static variables are stored in the <strong>Heap</strong> — specifically inside the <code>Class&lt;T&gt;</code> object that represents the class. Since this <code>Class</code> object lives on the heap, static variables live on the heap too.</p>
+      <p>Method bytecode and class metadata still go into Metaspace (native memory). This change eliminated most <code>OutOfMemoryError: PermGen space</code> issues.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q06</span>
+      <span class="qa-text">What is PermGen and why was it replaced by Metaspace?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>PermGen (Permanent Generation)</strong> was a fixed-size region of the JVM heap used to store class metadata, method bytecode, interned strings, and static variables. Its critical flaw: the size was fixed at JVM startup (<code>-XX:MaxPermSize</code>) and could not dynamically shrink or grow. Applications deploying many classes (e.g., app servers with hot-deploy) would frequently hit <code>OutOfMemoryError: PermGen space</code>.</p>
+      <p><strong>Metaspace (Java 8+)</strong> allocates class metadata in <strong>native OS memory</strong> (outside the JVM heap). It auto-grows by default and is bounded only by available system memory. You can cap it with <code>-XX:MaxMetaspaceSize</code>. This massively reduces OOM errors related to class loading.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q07</span>
+      <span class="qa-text">Explain the difference between Heap and Stack memory.</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <table>
+        <thead><tr><th>Heap</th><th>Stack</th></tr></thead>
+        <tbody>
+          <tr><td>Shared across all threads</td><td>Private to each thread</td></tr>
+          <tr><td>Objects and instance variables</td><td>Method frames, local vars, references</td></tr>
+          <tr><td>Dynamic size, GC-managed</td><td>Fixed size, LIFO, auto-managed</td></tr>
+          <tr><td>Slower allocation</td><td>Faster allocation (pointer bump)</td></tr>
+          <tr><td>OutOfMemoryError when full</td><td>StackOverflowError when full</td></tr>
+          <tr><td>Lifetimes managed by GC</td><td>Frame popped when method returns</td></tr>
+        </tbody>
+      </table>
+      <pre><code><span class="kw">void</span> <span class="fn">foo</span>() {
+    <span class="kw">int</span> x = <span class="num">5</span>;                    <span class="cm">// x lives on stack</span>
+    <span class="cls">String</span> s = <span class="kw">new</span> <span class="cls">String</span>(<span class="str">"hi"</span>); <span class="cm">// s (reference) on stack, "hi" object on heap</span>
+}                                 <span class="cm">// x, s reference popped; "hi" may be GC'd</span></code></pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q08</span>
+      <span class="qa-text">What is the difference between Interpreter and JIT Compiler?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>Interpreter</strong> translates and executes bytecode <em>one instruction at a time</em>. It starts immediately with no warm-up, but is slow for repeated code because the same bytecode gets re-translated on every execution.</p>
+      <p><strong>JIT Compiler</strong> monitors which methods are called frequently (hot spots), compiles them entirely to native machine code, and stores the result in the Code Cache. Future calls execute the native code directly — no translation overhead. JIT has a warm-up period but delivers near-native speed at peak.</p>
+      <p>Modern JVMs use both: interpret first, JIT-compile hot methods in the background (tiered compilation). This gives fast startup AND fast peak throughput.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q09</span>
+      <span class="qa-text">What is a Stack Frame? What does it contain?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>A <strong>stack frame</strong> is a data structure pushed onto a thread's stack for each method invocation. It contains:</p>
+      <ul class="styled">
+        <li><strong>Local Variable Array</strong> — <code>this</code>, method parameters, local variables (primitives stored directly; objects stored as references)</li>
+        <li><strong>Operand Stack</strong> — working memory for the bytecode engine (like a calculator's scratch pad)</li>
+        <li><strong>Frame Data / Constant Pool Reference</strong> — link to the class's runtime constant pool for symbolic resolution</li>
+        <li><strong>Return Address</strong> — where to resume execution in the calling method after this method returns</li>
+      </ul>
+      <p>When a method returns, its frame is popped from the stack and all its local data is gone.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q10</span>
+      <span class="qa-text">What is the PC Register? Why does each thread have its own?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>The <strong>Program Counter (PC) Register</strong> holds the address (pointer) to the currently executing bytecode instruction for a thread. It always knows: "which instruction am I executing right now?" and "which instruction comes next?"</p>
+      <p>Each thread <strong>must</strong> have its own PC register because threads execute independently and concurrently. Thread 1 may be at instruction 42 of <code>methodA()</code> while Thread 2 is at instruction 7 of <code>methodB()</code>. If they shared a PC, they'd corrupt each other's execution state.</p>
+      <p>Special case: For native methods, the PC register is <em>undefined</em> (the native code manages its own instruction pointer at the OS level).</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q11</span>
+      <span class="qa-text">What is bytecode verification and why is it important?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>Bytecode verification is the process during the <em>Linking → Verification</em> phase where the JVM's <strong>Bytecode Verifier</strong> checks that the loaded <code>.class</code> file is structurally valid and safe before executing it.</p>
+      <p>It checks that:</p>
+      <ul class="styled">
+        <li>The bytecode was produced by a valid Java compiler and follows the JVM specification</li>
+        <li>No stack underflow/overflow occurs</li>
+        <li>Type safety is not violated (no int passed where object expected)</li>
+        <li>No illegal memory access attempts exist</li>
+      </ul>
+      <p>This is the JVM's primary defense against malicious or corrupted bytecode. Without it, a crafted <code>.class</code> file could crash the JVM or access arbitrary memory. On failure, a <code>VerifyError</code> is thrown and the class is rejected.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q12</span>
+      <span class="qa-text">What is the difference between Minor GC and Major GC?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>Minor GC</strong> collects the <em>Young Generation</em> (Eden + Survivor spaces). It is triggered when Eden fills up. Minor GC is fast because most objects die young (weak generational hypothesis). It causes a stop-the-world pause but usually a short one (milliseconds).</p>
+      <p><strong>Major GC (Full GC)</strong> collects the <em>Old Generation</em>. Triggered when Old Gen fills up or is fragmented. Much slower because old gen is larger and objects there are long-lived (more to scan/compact). Full GC pauses the entire application and can take seconds in poorly tuned apps.</p>
+      <p>The goal of GC tuning is to keep objects in Young Gen as long as possible (die young) and minimize Full GC frequency.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q13</span>
+      <span class="qa-text">How does JIT method inlining work and why is it important?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>Method inlining</strong> is the most impactful JIT optimization. When a small method is called frequently, JIT replaces the method call with the actual body of the method at the call site — eliminating the overhead of:</p>
+      <ul class="styled">
+        <li>Stack frame creation and destruction</li>
+        <li>Jump instruction to method code</li>
+        <li>Argument passing</li>
+        <li>Return value handling</li>
+      </ul>
+      <p>After inlining, the JIT can apply further optimizations across the merged code (e.g., constant folding, dead code elimination) that would be impossible across method boundaries. Getters/setters are classic inlining candidates. Methods larger than ~35 bytecodes are typically not inlined.</p>
+      <pre><code><span class="cm">// Getter inlining example</span>
+<span class="kw">int</span> val = obj.<span class="fn">getValue</span>(); <span class="cm">// interpreted</span>
+
+<span class="cm">// After JIT inlining (no method call at all):</span>
+<span class="kw">int</span> val = obj.internalField; <span class="cm">// direct field access</span></code></pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q14</span>
+      <span class="qa-text">What is Escape Analysis in JIT? How does it help?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>Escape Analysis</strong> is a JIT optimization where the compiler determines whether an object can "escape" the scope in which it was created — i.e., whether a reference to it can be accessed from outside that method or thread.</p>
+      <p>If an object <strong>does NOT escape</strong> (it's used only locally within the method), JIT can:</p>
+      <ul class="styled">
+        <li><strong>Stack allocate</strong> it instead of heap-allocating — zero GC pressure, auto-freed when method returns</li>
+        <li><strong>Scalar replace</strong> it — break the object into individual fields stored directly in registers/stack</li>
+        <li><strong>Eliminate synchronization</strong> — if the object never escapes to another thread, locks on it are useless and can be removed</li>
+      </ul>
+      <pre><code><span class="kw">void</span> <span class="fn">process</span>() {
+    <span class="cls">StringBuilder</span> sb = <span class="kw">new</span> <span class="cls">StringBuilder</span>();
+    sb.<span class="fn">append</span>(<span class="str">"hello"</span>);
+    <span class="cls">String</span> result = sb.<span class="fn">toString</span>();
+    <span class="fn">use</span>(result);
+    <span class="cm">// sb does NOT escape → JIT may stack-allocate or scalar-replace it</span>
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q15</span>
+      <span class="qa-text">What is the difference between Bootstrap, Platform, and Application class loaders?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>Bootstrap ClassLoader</strong>: The top of the hierarchy. Written in native code (C/C++), not Java. Loads core JDK classes from <code>java.base</code> module (Java 9+) or <code>rt.jar</code> (Java 8-). Has the highest priority. Returns <code>null</code> when queried for its parent (<code>String.class.getClassLoader() == null</code>).</p>
+      <p><strong>Platform ClassLoader (formerly Extension CL)</strong>: Loads platform-specific modules like <code>java.sql</code>, <code>java.desktop</code>, <code>java.xml</code>. Before Java 9, this was called Extension ClassLoader and loaded <code>$JAVA_HOME/lib/ext</code> JARs.</p>
+      <p><strong>Application ClassLoader</strong>: Loads your application's code from the classpath or module path. This is the default ClassLoader for all user classes. When you call <code>Thread.currentThread().getContextClassLoader()</code>, this is typically what you get.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q16</span>
+      <span class="qa-text">What happens when you do <code>new Object()</code> in Java at the JVM level?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>When <code>new Object()</code> is executed:</p>
+      <ol class="styled">
+        <li>JVM checks if <code>Object</code> class is already loaded. If not, it triggers class loading.</li>
+        <li>JVM allocates memory for the object in the <strong>Eden space</strong> of the Young Generation heap. For multi-threaded allocation, each thread uses its own TLAB (Thread-Local Allocation Buffer) for lock-free fast allocation.</li>
+        <li>The allocated memory is <strong>zero-initialized</strong> (all instance variable fields set to default values: 0, null, false).</li>
+        <li>JVM sets the object's <strong>header</strong> — contains mark word (GC info, hash code, lock state) and klass pointer (points to <code>Class&lt;Object&gt;</code> in Metaspace).</li>
+        <li>The <strong>constructor</strong> (<code>Object()</code>) runs — initializing fields to their actual values.</li>
+        <li>A <strong>reference</strong> to the object is placed on the operand stack (returned to the caller).</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q17</span>
+      <span class="qa-text">What is the String Pool (String Intern Pool) and where does it live?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>The <strong>String Pool</strong> (also called String Intern Pool or String Literal Pool) is a special cache that stores unique string literals. When you write <code>"hello"</code> as a literal, the JVM checks the pool first. If "hello" already exists, it reuses the same object reference instead of creating a new one.</p>
+      <p><strong>Location:</strong></p>
+      <ul class="styled">
+        <li><strong>Java 7 and earlier</strong>: Lived inside PermGen (heap). Could cause OOM if too many unique strings were interned.</li>
+        <li><strong>Java 7+ (and 8+)</strong>: Moved to the main <strong>Heap</strong>. Can now be GC'd if no references remain.</li>
+      </ul>
+      <pre><code><span class="cls">String</span> a = <span class="str">"hello"</span>;          <span class="cm">// pool lookup → stored in pool</span>
+<span class="cls">String</span> b = <span class="str">"hello"</span>;          <span class="cm">// pool hit → same reference as a</span>
+<span class="cls">String</span> c = <span class="kw">new</span> <span class="cls">String</span>(<span class="str">"hello"</span>); <span class="cm">// always new heap object</span>
+System.out.<span class="fn">println</span>(a == b);    <span class="cm">// true (same pool reference)</span>
+System.out.<span class="fn">println</span>(a == c);    <span class="cm">// false (c is a new object)</span>
+System.out.<span class="fn">println</span>(a == c.<span class="fn">intern</span>()); <span class="cm">// true (intern returns pool ref)</span></code></pre>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q18</span>
+      <span class="qa-text">What is JNI? When would you use it in production?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>JNI (Java Native Interface)</strong> is a programming framework that allows Java code to call and be called by native applications and libraries written in C, C++, or assembly. The Execution Engine uses JNI to bridge Java and native code.</p>
+      <p><strong>Production use cases:</strong></p>
+      <ul class="styled">
+        <li>Hardware I/O — accessing serial ports, USB devices, GPU computing (CUDA)</li>
+        <li>Legacy systems — wrapping decades-old COBOL/C financial libraries</li>
+        <li>OS-specific APIs — Windows Registry access, POSIX file locking</li>
+        <li>Performance-critical routines — BLAS libraries for matrix math (used in ML frameworks)</li>
+        <li>Security — calling hardware security modules (HSMs) for cryptographic operations</li>
+      </ul>
+      <p><strong>Risks:</strong> JNI bypasses Java's memory safety. A crash in native code brings down the entire JVM. Use with extreme care and thorough testing.</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q19</span>
+      <span class="qa-text">Explain tiered compilation in HotSpot JVM.</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p>HotSpot uses 5 compilation levels (Tier 0–4):</p>
+      <ul class="styled">
+        <li><strong>Tier 0 — Interpreter:</strong> Pure interpretation. All methods start here.</li>
+        <li><strong>Tier 1 — C1 (no profiling):</strong> Fast compilation, no optimization data collected. For trivial/rarely-called methods.</li>
+        <li><strong>Tier 2 — C1 (limited profiling):</strong> Invocation and backedge counters only.</li>
+        <li><strong>Tier 3 — C1 (full profiling):</strong> Collects branch probabilities, type profiles, call site information. Feeds data to C2.</li>
+        <li><strong>Tier 4 — C2 (optimizing compiler):</strong> Uses all profiling data for aggressive optimizations: inlining, escape analysis, loop unrolling, vectorization. This is peak performance.</li>
+      </ul>
+      <p>The JVM dynamically moves methods between tiers based on how hot they are and how busy the compiler threads are. Tiered compilation is on by default since Java 7 and gives both fast startup (C1 quickly) and high peak throughput (C2 eventually).</p>
+    </div>
+  </div>
+
+  <div class="qa-item">
+    <div class="qa-q" onclick="toggle(this)">
+      <span class="qa-num">Q20</span>
+      <span class="qa-text">What is deoptimization in JIT and when does it happen?</span>
+      <span class="qa-toggle">+</span>
+    </div>
+    <div class="qa-a">
+      <p><strong>Deoptimization</strong> is the process where the JIT compiler throws away a previously compiled (optimized) version of a method and reverts to interpreting it. This happens when an assumption JIT made during compilation turns out to be wrong at runtime.</p>
+      <p><strong>Common triggers:</strong></p>
+      <ul class="styled">
+        <li><strong>New class loaded:</strong> JIT assumed a virtual call always went to class A (monomorphic). A new class B is loaded that overrides the method → deoptimize, recompile with new type profile.</li>
+        <li><strong>Uncommon trap:</strong> JIT excluded a rare branch as dead code. At runtime that branch is actually taken → deoptimize.</li>
+        <li><strong>Object escaped:</strong> JIT stack-allocated an object that later escapes to another thread → deoptimize to heap-allocate it.</li>
+        <li><strong>Class redefinition:</strong> Hot-redeployment or JVMTI agents redefine a class.</li>
+      </ul>
+      <p>Deoptimization is completely transparent to the developer. The JVM collects new profiling data and recompiles with updated information. It's safe but causes a temporary performance dip.</p>
+    </div>
+  </div>
+
+</section>
+
+</div><!-- end container -->
+
+<button class="scroll-top" id="scrollBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+  function toggle(el) {
+    const ans = el.nextElementSibling;
+    const sym = el.querySelector('.qa-toggle');
+    if (ans.classList.contains('open')) {
+      ans.classList.remove('open');
+      sym.textContent = '+';
+    } else {
+      ans.classList.add('open');
+      sym.textContent = '−';
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    document.getElementById('scrollBtn').classList.toggle('visible', window.scrollY > 400);
+  });
+</script>
+</body>
+</html>

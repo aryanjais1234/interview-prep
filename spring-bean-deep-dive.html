@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spring Bean — Complete Field Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b2542;
+    --bg-deep:#071a30;
+    --panel:#0f3055;
+    --panel-2:#0d2b4a;
+    --grid:rgba(140,199,232,.07);
+    --line:#25507a;
+    --ink:#eaf3fb;
+    --ink-dim:#a9c3da;
+    --ink-faint:#6f92b3;
+    --cyan:#7bc8ef;
+    --cyan-soft:#4f95bd;
+    --amber:#f0a862;
+    --green:#8fd6ac;
+    --code-bg:#061627;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:28px 28px;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.65;
+  }
+  a{color:var(--cyan);}
+  code, pre, .mono{font-family:'IBM Plex Mono', monospace;}
+
+  .shell{display:flex; min-height:100vh;}
+
+  .sidebar{
+    width:280px; flex-shrink:0;
+    background:var(--bg-deep);
+    border-right:1px solid var(--line);
+    padding:22px 0 40px;
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--line); border-radius:4px;}
+  .brand{padding:0 22px 18px; border-bottom:1px solid var(--line); margin-bottom:14px;}
+  .brand .tag{font-family:'IBM Plex Mono', monospace; font-size:10.5px; letter-spacing:.14em; color:var(--amber); text-transform:uppercase;}
+  .brand h1{font-size:16px; margin:6px 0 4px; line-height:1.3; color:var(--ink); font-weight:600;}
+  .brand .sub{font-size:11.5px; color:var(--ink-faint);}
+  .toc-group-label{font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.12em; color:var(--ink-faint); text-transform:uppercase; padding:14px 22px 6px;}
+  .toc a{display:block; padding:6px 22px 6px 26px; font-size:12.5px; color:var(--ink-dim); text-decoration:none; border-left:2px solid transparent;}
+  .toc a .num{font-family:'IBM Plex Mono', monospace; color:var(--cyan-soft); margin-right:8px; font-size:11px;}
+  .toc a:hover{color:var(--ink); border-left-color:var(--cyan-soft); background:rgba(123,200,239,.05);}
+
+  .main{flex:1; min-width:0;}
+  .titleblock{margin:36px 36px 10px; border:1px solid var(--line); background:var(--panel-2); position:relative;}
+  .titleblock .cr1, .titleblock .cr2, .titleblock .cr3, .titleblock .cr4{content:''; position:absolute; width:14px; height:14px; border-color:var(--cyan-soft); border-style:solid;}
+  .titleblock .cr3{top:-1px; left:-1px; border-width:2px 0 0 2px;}
+  .titleblock .cr4{top:-1px; right:-1px; border-width:2px 2px 0 0;}
+  .titleblock .cr1{bottom:-1px; left:-1px; border-width:0 0 2px 2px;}
+  .titleblock .cr2{bottom:-1px; right:-1px; border-width:0 2px 2px 0;}
+  .titleblock-inner{padding:26px 30px 22px;}
+  .titleblock .eyebrow{font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.16em; color:var(--amber); text-transform:uppercase;}
+  .titleblock h1{font-size:30px; margin:8px 0 10px; font-weight:700; letter-spacing:-.01em;}
+  .titleblock .desc{color:var(--ink-dim); font-size:14px; max-width:660px;}
+  .meta-row{display:flex; flex-wrap:wrap; gap:0; border-top:1px solid var(--line); margin-top:20px;}
+  .meta-cell{padding:10px 20px; border-right:1px solid var(--line); font-family:'IBM Plex Mono', monospace;}
+  .meta-cell:last-child{border-right:none;}
+  .meta-cell .k{font-size:9.5px; color:var(--ink-faint); letter-spacing:.1em; text-transform:uppercase;}
+  .meta-cell .v{font-size:12.5px; color:var(--cyan); margin-top:2px;}
+
+  .content{padding:14px 36px 60px;}
+  .part-divider{display:flex; align-items:center; gap:14px; margin:44px 0 20px;}
+  .part-divider .plabel{font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:.16em; color:var(--amber); text-transform:uppercase; white-space:nowrap;}
+  .part-divider .pline{height:1px; flex:1; background:var(--line);}
+
+  .module{position:relative; border:1px solid var(--line); background:var(--panel); margin-bottom:22px; scroll-margin-top:20px;}
+  .module::before, .module::after{content:''; position:absolute; width:10px; height:10px; border-color:var(--cyan-soft); border-style:solid;}
+  .module::before{top:-1px; left:-1px; border-width:2px 0 0 2px;}
+  .module::after{bottom:-1px; right:-1px; border-width:0 2px 2px 0;}
+
+  .module-head{display:flex; align-items:baseline; gap:12px; padding:18px 24px 14px; border-bottom:1px dashed var(--line);}
+  .module-tag{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--bg-deep); background:var(--cyan); padding:3px 8px; letter-spacing:.06em; font-weight:600;}
+  .module-head h2{font-size:18px; margin:0; font-weight:600; color:var(--ink);}
+
+  .prompt{margin:16px 24px 0; padding:10px 14px; border-left:3px solid var(--amber); background:rgba(240,168,98,.06); font-size:13px; color:var(--ink-dim); font-style:italic;}
+  .prompt b{color:var(--amber); font-style:normal;}
+
+  .body-grid{display:grid; grid-template-columns:1.05fr 1fr; gap:20px; padding:16px 24px 20px; align-items:start;}
+  @media (max-width:920px){ .body-grid{grid-template-columns:1fr;} }
+  .body-grid.stack{grid-template-columns:1fr;}
+
+  .explain p{margin:0 0 10px; font-size:13.6px; color:var(--ink-dim);}
+  .explain ul{margin:8px 0 10px; padding-left:18px;}
+  .explain li{font-size:13.4px; color:var(--ink-dim); margin-bottom:5px;}
+  .explain strong{color:var(--ink);}
+  .explain code{background:var(--code-bg); padding:1px 5px; border-radius:2px; color:var(--cyan); font-size:12px;}
+
+  .code-panel{background:var(--code-bg); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;}
+  .code-panel .code-label{font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); padding:7px 12px; border-bottom:1px solid var(--line); background:rgba(255,255,255,.02);}
+  .code-panel pre{margin:0; padding:14px 16px; font-size:12.3px; line-height:1.6; color:#dbe9f5; overflow-x:auto;}
+  .c-kw{color:#7bc8ef;} .c-str{color:#8fd6ac;} .c-com{color:#5f83a3; font-style:italic;} .c-an{color:#f0a862;} .c-ty{color:#d8b4f8;}
+
+  .field-note{margin:0 24px 20px; padding:11px 14px; background:rgba(143,214,172,.06); border-left:3px solid var(--green); font-size:12.8px; color:#cfe9d9;}
+  .field-note b{color:var(--green);}
+
+  .compare-table{width:100%; border-collapse:collapse; margin:0 24px 20px; width:calc(100% - 48px);}
+  .compare-table th, .compare-table td{border:1px solid var(--line); padding:9px 12px; font-size:12.6px; text-align:left; color:var(--ink-dim);}
+  .compare-table th{background:var(--panel-2); color:var(--amber); font-family:'IBM Plex Mono', monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase;}
+  .compare-table td:first-child{color:var(--ink); font-weight:500; white-space:nowrap;}
+
+  .qa-item{border:1px solid var(--line); background:var(--panel-2); margin-bottom:10px; border-radius:var(--radius);}
+  .qa-item summary{list-style:none; cursor:pointer; padding:13px 18px; display:flex; gap:12px; align-items:baseline; font-size:13.6px; font-weight:500; color:var(--ink);}
+  .qa-item summary::-webkit-details-marker{display:none;}
+  .qa-item summary .qnum{font-family:'IBM Plex Mono', monospace; color:var(--cyan); font-size:12px; flex-shrink:0;}
+  .qa-item summary::after{content:'+'; margin-left:auto; font-family:'IBM Plex Mono', monospace; color:var(--ink-faint); font-size:16px;}
+  .qa-item[open] summary::after{content:'–';}
+  .qa-item .qa-answer{padding:0 18px 16px 44px; font-size:13.2px; color:var(--ink-dim);}
+  .qa-answer p{margin:0 0 8px;}
+  .qa-answer code{background:var(--code-bg); padding:1px 5px; border-radius:2px; color:var(--cyan); font-size:12px;}
+
+  .footer-note{margin:40px 0 0; padding:16px 20px; border:1px dashed var(--line); font-size:12px; color:var(--ink-faint); text-align:center;}
+
+  @media (max-width:760px){
+    .sidebar{display:none;}
+    .titleblock, .content{margin-left:16px; margin-right:16px; padding-left:14px; padding-right:14px;}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <nav class="sidebar">
+    <div class="brand">
+      <a class="nav-back" href="index.html">← Back to Hub</a>
+      <div class="tag">Field Notes · Rev 1.0</div>
+      <h1>Spring Bean — The Complete Picture</h1>
+      <div class="sub">IoC, DI, creation methods, lifecycle &amp; scopes</div>
+    </div>
+    <div class="toc">
+      <div class="toc-group-label">Part A — Foundations</div>
+      <a href="#a1"><span class="num">01</span>What Is a Bean?</a>
+      <a href="#a2"><span class="num">02</span>Ways to Create a Bean</a>
+      <a href="#a3"><span class="num">03</span>@Component vs @Bean</a>
+      <a href="#a4"><span class="num">04</span>Why Use @Configuration + @Bean?</a>
+
+      <div class="toc-group-label">Part B — Wiring &amp; Behavior</div>
+      <a href="#b1"><span class="num">05</span>Dependency Injection Styles</a>
+      <a href="#b2"><span class="num">06</span>Bean Scopes</a>
+      <a href="#b3"><span class="num">07</span>Bean Lifecycle</a>
+      <a href="#b4"><span class="num">08</span>Resolving Multiple Candidates</a>
+      <a href="#b5"><span class="num">09</span>Full vs Lite @Configuration</a>
+
+      <div class="toc-group-label">Part C — Advanced</div>
+      <a href="#c1"><span class="num">10</span>FactoryBean vs @Bean Method</a>
+      <a href="#c2"><span class="num">11</span>Conditional Beans</a>
+      <a href="#c3"><span class="num">12</span>Circular Dependency</a>
+      <a href="#c4"><span class="num">13</span>@Lazy &amp; @DependsOn</a>
+      <a href="#c5"><span class="num">14</span>Definition vs Instance</a>
+
+      <div class="toc-group-label">Reference</div>
+      <a href="#qa"><span class="num">Q</span>Interview Q&amp;A Bank</a>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div class="titleblock">
+      <span class="cr1"></span><span class="cr2"></span><span class="cr3"></span><span class="cr4"></span>
+      <div class="titleblock-inner">
+        <div class="eyebrow">Spring Core · Inversion of Control</div>
+        <h1>Spring Bean — Complete Field Notes</h1>
+        <p class="desc">Everything about the Spring bean: what it actually is, every way to register one,
+        why <code style="background:var(--code-bg); padding:1px 5px; color:var(--cyan);">@Component</code> and
+        <code style="background:var(--code-bg); padding:1px 5px; color:var(--cyan);">@Bean</code> aren't
+        interchangeable, when you're forced into manual <code style="background:var(--code-bg); padding:1px 5px; color:var(--cyan);">@Configuration</code>
+        classes, scopes, the full lifecycle, and the edge cases interviewers actually probe.</p>
+        <div class="meta-row">
+          <div class="meta-cell"><div class="k">Track</div><div class="v">Java / Spring Core</div></div>
+          <div class="meta-cell"><div class="k">Level</div><div class="v">3–5 YOE</div></div>
+          <div class="meta-cell"><div class="k">Modules</div><div class="v">14</div></div>
+          <div class="meta-cell"><div class="k">Q&amp;A Bank</div><div class="v">18 Questions</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <div class="part-divider"><span class="plabel">Part A — Foundations</span><span class="pline"></span></div>
+
+      <!-- ============ A1 ============ -->
+      <section class="module" id="a1">
+        <div class="module-head"><span class="module-tag">SPEC-01</span><h2>What Is a Spring Bean?</h2></div>
+        <div class="body-grid">
+          <div class="explain">
+            <p>A <strong>bean</strong> is just an ordinary Java object — but one whose creation, wiring, and
+            lifecycle are handed over to the <strong>Spring IoC (Inversion of Control) container</strong> instead of
+            being managed by your own <code>new SomeClass()</code> calls. "IoC" describes exactly this handover:
+            control over object creation and dependency wiring is inverted — it moves from your code to the framework.</p>
+            <p>Concretely, the container (an <code>ApplicationContext</code>) reads a set of instructions — a
+            <strong>bean definition</strong> — describing how to build an object, what it depends on, and how long
+            it should live. It then instantiates, wires, and manages that object for you: that managed object is
+            the bean.</p>
+            <ul>
+              <li>Beans live in the <strong>ApplicationContext</strong> (a <code>BeanFactory</code> under the hood),
+              which acts as a registry you can query by type or name.</li>
+              <li>The container also resolves each bean's <strong>dependencies</strong> automatically — this is
+              <strong>Dependency Injection (DI)</strong>, the practical mechanism that makes IoC useful day to day.</li>
+              <li>Not every object in a Spring app is a bean — a plain DTO you build with <code>new</code> inside a
+              method is not container-managed and is not a bean.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Without Spring — you own the wiring</div>
+            <pre><span class="c-ty">OrderRepository</span> repo = <span class="c-kw">new</span> <span class="c-ty">OrderRepositoryImpl</span>(<span class="c-kw">new</span> <span class="c-ty">DataSource</span>(...));
+<span class="c-ty">OrderService</span> service = <span class="c-kw">new</span> <span class="c-ty">OrderService</span>(repo); <span class="c-com">// manual, brittle, hard to test</span></pre>
+            <div class="code-label">With Spring — container owns the wiring</div>
+            <pre><span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">OrderService</span> {
+    <span class="c-kw">private</span> <span class="c-kw">final</span> <span class="c-ty">OrderRepository</span> repo;
+
+    <span class="c-com">// Spring finds an OrderRepository bean and injects it — you never call new</span>
+    <span class="c-kw">public</span> <span class="c-ty">OrderService</span>(<span class="c-ty">OrderRepository</span> repo) {
+        <span class="c-kw">this</span>.repo = repo;
+    }
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "A bean is any object whose lifecycle — creation, dependency wiring, and destruction — is managed by the Spring IoC container instead of my own code. IoC is the principle; Dependency Injection is the mechanism that implements it."</div>
+      </section>
+
+      <!-- ============ A2 ============ -->
+      <section class="module" id="a2">
+        <div class="module-head"><span class="module-tag">SPEC-02</span><h2>Every Way to Create/Register a Bean</h2></div>
+        <p class="prompt"><b>Prompt:</b> "What are the different ways to create a bean in Spring?"</p>
+        <div class="body-grid stack">
+          <div class="explain">
+            <p>All roads lead to the same place — a <strong>bean definition</strong> registered in the container —
+            but there are five distinct ways to get there:</p>
+            <ul>
+              <li><strong>Stereotype annotations + component scan</strong> — <code>@Component</code> and its
+              specializations <code>@Service</code>, <code>@Repository</code>, <code>@Controller</code>/<code>@RestController</code>
+              on classes you own. Discovered automatically by <code>@ComponentScan</code>.</li>
+              <li><strong>@Bean methods inside @Configuration</strong> — explicit factory methods, most useful for
+              classes you don't own or construction logic that needs code.</li>
+              <li><strong>XML configuration</strong> — the legacy <code>&lt;bean&gt;</code> tag in an XML context
+              file. Rare in new code, but still shows up in older enterprise codebases.</li>
+              <li><strong>@Import</strong> — pull in another <code>@Configuration</code> class (or even
+              <code>@Component</code>-annotated class) explicitly, without relying on component scanning to find it.</li>
+              <li><strong>Programmatic registration</strong> — register a bean at runtime directly against the
+              context, e.g. via <code>ApplicationContextInitializer</code> or <code>GenericApplicationContext.registerBean()</code> —
+              used by frameworks and advanced bootstrapping, rarely in everyday app code.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">1 — Stereotype annotation (component scan)</div>
+            <pre><span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">PricingService</span> { }</pre>
+            <div class="code-label">2 — @Bean inside @Configuration</div>
+            <pre><span class="c-an">@Configuration</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">AppConfig</span> {
+    <span class="c-an">@Bean</span>
+    <span class="c-kw">public</span> <span class="c-ty">RestTemplate</span> restTemplate() {
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">RestTemplate</span>();
+    }
+}</pre>
+            <div class="code-label">3 — XML (legacy)</div>
+            <pre>&lt;bean id=<span class="c-str">"restTemplate"</span> class=<span class="c-str">"org.springframework.web.client.RestTemplate"</span>/&gt;</pre>
+            <div class="code-label">4 — @Import</div>
+            <pre><span class="c-an">@Configuration</span>
+<span class="c-an">@Import</span>({ <span class="c-ty">SecurityConfig</span>.<span class="c-kw">class</span>, <span class="c-ty">CacheConfig</span>.<span class="c-kw">class</span> })
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">AppConfig</span> { }</pre>
+            <div class="code-label">5 — Programmatic registration</div>
+            <pre><span class="c-ty">GenericApplicationContext</span> ctx = <span class="c-kw">new</span> <span class="c-ty">GenericApplicationContext</span>();
+ctx.registerBean(<span class="c-ty">AuditLogger</span>.<span class="c-kw">class</span>, () -&gt; <span class="c-kw">new</span> <span class="c-ty">AuditLogger</span>(<span class="c-str">"audit.log"</span>));
+ctx.refresh();</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "In practice it's almost always stereotype annotations for my own classes, and @Bean methods in a @Configuration class for third-party or conditionally-built objects. XML and programmatic registration exist but are rare in modern Spring Boot code."</div>
+      </section>
+
+      <!-- ============ A3 ============ -->
+      <section class="module" id="a3">
+        <div class="module-head"><span class="module-tag">SPEC-03</span><h2>@Component vs @Bean — The Real Difference</h2></div>
+        <p class="prompt"><b>Prompt:</b> "What's the difference between @Component and @Bean?"</p>
+        <div class="body-grid stack">
+          <div class="explain">
+            <p>They both end with "a bean in the container," but they operate at completely different levels:
+            one is a <strong>class-level marker</strong> discovered by scanning; the other is a
+            <strong>method-level factory</strong> you write by hand.</p>
+          </div>
+          <table class="compare-table">
+            <tr><th>Aspect</th><th>@Component</th><th>@Bean</th></tr>
+            <tr><td>Applied to</td><td>A class declaration</td><td>A method inside a @Configuration class</td></tr>
+            <tr><td>How it's found</td><td>Auto-detected via <code>@ComponentScan</code></td><td>Explicitly written, not scanned for — the method itself <em>is</em> the registration</td></tr>
+            <tr><td>Who owns the class</td><td>You — you can put the annotation on it</td><td>Anyone — perfect for third-party / library classes you can't annotate</td></tr>
+            <tr><td>Construction logic</td><td>Whatever the constructor does; limited flexibility</td><td>Full Java method body — conditionals, builders, factory calls, external SDK setup</td></tr>
+            <tr><td>Multiple instances of same type</td><td>Awkward — one class, one component</td><td>Trivial — write two @Bean methods returning the same type with different config</td></tr>
+            <tr><td>Typical use</td><td>Your own services, repositories, controllers</td><td>SDK clients, DataSources, ObjectMapper customization, anything needing setup code</td></tr>
+          </table>
+          <div class="code-panel">
+            <div class="code-label">@Component — you own PricingService, so annotate it directly</div>
+            <pre><span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">PricingService</span> {
+    <span class="c-kw">public</span> <span class="c-ty">PricingService</span>() { }
+}</pre>
+            <div class="code-label">@Bean — you DON'T own OkHttpClient, so wrap it in a factory method</div>
+            <pre><span class="c-an">@Configuration</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">HttpClientConfig</span> {
+    <span class="c-an">@Bean</span>
+    <span class="c-kw">public</span> <span class="c-ty">OkHttpClient</span> okHttpClient() {
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">OkHttpClient</span>.<span class="c-ty">Builder</span>()
+                .connectTimeout(<span class="c-ty">Duration</span>.ofSeconds(5))
+                .build(); <span class="c-com">// can't put @Component on a class you don't control</span>
+    }
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "@Component is a class-level stereotype found by component scanning — for classes I own. @Bean is a method I write inside a @Configuration class that explicitly returns an object — the go-to when I need construction logic or I'm registering a class I don't control, like a third-party client."</div>
+      </section>
+
+      <!-- ============ A4 ============ -->
+      <section class="module" id="a4">
+        <div class="module-head"><span class="module-tag">SPEC-04</span><h2>Why @Configuration + Manual @Bean, When @Component Exists?</h2></div>
+        <p class="prompt"><b>Prompt:</b> "If @Component already registers a bean automatically, why do we bother writing @Configuration classes and manually defining beans?"</p>
+        <div class="body-grid stack">
+          <div class="explain">
+            <p>Because <code>@Component</code> only works when three conditions all hold: you own the source, a
+            single no-argument-ish constructor is enough, and one instance of that type is all you'll ever need.
+            The moment any of those breaks, you need a hand-written factory — that's what <code>@Bean</code> inside
+            <code>@Configuration</code> is for. Concretely:</p>
+            <ul>
+              <li><strong>Third-party classes</strong> — you cannot add <code>@Component</code> to a class from a
+              JAR you don't own (e.g. <code>ObjectMapper</code>, <code>RestTemplate</code>, an AWS SDK client).
+              A <code>@Bean</code> method is the only way to hand that object to the container.</li>
+              <li><strong>Non-trivial construction logic</strong> — builder chains, conditional setup, reading
+              values from multiple properties, try/catch around a resource — a constructor can't express this as
+              cleanly as a plain Java method body can.</li>
+              <li><strong>Multiple beans of the same type</strong> — e.g. two <code>DataSource</code>s (primary +
+              reporting replica). One class can't be annotated twice; two <code>@Bean</code> methods handle it
+              naturally, disambiguated with names or <code>@Qualifier</code>.</li>
+              <li><strong>Conditional / environment-specific beans</strong> — using <code>@Profile</code> or
+              <code>@ConditionalOnProperty</code> on a <code>@Bean</code> method to swap implementations
+              (mock vs real payment gateway) per environment.</li>
+              <li><strong>Centralizing infra config</strong> — grouping every low-level bean (DataSource, security
+              filter chain, cache manager) in dedicated <code>@Configuration</code> classes keeps that concern out
+              of your business-logic classes, which stay pure <code>@Component</code>s.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Two beans, same type, disambiguated</div>
+            <pre><span class="c-an">@Configuration</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">DataSourceConfig</span> {
+
+    <span class="c-an">@Bean</span> <span class="c-an">@Primary</span>
+    <span class="c-kw">public</span> <span class="c-ty">DataSource</span> primaryDataSource() {
+        <span class="c-kw">return</span> <span class="c-ty">DataSourceBuilder</span>.create().url(<span class="c-str">"jdbc:postgresql://primary/db"</span>).build();
+    }
+
+    <span class="c-an">@Bean</span>
+    <span class="c-kw">public</span> <span class="c-ty">DataSource</span> reportingDataSource() {
+        <span class="c-kw">return</span> <span class="c-ty">DataSourceBuilder</span>.create().url(<span class="c-str">"jdbc:postgresql://replica/db"</span>).build();
+    }
+}
+
+<span class="c-com">// consumer picks explicitly</span>
+<span class="c-kw">public</span> <span class="c-ty">ReportService</span>(<span class="c-an">@Qualifier</span>(<span class="c-str">"reportingDataSource"</span>) <span class="c-ty">DataSource</span> ds) { ... }</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "@Component works when I own the class and need exactly one instance built a simple way. I reach for @Configuration + @Bean whenever any of that breaks — third-party classes, construction logic that needs real code, multiple instances of the same type, or environment-conditional beans."</div>
+      </section>
+
+      <div class="part-divider"><span class="plabel">Part B — Wiring &amp; Behavior</span><span class="pline"></span></div>
+
+      <!-- ============ B1 ============ -->
+      <section class="module" id="b1">
+        <div class="module-head"><span class="module-tag">SPEC-05</span><h2>Dependency Injection Styles</h2></div>
+        <div class="body-grid">
+          <div class="explain">
+            <p>Once a bean exists, Spring has to hand it its own dependencies. There are three mechanisms — and
+            modern Spring guidance is clear about which one to default to:</p>
+            <ul>
+              <li><strong>Constructor injection (preferred)</strong> — dependencies passed via the constructor,
+              stored in <code>final</code> fields. The object can never exist in a half-wired state, dependencies
+              are visible at a glance, and it plays perfectly with immutability.</li>
+              <li><strong>Setter injection</strong> — dependencies set via public setters after construction. Useful
+              for genuinely optional dependencies, but the object can exist momentarily unwired.</li>
+              <li><strong>Field injection</strong> — <code>@Autowired</code> directly on a field. Least boilerplate,
+              but hides dependencies from the constructor signature, makes the class hard to unit test without
+              Spring or reflection, and is explicitly discouraged by the Spring team.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Constructor injection — the default choice</div>
+            <pre><span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">OrderService</span> {
+    <span class="c-kw">private</span> <span class="c-kw">final</span> <span class="c-ty">OrderRepository</span> repo;
+    <span class="c-kw">private</span> <span class="c-kw">final</span> <span class="c-ty">PaymentClient</span> paymentClient;
+
+    <span class="c-com">// with a single constructor, @Autowired is optional (Spring 4.3+)</span>
+    <span class="c-kw">public</span> <span class="c-ty">OrderService</span>(<span class="c-ty">OrderRepository</span> repo, <span class="c-ty">PaymentClient</span> paymentClient) {
+        <span class="c-kw">this</span>.repo = repo;
+        <span class="c-kw">this</span>.paymentClient = paymentClient;
+    }
+}</pre>
+            <div class="code-label">Field injection — works, but avoid it</div>
+            <pre><span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">OrderService</span> {
+    <span class="c-an">@Autowired</span>
+    <span class="c-kw">private</span> <span class="c-ty">OrderRepository</span> repo; <span class="c-com">// can't be final, hard to test in isolation</span>
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "Constructor injection by default — it enables final fields, makes required dependencies explicit, and lets me construct the class in a plain unit test without a Spring context. Field injection I avoid; it hides dependencies and breaks easily-testable design."</div>
+      </section>
+
+      <!-- ============ B2 ============ -->
+      <section class="module" id="b2">
+        <div class="module-head"><span class="module-tag">SPEC-06</span><h2>Bean Scopes</h2></div>
+        <p class="prompt"><b>Prompt:</b> "What bean scopes does Spring support?"</p>
+        <div class="body-grid stack">
+          <div class="explain">
+            <p>Scope determines <strong>how many instances</strong> the container creates and <strong>how long
+            each lives</strong>.</p>
+          </div>
+          <table class="compare-table">
+            <tr><th>Scope</th><th>Lifetime</th><th>Notes</th></tr>
+            <tr><td>singleton <em>(default)</em></td><td>One instance per container</td><td>Shared by every injection point — must be stateless/thread-safe</td></tr>
+            <tr><td>prototype</td><td>New instance every time it's requested</td><td>Container does not manage destruction after handing it out</td></tr>
+            <tr><td>request</td><td>One instance per HTTP request</td><td>Web-aware contexts only</td></tr>
+            <tr><td>session</td><td>One instance per HTTP session</td><td>Web-aware contexts only</td></tr>
+            <tr><td>application</td><td>One instance per ServletContext</td><td>Similar to singleton, but scoped to the web app</td></tr>
+          </table>
+          <div class="code-panel">
+            <div class="code-label">Injecting a prototype bean into a singleton — the classic trap</div>
+            <pre><span class="c-com">// naive version: the prototype is injected ONCE at singleton construction,
+// so every call sees the SAME instance — defeats the purpose of "prototype"</span>
+<span class="c-an">@Component</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">ReportRunner</span> {
+    <span class="c-kw">private</span> <span class="c-kw">final</span> <span class="c-ty">ReportBuilder</span> builder; <span class="c-com">// prototype-scoped</span>
+    <span class="c-kw">public</span> <span class="c-ty">ReportRunner</span>(<span class="c-ty">ReportBuilder</span> builder) { <span class="c-kw">this</span>.builder = builder; }
+}
+
+<span class="c-com">// fix: inject an ObjectProvider (or use scoped-proxy) to get a FRESH instance per call</span>
+<span class="c-an">@Component</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">ReportRunner</span> {
+    <span class="c-kw">private</span> <span class="c-kw">final</span> <span class="c-ty">ObjectProvider</span>&lt;<span class="c-ty">ReportBuilder</span>&gt; builderProvider;
+    <span class="c-kw">public</span> <span class="c-ty">ReportRunner</span>(<span class="c-ty">ObjectProvider</span>&lt;<span class="c-ty">ReportBuilder</span>&gt; builderProvider) {
+        <span class="c-kw">this</span>.builderProvider = builderProvider;
+    }
+    <span class="c-kw">public</span> <span class="c-kw">void</span> run() {
+        <span class="c-ty">ReportBuilder</span> fresh = builderProvider.getObject(); <span class="c-com">// new instance, every call</span>
+    }
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "Singleton is the default and covers most services. Prototype gives a new instance per lookup — but injecting one directly into a singleton only wires it once, so I'd use ObjectProvider or a scoped-proxy to get a fresh instance on every call. Request/session/application only apply in web-aware contexts."</div>
+      </section>
+
+      <!-- ============ B3 ============ -->
+      <section class="module" id="b3">
+        <div class="module-head"><span class="module-tag">SPEC-07</span><h2>Bean Lifecycle</h2></div>
+        <p class="prompt"><b>Prompt:</b> "Walk me through the lifecycle of a Spring bean."</p>
+        <div class="body-grid stack">
+          <div class="explain">
+            <p>From container startup to shutdown, a singleton bean passes through a well-defined sequence:</p>
+            <ul>
+              <li><strong>1. Instantiation</strong> — constructor is called (or the @Bean factory method runs).</li>
+              <li><strong>2. Populate properties</strong> — dependencies are injected (constructor args already
+              set at step 1; setter/field injection happens here).</li>
+              <li><strong>3. Aware interfaces</strong> — if implemented, callbacks like <code>BeanNameAware</code>,
+              <code>BeanFactoryAware</code>, <code>ApplicationContextAware</code> fire, giving the bean access to
+              container internals.</li>
+              <li><strong>4. BeanPostProcessor — before initialization</strong> — <code>postProcessBeforeInitialization()</code>
+              runs for every registered post-processor (this is how <code>@Autowired</code>, <code>@Value</code>,
+              and AOP proxies actually get applied under the hood).</li>
+              <li><strong>5. Initialization callbacks</strong> — in order: <code>@PostConstruct</code> method →
+              <code>InitializingBean.afterPropertiesSet()</code> → custom <code>init-method</code> (if configured).</li>
+              <li><strong>6. BeanPostProcessor — after initialization</strong> — <code>postProcessAfterInitialization()</code>;
+              this is also where proxying (e.g. for <code>@Transactional</code>) typically wraps the bean.</li>
+              <li><strong>7. Bean is ready</strong> — sits in the container, available for injection, until shutdown.</li>
+              <li><strong>8. Destruction</strong> — on container shutdown: <code>@PreDestroy</code> →
+              <code>DisposableBean.destroy()</code> → custom <code>destroy-method</code>. Only singleton beans get
+              this — prototypes are handed off and the container stops tracking them.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Lifecycle callbacks in one class</div>
+            <pre><span class="c-an">@Component</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">CacheWarmer</span> <span class="c-kw">implements</span> <span class="c-ty">InitializingBean</span>, <span class="c-ty">DisposableBean</span> {
+
+    <span class="c-an">@PostConstruct</span>
+    <span class="c-kw">public</span> <span class="c-kw">void</span> onPostConstruct() {
+        <span class="c-kw">System</span>.out.println(<span class="c-str">"1. @PostConstruct — warm the cache"</span>);
+    }
+
+    <span class="c-an">@Override</span>
+    <span class="c-kw">public</span> <span class="c-kw">void</span> afterPropertiesSet() {
+        <span class="c-kw">System</span>.out.println(<span class="c-str">"2. InitializingBean.afterPropertiesSet()"</span>);
+    }
+
+    <span class="c-an">@PreDestroy</span>
+    <span class="c-kw">public</span> <span class="c-kw">void</span> onPreDestroy() {
+        <span class="c-kw">System</span>.out.println(<span class="c-str">"flush cache before shutdown"</span>);
+    }
+
+    <span class="c-an">@Override</span>
+    <span class="c-kw">public</span> <span class="c-kw">void</span> destroy() {
+        <span class="c-kw">System</span>.out.println(<span class="c-str">"DisposableBean.destroy()"</span>);
+    }
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "Construct → inject dependencies → Aware callbacks → BeanPostProcessor before-init → @PostConstruct/InitializingBean/init-method → BeanPostProcessor after-init (this is where proxies get applied) → ready → on shutdown, @PreDestroy/DisposableBean/destroy-method, for singletons only."</div>
+      </section>
+
+      <!-- ============ B4 ============ -->
+      <section class="module" id="b4">
+        <div class="module-head"><span class="module-tag">SPEC-08</span><h2>Resolving Multiple Candidates</h2></div>
+        <p class="prompt"><b>Prompt:</b> "You have two beans of the same type — how does Spring know which to inject?"</p>
+        <div class="body-grid">
+          <div class="explain">
+            <p>By default it doesn't — and that's a startup failure, not a silent guess (see Module 11 in the
+            companion Spring Boot notes on <code>BeanDefinitionOverrideException</code> vs
+            <code>NoUniqueBeanDefinitionException</code>). You resolve ambiguity explicitly:</p>
+            <ul>
+              <li><code>@Primary</code> on one candidate — makes it the default whenever a qualifier isn't specified.</li>
+              <li><code>@Qualifier("beanName")</code> at the injection point — picks a specific bean by name,
+              overriding <code>@Primary</code> if both are present.</li>
+              <li>Matching the <strong>parameter/field name</strong> to the bean name also works, since Spring falls
+              back to by-name matching when there's a type conflict — but explicit <code>@Qualifier</code> is clearer.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">@Primary + @Qualifier together</div>
+            <pre><span class="c-an">@Service</span> <span class="c-an">@Primary</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">RazorpayGateway</span> <span class="c-kw">implements</span> <span class="c-ty">PaymentGateway</span> { }
+
+<span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">StripeGateway</span> <span class="c-kw">implements</span> <span class="c-ty">PaymentGateway</span> { }
+
+<span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">CheckoutService</span> {
+    <span class="c-kw">public</span> <span class="c-ty">CheckoutService</span>(<span class="c-an">@Qualifier</span>(<span class="c-str">"stripeGateway"</span>) <span class="c-ty">PaymentGateway</span> gateway) {
+        <span class="c-com">// explicitly wants Stripe, overriding @Primary's default of Razorpay</span>
+    }
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "@Primary marks the default candidate; @Qualifier at the injection point picks a specific one by name and wins over @Primary if both exist. With no disambiguation at all, Spring fails fast at startup rather than guessing."</div>
+      </section>
+
+      <!-- ============ B5 ============ -->
+      <section class="module" id="b5">
+        <div class="module-head"><span class="module-tag">SPEC-09</span><h2>Full vs Lite @Configuration Mode</h2></div>
+        <p class="prompt"><b>Prompt:</b> "If a @Bean method calls another @Bean method directly, do you get two instances or one?"</p>
+        <div class="body-grid">
+          <div class="explain">
+            <p>One — and this is a genuinely sharp interview question, because the answer looks like it should be
+            "two" if you think of <code>@Bean</code> methods as plain Java methods.</p>
+            <p>When a class is annotated <code>@Configuration</code> (not <code>@Component</code>), Spring generates
+            a <strong>CGLIB subclass proxy</strong> of it at startup — this is "full" mode. Every call to another
+            <code>@Bean</code> method on <code>this</code> is intercepted by the proxy, which checks the container
+            first: if that bean already exists, the proxy returns the cached singleton instead of actually running
+            the method body again.</p>
+            <ul>
+              <li><strong>@Configuration (full mode)</strong> — CGLIB-proxied; inter-bean method calls are
+              intercepted and return the same singleton. This is what guarantees singleton semantics even when
+              beans reference each other.</li>
+              <li><strong>@Configuration(proxyBeanMethods = false) or plain @Component with @Bean methods (lite
+              mode)</strong> — no proxy; calling another <code>@Bean</code> method directly really does re-run its
+              body and create a second, separate object.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Full mode — same instance, guaranteed</div>
+            <pre><span class="c-an">@Configuration</span> <span class="c-com">// CGLIB-proxied by default</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">AppConfig</span> {
+
+    <span class="c-an">@Bean</span>
+    <span class="c-kw">public</span> <span class="c-ty">ObjectMapper</span> objectMapper() {
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">ObjectMapper</span>();
+    }
+
+    <span class="c-an">@Bean</span>
+    <span class="c-kw">public</span> <span class="c-ty">JsonExporter</span> jsonExporter() {
+        <span class="c-com">// intercepted by the proxy → returns the SAME ObjectMapper singleton</span>
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">JsonExporter</span>(objectMapper());
+    }
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "@Configuration classes are CGLIB-proxied by default (full mode) — calling one @Bean method from another goes through the proxy and returns the existing singleton rather than re-running the constructor. With proxyBeanMethods=false, or plain @Component, you lose that guarantee and get two separate objects."</div>
+      </section>
+
+      <div class="part-divider"><span class="plabel">Part C — Advanced</span><span class="pline"></span></div>
+
+      <!-- ============ C1 ============ -->
+      <section class="module" id="c1">
+        <div class="module-head"><span class="module-tag">SPEC-10</span><h2>FactoryBean vs @Bean Factory Method</h2></div>
+        <p class="prompt"><b>Prompt:</b> "What's the difference between implementing FactoryBean and just writing a @Bean method?"</p>
+        <div class="body-grid">
+          <div class="explain">
+            <p>Both ultimately produce an object for the container, but they solve it at different layers:</p>
+            <ul>
+              <li><strong>@Bean method</strong> — a simple, imperative "build and return" step. The right tool 95%
+              of the time.</li>
+              <li><strong>FactoryBean&lt;T&gt; interface</strong> — a reusable, encapsulated factory
+              <em>component</em>. You implement <code>getObject()</code>, <code>getObjectType()</code>, and
+              <code>isSingleton()</code>; Spring detects the interface and registers the <em>product</em> of
+              <code>getObject()</code> as the bean — not the factory itself. This is how libraries like MyBatis and
+              early Hibernate integrations plugged complex object construction into Spring before Java config existed,
+              and it's still useful when you want the construction logic packaged as its own reusable, testable unit.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">FactoryBean implementation</div>
+            <pre><span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">SqlSessionFactoryBean</span> <span class="c-kw">implements</span> <span class="c-ty">FactoryBean</span>&lt;<span class="c-ty">SqlSessionFactory</span>&gt; {
+
+    <span class="c-an">@Override</span>
+    <span class="c-kw">public</span> <span class="c-ty">SqlSessionFactory</span> getObject() <span class="c-kw">throws</span> <span class="c-ty">Exception</span> {
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">SqlSessionFactoryBuilder</span>().build(configuration());
+    }
+
+    <span class="c-an">@Override</span>
+    <span class="c-kw">public</span> <span class="c-ty">Class</span>&lt;?&gt; getObjectType() { <span class="c-kw">return</span> <span class="c-ty">SqlSessionFactory</span>.<span class="c-kw">class</span>; }
+
+    <span class="c-an">@Override</span>
+    <span class="c-kw">public</span> <span class="c-kw">boolean</span> isSingleton() { <span class="c-kw">return</span> <span class="c-kw">true</span>; }
+}
+
+<span class="c-com">// registering it yields a SqlSessionFactory bean, NOT a SqlSessionFactoryBean bean
+// (prefix the name with '&' to get the factory itself: ctx.getBean("&mySessionFactory"))</span></pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "A @Bean method is the everyday, imperative way to register something. FactoryBean is a reusable component whose getObject() supplies the actual bean — Spring registers the product, not the factory — and it's the pattern libraries use to plug non-trivial construction logic into the container."</div>
+      </section>
+
+      <!-- ============ C2 ============ -->
+      <section class="module" id="c2">
+        <div class="module-head"><span class="module-tag">SPEC-11</span><h2>Conditional Bean Registration</h2></div>
+        <p class="prompt"><b>Prompt:</b> "How would you register a bean only in certain environments, or only if another bean isn't already defined?"</p>
+        <div class="body-grid">
+          <div class="explain">
+            <p>Spring Boot's auto-configuration is built almost entirely on conditional <code>@Bean</code>
+            definitions — the same annotations are just as usable in application code:</p>
+            <ul>
+              <li><code>@Profile("dev")</code> — only registered when that Spring profile is active.</li>
+              <li><code>@ConditionalOnProperty(...)</code> — gated on an application property's presence/value.</li>
+              <li><code>@ConditionalOnMissingBean</code> — registered only if the container doesn't already have
+              one of that type — this is exactly how Boot's auto-configured beans "back off" when you supply your own.</li>
+              <li><code>@ConditionalOnClass</code> — registered only if a given class is present on the classpath
+              (how Boot decides whether to configure Redis support at all, for example).</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Swap gateway implementation per environment</div>
+            <pre><span class="c-an">@Configuration</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">PaymentConfig</span> {
+
+    <span class="c-an">@Bean</span>
+    <span class="c-an">@Profile</span>(<span class="c-str">"dev"</span>)
+    <span class="c-kw">public</span> <span class="c-ty">PaymentGateway</span> mockGateway() {
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">MockPaymentGateway</span>();
+    }
+
+    <span class="c-an">@Bean</span>
+    <span class="c-an">@Profile</span>(<span class="c-str">"prod"</span>)
+    <span class="c-kw">public</span> <span class="c-ty">PaymentGateway</span> razorpayGateway() {
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">RazorpayGateway</span>();
+    }
+
+    <span class="c-com">// back off if the app already defines its own MeterRegistry</span>
+    <span class="c-an">@Bean</span>
+    <span class="c-an">@ConditionalOnMissingBean</span>(<span class="c-ty">MeterRegistry</span>.<span class="c-kw">class</span>)
+    <span class="c-kw">public</span> <span class="c-ty">MeterRegistry</span> defaultMeterRegistry() {
+        <span class="c-kw">return</span> <span class="c-kw">new</span> <span class="c-ty">SimpleMeterRegistry</span>();
+    }
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "@Profile swaps implementations per environment, @ConditionalOnProperty gates on a config flag, and @ConditionalOnMissingBean lets my default back off if the app supplies its own — the exact mechanism Spring Boot's own auto-configuration uses."</div>
+      </section>
+
+      <!-- ============ C3 ============ -->
+      <section class="module" id="c3">
+        <div class="module-head"><span class="module-tag">SPEC-12</span><h2>Circular Dependency Between Beans</h2></div>
+        <p class="prompt"><b>Prompt:</b> "Bean A depends on Bean B, and Bean B depends on Bean A. What happens?"</p>
+        <div class="body-grid">
+          <div class="explain">
+            <p>The outcome depends entirely on <strong>which injection style</strong> is used:</p>
+            <ul>
+              <li><strong>Setter/field injection</strong> — Spring can usually resolve it. It creates a bean's raw
+              instance first, registers it in an "early reference" cache, then finishes wiring — so the circular
+              reference can be satisfied with a not-yet-fully-initialized object.</li>
+              <li><strong>Constructor injection on both sides</strong> — <strong>cannot</strong> be resolved. Neither
+              object can finish constructing without the other already existing. Spring throws
+              <code>BeanCurrentlyInCreationException</code> at startup.</li>
+            </ul>
+            <p>Either way, a circular dependency is usually a <strong>design smell</strong> — the real fix is
+            almost always to break the cycle: extract the shared behavior into a third bean both depend on, or use
+            <code>@Lazy</code> on one side to defer resolution, rather than leaning on setter injection as a
+            permanent workaround.</p>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Fails — constructor injection, no escape</div>
+            <pre><span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">ServiceA</span> {
+    <span class="c-kw">public</span> <span class="c-ty">ServiceA</span>(<span class="c-ty">ServiceB</span> b) { } <span class="c-com">// needs a fully-built ServiceB</span>
+}
+<span class="c-an">@Service</span>
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">ServiceB</span> {
+    <span class="c-kw">public</span> <span class="c-ty">ServiceB</span>(<span class="c-ty">ServiceA</span> a) { } <span class="c-com">// needs a fully-built ServiceA — deadlock</span>
+}</pre>
+            <div class="code-label">Workaround (use sparingly) — @Lazy breaks the cycle</div>
+            <pre><span class="c-kw">public</span> <span class="c-ty">ServiceA</span>(<span class="c-an">@Lazy</span> <span class="c-ty">ServiceB</span> b) { } <span class="c-com">// injects a proxy, resolved on first use</span></pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "With constructor injection on both sides it fails at startup with BeanCurrentlyInCreationException — neither bean can finish building first. Setter injection can resolve it via an early-reference cache, but I'd treat the cycle itself as a design smell and extract the shared logic into a third bean instead."</div>
+      </section>
+
+      <!-- ============ C4 ============ -->
+      <section class="module" id="c4">
+        <div class="module-head"><span class="module-tag">SPEC-13</span><h2>@Lazy and @DependsOn</h2></div>
+        <div class="body-grid">
+          <div class="explain">
+            <p>Two small annotations that control <strong>when</strong> and <strong>in what order</strong> beans get
+            created, on top of the default (eager, dependency-order) behavior:</p>
+            <ul>
+              <li><code>@Lazy</code> on a bean — delays its creation until first use, and injects a proxy in the
+              meantime. Useful for rarely-used or expensive-to-build beans, and as an escape hatch for circular
+              dependencies (see Module 12).</li>
+              <li><code>@DependsOn("beanName")</code> — forces one bean to be initialized <em>after</em> another,
+              even when there's no direct field/constructor dependency between them — e.g. a cache warmer that must
+              run only after a JDBC connection pool bean is fully up.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">@DependsOn — no direct reference, but strict ordering needed</div>
+            <pre><span class="c-an">@Component</span>
+<span class="c-an">@DependsOn</span>(<span class="c-str">"connectionPoolInitializer"</span>)
+<span class="c-kw">public</span> <span class="c-kw">class</span> <span class="c-ty">CacheWarmer</span> {
+    <span class="c-com">// guaranteed to be constructed AFTER connectionPoolInitializer,
+    // even though CacheWarmer never injects it directly</span>
+}</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "@Lazy defers a bean's construction to first use — good for expensive or rarely-needed beans. @DependsOn enforces initialization order between beans that don't have a direct dependency relationship but still need one built before the other."</div>
+      </section>
+
+      <!-- ============ C5 ============ -->
+      <section class="module" id="c5">
+        <div class="module-head"><span class="module-tag">SPEC-14</span><h2>Bean Definition vs Bean Instance</h2></div>
+        <div class="body-grid">
+          <div class="explain">
+            <p>Worth separating clearly, because a lot of Spring's internal APIs (and questions about
+            <code>BeanDefinitionOverrideException</code>) only make sense once this distinction is clear:</p>
+            <ul>
+              <li>A <strong><code>BeanDefinition</code></strong> is metadata — the class name, scope, constructor
+              args, property values, lazy flag, init/destroy method names. It's a blueprint, created when the
+              container starts up and parses your annotations/config, before any actual object exists.</li>
+              <li>The <strong>bean instance</strong> is the real Java object, built later by following that
+              blueprint — for a singleton, built once and cached; for a prototype, built fresh on every request.</li>
+              <li>This is why two conflicting <code>@Bean</code> definitions fail at the <em>definition</em> stage
+              (before either object is ever constructed) — the container detects the metadata clash while assembling
+              its registry, not at runtime when something is finally injected.</li>
+            </ul>
+          </div>
+          <div class="code-panel">
+            <div class="code-label">Inspecting definitions vs instances</div>
+            <pre><span class="c-ty">ConfigurableApplicationContext</span> ctx = ...;
+
+<span class="c-com">// metadata — no object created yet</span>
+<span class="c-ty">BeanDefinition</span> def = ctx.getBeanFactory().getBeanDefinition(<span class="c-str">"pricingService"</span>);
+<span class="c-kw">System</span>.out.println(def.getScope()); <span class="c-com">// e.g. "singleton"</span>
+
+<span class="c-com">// actual object — created (or fetched from cache) on demand</span>
+<span class="c-ty">PricingService</span> instance = ctx.getBean(<span class="c-ty">PricingService</span>.<span class="c-kw">class</span>);</pre>
+          </div>
+        </div>
+        <div class="field-note"><b>Say this:</b> "A BeanDefinition is the blueprint the container parses at startup — class, scope, dependencies. The bean instance is the actual object built from that blueprint, later, on demand. Definition conflicts are caught before any object is even constructed."</div>
+      </section>
+
+      <!-- ================= QA REFERENCE ================= -->
+      <div class="part-divider" id="qa"><span class="plabel">Rapid Reference — Interview Q&amp;A Bank</span><span class="pline"></span></div>
+
+      <div style="margin-bottom:18px; font-size:12.5px; color:var(--ink-faint);">Tap to expand a clean, interview-ready answer for each.</div>
+
+      <details class="qa-item"><summary><span class="qnum">Q01</span>What is a Spring bean?</summary>
+        <div class="qa-answer"><p>An object whose creation, dependency wiring, and lifecycle are managed by the Spring IoC container instead of your own code — registered against a bean definition and retrievable from the ApplicationContext.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q02</span>What are the different ways to create/register a bean?</summary>
+        <div class="qa-answer"><p>Stereotype annotations (@Component and its specializations) with component scanning, @Bean factory methods inside @Configuration classes, legacy XML &lt;bean&gt; definitions, @Import to pull in configuration classes explicitly, and programmatic registration via GenericApplicationContext.registerBean() for advanced bootstrapping.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q03</span>What's the difference between @Component and @Bean?</summary>
+        <div class="qa-answer"><p>@Component is a class-level annotation discovered automatically by component scanning — for classes you own. @Bean is a method-level annotation inside a @Configuration class that explicitly builds and returns an object — needed for third-party classes, non-trivial construction logic, or multiple instances of the same type.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q04</span>Why write @Configuration classes and manually define beans when @Component already does it automatically?</summary>
+        <div class="qa-answer"><p>Because @Component only works when you own the class, need a single instance, and construction is trivial. @Bean methods are required for third-party/library classes, construction logic that needs real code, multiple beans of the same type, and environment-conditional beans.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q05</span>What's the difference between constructor, setter, and field injection?</summary>
+        <div class="qa-answer"><p>Constructor injection (preferred) wires required dependencies at construction time via final fields — no half-wired state. Setter injection wires after construction, suited to optional dependencies. Field injection is the least boilerplate but hides dependencies and makes unit testing without a Spring context difficult — generally discouraged.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q06</span>What bean scopes does Spring support?</summary>
+        <div class="qa-answer"><p>singleton (default, one instance per container), prototype (a new instance every lookup), and the web-aware scopes request, session, and application.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q07</span>What happens if you inject a prototype-scoped bean into a singleton?</summary>
+        <div class="qa-answer"><p>The prototype is only resolved once, at singleton construction time, so every subsequent use sees the same instance — defeating the point of "prototype." Fix it by injecting an ObjectProvider (or a scoped-proxy) so a fresh instance is fetched on every call.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q08</span>Walk me through the full bean lifecycle.</summary>
+        <div class="qa-answer"><p>Instantiate → populate dependencies → Aware interface callbacks → BeanPostProcessor before-init → @PostConstruct → InitializingBean.afterPropertiesSet() → custom init-method → BeanPostProcessor after-init (proxies applied here) → bean ready → on shutdown: @PreDestroy → DisposableBean.destroy() → custom destroy-method (singletons only).</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q09</span>How do you resolve a conflict when two beans of the same type exist?</summary>
+        <div class="qa-answer"><p>Mark one @Primary as the default, and use @Qualifier("beanName") at the injection point to pick a specific one explicitly — @Qualifier wins over @Primary when both are present. With no disambiguation, Spring fails at startup rather than guessing.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q10</span>If a @Bean method calls another @Bean method directly inside the same @Configuration class, do you get one instance or two?</summary>
+        <div class="qa-answer"><p>One. @Configuration classes are CGLIB-proxied by default ("full" mode) — the proxy intercepts inter-bean method calls and returns the already-created singleton instead of re-running the method. With proxyBeanMethods=false, or on a plain @Component, that guarantee disappears and you get two separate objects.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q11</span>What's the difference between implementing FactoryBean and writing a @Bean method?</summary>
+        <div class="qa-answer"><p>A @Bean method is a simple, direct "build and return" step — the default choice. FactoryBean&lt;T&gt; is a reusable component whose getObject() supplies the actual registered bean (not the factory itself) — useful when construction logic needs to be packaged as its own testable unit, as libraries like MyBatis do.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q12</span>How do you register a bean only for certain environments, or only if a property is set?</summary>
+        <div class="qa-answer"><p>@Profile("dev"/"prod") gates a bean on the active Spring profile; @ConditionalOnProperty gates it on an application property; @ConditionalOnMissingBean registers a default only if the app hasn't already supplied its own — the same mechanism Spring Boot's auto-configuration uses internally.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q13</span>What happens with a circular dependency between two beans?</summary>
+        <div class="qa-answer"><p>With setter/field injection, Spring can usually resolve it using an early-reference cache. With constructor injection on both sides, it cannot — neither bean can finish constructing without the other, and Spring throws BeanCurrentlyInCreationException at startup. The real fix is to break the cycle, e.g. by extracting shared logic into a third bean.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q14</span>What does @Lazy do, and when would you use it?</summary>
+        <div class="qa-answer"><p>Defers a bean's construction until it's first actually used, injecting a proxy in the meantime — useful for expensive or rarely-used beans, and as a targeted fix for circular dependency deadlocks.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q15</span>What does @DependsOn do?</summary>
+        <div class="qa-answer"><p>Forces one bean to be initialized only after another named bean, even when there's no direct injection relationship between them — useful for enforcing setup order (e.g. a cache warmer that must run after a connection pool is ready).</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q16</span>What's the difference between a bean definition and a bean instance?</summary>
+        <div class="qa-answer"><p>A BeanDefinition is metadata parsed at container startup — class, scope, dependencies, lifecycle method names. The bean instance is the actual object built from that metadata, later, on demand. Definition conflicts are caught while the registry is being assembled, before any instance is ever created.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q17</span>Are all Spring beans singletons?</summary>
+        <div class="qa-answer"><p>Singleton is only the default scope, not a rule — a bean can be declared prototype, request, session, or application scoped depending on the annotation/config, so "one instance per container" only holds for the default case.</p></div>
+      </details>
+
+      <details class="qa-item"><summary><span class="qnum">Q18</span>Can a bean depend on itself, or reference an unfinished bean during construction?</summary>
+        <div class="qa-answer"><p>Not with constructor injection — the object literally cannot exist until its constructor returns, so a self- or mutual-reference at that stage is unresolvable and fails fast. Setter/field injection can work around it via early references, but it's a sign the design should be restructured.</p></div>
+      </details>
+
+      <div class="footer-note">Compiled study notes — original explanations, code, and answers written for interview clarity.</div>
+
+    </div>
+  </main>
+</div>
+</body>
+</html>

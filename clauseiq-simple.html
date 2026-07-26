@@ -1,0 +1,3175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClauseIQ — Spring AI Microservices (Simple Version)</title>
+<style>
+:root{
+  --bg:#0d1117; --bg2:#161b22; --bg3:#1c2430; --line:#28313d;
+  --tx:#e6edf3; --tx2:#93a1b3; --tx3:#6b7787;
+  --ac:#7cc47c; --ac2:#6aa9ff; --warn:#e3b657; --red:#f2686b; --pur:#c99bff; --org:#ffab6b;
+  --mono:'SF Mono',Menlo,Consolas,'Liberation Mono',monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font:16px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--ac2);text-decoration:none}a:hover{text-decoration:underline}
+
+#wrap{display:flex;min-height:100vh}
+#side{width:310px;flex:0 0 310px;background:var(--bg2);border-right:1px solid var(--line);
+  position:sticky;top:0;height:100vh;overflow-y:auto;padding-bottom:60px}
+#brand{padding:20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg2);z-index:5}
+#brand .t{font-size:17px;font-weight:700;letter-spacing:-.01em}
+#brand .s{font-size:12px;color:var(--tx3);margin-top:3px;line-height:1.5}
+#q{width:100%;margin-top:12px;padding:8px 11px;border-radius:7px;border:1px solid var(--line);
+  background:var(--bg);color:var(--tx);font-size:13px;font-family:inherit}
+#q:focus{outline:none;border-color:var(--ac)}
+#toc{list-style:none;margin:8px 0 0;padding:0}
+#toc .grp{font-size:10.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--tx3);
+  padding:16px 20px 5px;font-weight:700}
+#toc li a{display:block;padding:6px 20px 6px 22px;color:var(--tx2);font-size:13px;
+  border-left:2px solid transparent;line-height:1.45}
+#toc li a:hover{background:var(--bg3);color:var(--tx);text-decoration:none}
+#toc li a.on{border-left-color:var(--ac);color:var(--tx);background:var(--bg3)}
+#toc li a .f{font-family:var(--mono);font-size:12px}
+#main{flex:1;min-width:0;padding-bottom:120px}
+.inner{max-width:920px;margin:0 auto;padding:0 40px}
+
+#hero{border-bottom:1px solid var(--line);padding:54px 0 40px;
+  background:radial-gradient(900px 320px at 15% -10%,rgba(124,196,124,.13),transparent 62%),var(--bg)}
+#hero h1{font-size:38px;line-height:1.14;margin:0 0 10px;letter-spacing:-.026em}
+#hero .sub{color:var(--ac);font-family:var(--mono);font-size:13px;margin:0 0 16px}
+#hero p{color:var(--tx2);margin:0 0 22px;font-size:17px;max-width:680px}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-size:12px;padding:4px 11px;border-radius:20px;background:var(--bg3);
+  border:1px solid var(--line);color:var(--tx2);font-family:var(--mono)}
+
+section.ch{padding:46px 0 8px;border-bottom:1px solid var(--line)}
+.chead{display:flex;align-items:baseline;gap:13px;margin-bottom:18px}
+.chead .num{font-family:var(--mono);font-size:12px;color:var(--ac);border:1px solid var(--ac);
+  border-radius:6px;padding:2px 9px;flex:0 0 auto}
+.chead h2{font-size:26px;margin:0;letter-spacing:-.02em;line-height:1.25}
+h3{font-size:19px;margin:30px 0 10px;letter-spacing:-.01em}
+h4{font-size:15.5px;margin:22px 0 8px}
+p{margin:0 0 14px}
+ul,ol{margin:0 0 14px;padding-left:22px}
+li{margin-bottom:6px}
+code.i{font-family:var(--mono);font-size:.86em;background:var(--bg3);padding:2px 6px;
+  border-radius:5px;border:1px solid var(--line);color:var(--org)}
+strong{color:#fff;font-weight:650}
+
+.box{border-radius:9px;padding:14px 18px;margin:18px 0;border:1px solid var(--line);
+  background:var(--bg2);font-size:14.5px}
+.box .lbl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;display:block;margin-bottom:6px}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.box.key{border-left:3px solid var(--ac)}.box.key .lbl{color:var(--ac)}
+.box.warn{border-left:3px solid var(--warn)}.box.warn .lbl{color:var(--warn)}
+.box.why{border-left:3px solid var(--pur)}.box.why .lbl{color:var(--pur)}
+
+.code{margin:16px 0;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#090d13}
+.code .bar{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);
+  padding:7px 14px;border-bottom:1px solid var(--line);gap:12px}
+.code .fn{font-family:var(--mono);font-size:12px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.code .cp{font-size:11px;font-family:var(--mono);background:transparent;border:1px solid var(--line);
+  color:var(--tx3);padding:3px 9px;border-radius:5px;cursor:pointer;flex:0 0 auto}
+.code .cp:hover{color:var(--tx);border-color:var(--tx3)}
+.code pre{margin:0;padding:15px 18px;overflow-x:auto;font-family:var(--mono);font-size:12.6px;line-height:1.62;tab-size:4}
+.code pre::-webkit-scrollbar{height:9px}
+.code pre::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+.k{color:#ff7b8a}.s{color:#9fd8ff}.c{color:#5e6c7e;font-style:italic}
+.a{color:var(--warn)}.t{color:var(--pur)}.nm{color:#6aa9ff}.f{color:#7ee0c0}
+
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14px}
+th,td{text-align:left;padding:9px 13px;border:1px solid var(--line);vertical-align:top}
+th{background:var(--bg2);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--tx2)}
+td code.i{font-size:12px}
+
+.pipe{margin:22px 0;border:1px solid var(--line);border-radius:11px;background:var(--bg2);padding:20px}
+.lane{display:flex;align-items:stretch;gap:14px;margin-bottom:9px}
+.lane:last-child{margin-bottom:0}
+.lane .badge{flex:0 0 120px;font-family:var(--mono);font-size:10.5px;color:var(--tx3);
+  text-transform:uppercase;letter-spacing:.07em;padding-top:12px;text-align:right}
+.lane .body{flex:1;border:1px solid var(--line);border-radius:8px;background:var(--bg3);padding:10px 15px}
+.lane .body .ttl{font-weight:650;font-size:14px}
+.lane .body .dsc{font-size:12.5px;color:var(--tx2);margin-top:3px;line-height:1.55}
+.lane.hl .body{border-color:var(--ac)}
+.lane.hl .badge{color:var(--ac)}
+.arrow{margin:0 0 9px 134px;color:var(--tx3);font-family:var(--mono);font-size:13px;line-height:1}
+
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:16px 0;padding:15px;
+  background:var(--bg2);border:1px solid var(--line);border-radius:9px;font-size:13px}
+.flow .n{padding:6px 12px;background:var(--bg3);border:1px solid var(--line);border-radius:7px;
+  font-family:var(--mono);font-size:12px}
+.flow .n.hl{border-color:var(--ac);color:var(--ac)}
+.flow .ar{color:var(--tx3)}
+
+::selection{background:rgba(124,196,124,.3)}
+#side::-webkit-scrollbar{width:9px}
+#side::-webkit-scrollbar-thumb{background:var(--line);border-radius:5px}
+@media(max-width:1040px){#side{display:none}.inner{padding:0 22px}#hero h1{font-size:28px}
+  .lane .badge{display:none}.arrow{margin-left:0}}
+</style>
+</head>
+<body>
+<div id="wrap">
+
+<nav id="side">
+  <a class="nav-back" href="index.html">← Back to Hub</a>
+  <div id="brand">
+    <div class="t">ClauseIQ — Simple Version</div>
+    <div class="s">AI Contract Analysis<br>Spring AI · Kafka · Redis · pgvector</div>
+    <input id="q" placeholder="Filter files…" autocomplete="off">
+  </div>
+  <ul id="toc"></ul>
+</nav>
+
+<main id="main">
+
+<header id="hero">
+  <div class="inner">
+    <div class="sub">spring-boot · spring-cloud-gateway · spring-kafka · spring-ai · redis · pgvector</div>
+    <h1>ClauseIQ — AI Contract Analysis</h1>
+    <p>A microservices project that reads a contract, breaks it into clauses, and uses AI to
+       score the risk of each clause against the customer's own rules. Same architecture as
+       before, written in a plain and straightforward way.</p>
+    <div class="pills">
+      <span class="pill">Java 21</span><span class="pill">Spring Boot 3.5</span>
+      <span class="pill">Spring AI</span><span class="pill">Kafka</span>
+      <span class="pill">Redis</span><span class="pill">PostgreSQL + pgvector</span>
+      <span class="pill">5 modules</span>
+    </div>
+  </div>
+</header>
+
+<div class="inner" id="body">
+
+<!-- ============ OVERVIEW ============ -->
+<section class="ch" id="s-overview" data-g="Overview" data-t="What it does">
+<div class="chead"><span class="num">00</span><h2>What the project does</h2></div>
+
+<h3>The idea</h3>
+<p>Companies sign a lot of contracts. Somebody has to read each one and check whether the terms are
+acceptable. ClauseIQ does the first pass of that reading with AI.</p>
+
+<p>Each customer of ClauseIQ is called a <strong>tenant</strong>. A tenant does two things:</p>
+<ol>
+  <li><strong>Uploads a playbook once.</strong> This is a document with their own rules, like
+      <em>"liability must be capped at 12 months of fees"</em>.</li>
+  <li><strong>Uploads contracts.</strong> For each contract we split it into clauses, and for every
+      clause we ask the AI: what kind of clause is this, how risky is it, and does it break any of
+      this tenant's rules?</li>
+</ol>
+
+<h3>Why the request is asynchronous</h3>
+<p>A 40 page contract becomes around 40 to 60 clauses. Every clause needs its own AI call, and each
+call takes a few seconds. So one contract takes several minutes.</p>
+
+<div class="box why">
+  <span class="lbl">The main reason for this design</span>
+  <p>We cannot make the user wait several minutes on one HTTP request — it will time out. And if
+  ten users upload contracts at the same time, we would suddenly send hundreds of requests to
+  OpenAI and hit their rate limit.</p>
+  <p>So instead: the API accepts the request, saves it, and puts a message on <strong>Kafka</strong>.
+  Worker services read from Kafka at their own speed. The user gets a job id and checks the status
+  later. Kafka acts as a waiting queue between the fast API and the slow AI work.</p>
+</div>
+
+<h3>The flow</h3>
+
+<div class="pipe">
+  <div class="lane">
+    <div class="badge">Client</div>
+    <div class="body">
+      <div class="ttl">Browser / Postman</div>
+      <div class="dsc">Uploads a contract, asks for an analysis, then polls for the result or
+        opens a stream to watch the progress.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane hl">
+    <div class="badge">API Gateway</div>
+    <div class="body">
+      <div class="ttl">Login check, tenant, rate limit</div>
+      <div class="dsc">Reads the JWT token, takes the tenant id out of it, and puts it into a header.
+        Also counts requests in Redis so one customer cannot send too many.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane">
+    <div class="badge">Controller</div>
+    <div class="body">
+      <div class="ttl">contract-service</div>
+      <div class="dsc">Saves a job row with status <code class="i">QUEUED</code> and returns
+        <strong>202 Accepted</strong> straight away with the job id.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane hl">
+    <div class="badge">Kafka</div>
+    <div class="body">
+      <div class="ttl">Producer → topic → consumers</div>
+      <div class="dsc">The job is sent to the topic <code class="i">analysis-requested</code>.
+        This is the buffer. If 100 jobs arrive at once they just wait in the topic.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane hl">
+    <div class="badge">AI Worker</div>
+    <div class="body">
+      <div class="ttl">Redis + RAG + Spring AI</div>
+      <div class="dsc">For each clause: check Redis cache first, then search the tenant's playbook
+        in pgvector, then call the AI and get back a proper Java object.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane">
+    <div class="badge">Result store</div>
+    <div class="body">
+      <div class="ttl">PostgreSQL + Redis</div>
+      <div class="dsc">Findings are saved as rows in Postgres. The current job status is also kept
+        in Redis so polling is fast.</div>
+    </div>
+  </div>
+  <div class="arrow">│</div>
+
+  <div class="lane">
+    <div class="badge">Client</div>
+    <div class="body">
+      <div class="ttl">Poll or stream</div>
+      <div class="dsc"><code class="i">GET /analysis/{jobId}</code> to check status, or
+        <code class="i">GET /analysis/{jobId}/stream</code> to receive live updates using SSE.</div>
+    </div>
+  </div>
+</div>
+
+<h3>The five modules</h3>
+<div class="code" data-lang="tree" data-file="folder structure"><script type="text/plain">
+clauseiq/
+├── docker-compose.yml
+├── db/schema.sql
+├── pom.xml                     (parent)
+│
+├── common/                     shared events and enums
+├── api-gateway/                login check + tenant + rate limit
+├── contract-service/           REST API + Kafka producer + results
+├── ingestion-service/          reads PDF files into pgvector
+└── ai-worker/                  Kafka consumer + AI analysis
+</script></div>
+
+<table>
+<tr><th>Module</th><th>Port</th><th>What it does</th></tr>
+<tr><td><code class="i">api-gateway</code></td><td>8080</td><td>The only port we open. Checks the token, adds tenant header, limits requests.</td></tr>
+<tr><td><code class="i">contract-service</code></td><td>8081</td><td>Takes the analysis request, sends it to Kafka, returns the result later.</td></tr>
+<tr><td><code class="i">ingestion-service</code></td><td>8082</td><td>Uploads a PDF, splits it, saves it into the vector database.</td></tr>
+<tr><td><code class="i">ai-worker</code></td><td>8083</td><td>Reads from Kafka and does the actual AI work. No REST API.</td></tr>
+</table>
+
+<h3>Example: using the API</h3>
+
+<div class="code" data-lang="bash" data-file="step by step"><script type="text/plain">
+# 1. upload the tenant's playbook (only once)
+curl -X POST http://localhost:8080/api/v1/ingestion/playbook \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@company-rules.pdf"
+
+# 2. upload a contract
+curl -X POST http://localhost:8080/api/v1/ingestion/contract \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "file=@vendor-contract.pdf"
+# -> { "documentId": "d3f1...", "chunks": 47 }
+
+# 3. ask for the analysis (returns immediately)
+curl -X POST http://localhost:8080/api/v1/contracts/d3f1.../analyze \
+  -H "Authorization: Bearer $TOKEN"
+# -> 202 { "jobId": "a81b...", "status": "QUEUED" }
+
+# 4. check the status
+curl http://localhost:8080/api/v1/analysis/a81b... \
+  -H "Authorization: Bearer $TOKEN"
+# -> { "status": "PROCESSING", "processedClauses": 12, "totalClauses": 47 }
+
+# 5. get the report when it is done
+curl http://localhost:8080/api/v1/analysis/a81b.../report \
+  -H "Authorization: Bearer $TOKEN"
+</script></div>
+</section>
+
+<!-- ============ INFRA ============ -->
+<section class="ch" id="s-compose" data-g="Infrastructure" data-t="docker-compose.yml">
+<div class="chead"><span class="num">01</span><h2>Docker Compose</h2></div>
+
+<p>Three things we need running: PostgreSQL (with the pgvector extension so it can also store
+embeddings), Redis, and Kafka.</p>
+
+<div class="code" data-lang="yaml" data-file="docker-compose.yml"><script type="text/plain">
+services:
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: clauseiq-postgres
+    environment:
+      POSTGRES_DB: clauseiq
+      POSTGRES_USER: clauseiq
+      POSTGRES_PASSWORD: clauseiq
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:7-alpine
+    container_name: clauseiq-redis
+    ports:
+      - "6379:6379"
+
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: clauseiq-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CFG_NODE_ID: 0
+      KAFKA_CFG_PROCESS_ROLES: controller,broker
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Why pgvector and not a separate vector database</span>
+  <p>We already need PostgreSQL for the job and finding tables. The <code class="i">pgvector</code>
+  extension lets the same database also store embeddings, so we only have one database to run
+  and back up.</p>
+</div>
+</section>
+
+<section class="ch" id="s-schema" data-g="Infrastructure" data-t="schema.sql">
+<div class="chead"><span class="num">02</span><h2>Database tables</h2></div>
+
+<div class="code" data-lang="sql" data-file="db/schema.sql"><script type="text/plain">
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Every uploaded file (contract or playbook)
+CREATE TABLE documents (
+    id           UUID PRIMARY KEY,
+    tenant_id    VARCHAR(64)  NOT NULL,
+    filename     VARCHAR(255) NOT NULL,
+    kind         VARCHAR(20)  NOT NULL,     -- CONTRACT or PLAYBOOK
+    chunk_count  INT          NOT NULL,
+    created_at   TIMESTAMP    NOT NULL
+);
+
+-- One row per analysis request
+CREATE TABLE analysis_jobs (
+    id                UUID PRIMARY KEY,
+    tenant_id         VARCHAR(64) NOT NULL,
+    document_id       UUID        NOT NULL,
+    status            VARCHAR(20) NOT NULL,   -- QUEUED, PROCESSING, COMPLETED, FAILED
+    processed_clauses INT         NOT NULL DEFAULT 0,
+    total_clauses     INT         NOT NULL DEFAULT 0,
+    overall_risk      VARCHAR(20),
+    total_tokens      INT         NOT NULL DEFAULT 0,
+    error_message     TEXT,
+    created_at        TIMESTAMP   NOT NULL,
+    updated_at        TIMESTAMP
+);
+
+-- One row per analysed clause
+CREATE TABLE clause_findings (
+    id                 UUID PRIMARY KEY,
+    job_id             UUID        NOT NULL,
+    tenant_id          VARCHAR(64) NOT NULL,
+    clause_index       INT         NOT NULL,
+    clause_type        VARCHAR(40) NOT NULL,
+    risk_level         VARCHAR(20) NOT NULL,
+    summary            TEXT,
+    playbook_deviation TEXT,
+    suggested_redline  TEXT,
+    created_at         TIMESTAMP   NOT NULL
+);
+
+-- Indexes we actually need
+CREATE INDEX idx_jobs_tenant     ON analysis_jobs (tenant_id);
+CREATE INDEX idx_findings_job    ON clause_findings (job_id);
+
+-- Spring AI creates this table itself, but we create it here so the
+-- vector index exists from the start. 1536 = size of text-embedding-3-small
+CREATE TABLE IF NOT EXISTS vector_store (
+    id        UUID PRIMARY KEY,
+    content   TEXT,
+    metadata  JSONB,
+    embedding VECTOR(1536)
+);
+
+CREATE INDEX idx_vector_embedding ON vector_store
+    USING HNSW (embedding vector_cosine_ops);
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Careful with the vector size</span>
+  <p>The number <code class="i">1536</code> must match the embedding model. We use
+  <code class="i">text-embedding-3-small</code> which gives 1536 numbers. If you change the model to a
+  bigger one you must also change this column and upload all documents again.</p>
+</div>
+</section>
+
+<!-- ============ COMMON ============ -->
+<section class="ch" id="s-common" data-g="common" data-t="Enums + constants">
+<div class="chead"><span class="num">03</span><h2>common — enums and constants</h2></div>
+
+<p>A small module with no logic. Both the producer and the consumer use these classes, so the
+message format cannot become different on the two sides.</p>
+
+<div class="code" data-lang="xml" data-file="common/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.clauseiq</groupId>
+        <artifactId>clauseiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>common</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="java" data-file="common/.../JobStatus.java"><script type="text/plain">
+package com.clauseiq.common;
+
+public enum JobStatus {
+
+    QUEUED,       // saved in DB and sent to Kafka, waiting for a worker
+    PROCESSING,   // a worker picked it up
+    COMPLETED,
+    FAILED;
+
+    // Used to know when we can stop sending progress updates
+    public boolean isFinished() {
+        return this == COMPLETED || this == FAILED;
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="common/.../RiskLevel.java"><script type="text/plain">
+package com.clauseiq.common;
+
+/**
+ * The order of these values matters.
+ * We use ordinal() to find the highest risk in a contract,
+ * so please keep them from lowest to highest.
+ */
+public enum RiskLevel {
+    NONE,
+    LOW,
+    MEDIUM,
+    HIGH,
+    CRITICAL
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="common/.../ClauseType.java"><script type="text/plain">
+package com.clauseiq.common;
+
+/**
+ * The AI must pick exactly one of these for every clause.
+ * If it does not fit anywhere, it should pick OTHER.
+ */
+public enum ClauseType {
+    TERMINATION,
+    AUTO_RENEWAL,
+    LIABILITY,
+    INDEMNITY,
+    PAYMENT_TERMS,
+    CONFIDENTIALITY,
+    INTELLECTUAL_PROPERTY,
+    DATA_PROTECTION,
+    GOVERNING_LAW,
+    SERVICE_LEVEL,
+    OTHER
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="common/.../AppConstants.java"><script type="text/plain">
+package com.clauseiq.common;
+
+public class AppConstants {
+
+    // Kafka topics
+    public static final String TOPIC_ANALYSIS_REQUESTED = "analysis-requested";
+    public static final String TOPIC_ANALYSIS_PROGRESS  = "analysis-progress";
+
+    // Consumer group for the AI workers
+    public static final String GROUP_AI_WORKERS = "ai-workers";
+
+    // Headers that the gateway adds after checking the token.
+    // The other services just read them, they never check the token again.
+    public static final String HEADER_TENANT_ID = "X-Tenant-Id";
+    public static final String HEADER_USER_ID   = "X-User-Id";
+    public static final String HEADER_PLAN      = "X-Plan";
+
+    // Redis channel used to send SSE updates between instances
+    public static final String REDIS_PROGRESS_CHANNEL = "analysis-progress-channel";
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-common-events" data-g="common" data-t="Kafka event classes">
+<div class="chead"><span class="num">04</span><h2>The Kafka messages</h2></div>
+
+<p>Two message classes. Plain classes with getters and setters, because Jackson needs an empty
+constructor to convert JSON back into an object.</p>
+
+<div class="code" data-lang="java" data-file="common/.../AnalysisRequestedEvent.java"><script type="text/plain">
+package com.clauseiq.common;
+
+/**
+ * Sent by contract-service, read by ai-worker.
+ *
+ * Note that we only send the ids here, not the contract text.
+ * Kafka messages have a 1 MB limit by default and a contract is much
+ * bigger than that. The worker reads the actual text from the database.
+ */
+public class AnalysisRequestedEvent {
+
+    private String jobId;
+    private String tenantId;
+    private String documentId;
+    private String requestedBy;
+
+    public AnalysisRequestedEvent() {
+        // needed by Jackson
+    }
+
+    public AnalysisRequestedEvent(String jobId, String tenantId,
+                                  String documentId, String requestedBy) {
+        this.jobId = jobId;
+        this.tenantId = tenantId;
+        this.documentId = documentId;
+        this.requestedBy = requestedBy;
+    }
+
+    public String getJobId() { return jobId; }
+    public void setJobId(String jobId) { this.jobId = jobId; }
+
+    public String getTenantId() { return tenantId; }
+    public void setTenantId(String tenantId) { this.tenantId = tenantId; }
+
+    public String getDocumentId() { return documentId; }
+    public void setDocumentId(String documentId) { this.documentId = documentId; }
+
+    public String getRequestedBy() { return requestedBy; }
+    public void setRequestedBy(String requestedBy) { this.requestedBy = requestedBy; }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="common/.../AnalysisProgressEvent.java"><script type="text/plain">
+package com.clauseiq.common;
+
+/**
+ * Sent by ai-worker while it is working, read by contract-service.
+ * This is what lets the UI show "clause 12 of 47".
+ */
+public class AnalysisProgressEvent {
+
+    private String jobId;
+    private String tenantId;
+    private JobStatus status;
+    private int processedClauses;
+    private int totalClauses;
+    private String errorMessage;
+
+    public AnalysisProgressEvent() {
+    }
+
+    public AnalysisProgressEvent(String jobId, String tenantId, JobStatus status,
+                                 int processedClauses, int totalClauses) {
+        this.jobId = jobId;
+        this.tenantId = tenantId;
+        this.status = status;
+        this.processedClauses = processedClauses;
+        this.totalClauses = totalClauses;
+    }
+
+    public String getJobId() { return jobId; }
+    public void setJobId(String jobId) { this.jobId = jobId; }
+
+    public String getTenantId() { return tenantId; }
+    public void setTenantId(String tenantId) { this.tenantId = tenantId; }
+
+    public JobStatus getStatus() { return status; }
+    public void setStatus(JobStatus status) { this.status = status; }
+
+    public int getProcessedClauses() { return processedClauses; }
+    public void setProcessedClauses(int processedClauses) { this.processedClauses = processedClauses; }
+
+    public int getTotalClauses() { return totalClauses; }
+    public void setTotalClauses(int totalClauses) { this.totalClauses = totalClauses; }
+
+    public String getErrorMessage() { return errorMessage; }
+    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+}
+</script></div>
+</section>
+
+<!-- ============ GATEWAY ============ -->
+<section class="ch" id="s-gw-setup" data-g="api-gateway" data-t="pom.xml + application.yml">
+<div class="chead"><span class="num">05</span><h2>api-gateway — setup</h2></div>
+
+<p>The gateway is the front door. All requests come here first, and it forwards them to the right
+service. It also does the login check and the rate limiting so the other services do not have to.</p>
+
+<div class="code" data-lang="xml" data-file="api-gateway/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.clauseiq</groupId>
+        <artifactId>clauseiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>api-gateway</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.clauseiq</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+
+        <!-- Redis is used to count requests for the rate limit -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+
+        <!-- for reading the JWT token -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="api-gateway/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+
+  cloud:
+    gateway:
+      routes:
+
+        # anything starting with /api/v1/contracts or /api/v1/analysis
+        # goes to contract-service
+        - id: contract-service
+          uri: ${CONTRACT_SERVICE_URL:http://localhost:8081}
+          predicates:
+            - Path=/api/v1/contracts/**,/api/v1/analysis/**
+
+        # file uploads go to ingestion-service
+        - id: ingestion-service
+          uri: ${INGESTION_SERVICE_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/v1/ingestion/**
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:my-secret-key-must-be-at-least-32-characters}
+
+  # how many requests per minute each plan is allowed
+  rate-limit:
+    free: 10
+    pro: 120
+    enterprise: 600
+</script></div>
+
+<div class="code" data-lang="java" data-file="api-gateway/.../ApiGatewayApplication.java"><script type="text/plain">
+package com.clauseiq.gateway;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ApiGatewayApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ApiGatewayApplication.class, args);
+    }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-gw-auth" data-g="api-gateway" data-t="JWT + tenant filter">
+<div class="chead"><span class="num">06</span><h2>Checking the token and finding the tenant</h2></div>
+
+<p>The token contains the tenant id inside it. We read it once here and put it in a header. After
+that, every other service can simply read <code class="i">X-Tenant-Id</code> from the request.</p>
+
+<div class="code" data-lang="java" data-file="api-gateway/.../JwtUtil.java"><script type="text/plain">
+package com.clauseiq.gateway;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+
+@Component
+public class JwtUtil {
+
+    @Value("${app.jwt.secret}")
+    private String secret;
+
+    /**
+     * Reads the token and returns the data inside it.
+     * Returns null if the token is wrong or expired, and the caller
+     * then sends back 401.
+     */
+    public Claims getClaims(String token) {
+        try {
+            SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+        } catch (Exception e) {
+            // wrong signature, expired token, bad format... all mean "not allowed"
+            return null;
+        }
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="api-gateway/.../AuthenticationFilter.java"><script type="text/plain">
+package com.clauseiq.gateway;
+
+import com.clauseiq.common.AppConstants;
+import io.jsonwebtoken.Claims;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+/**
+ * A GlobalFilter runs for every request that goes through the gateway.
+ *
+ * This one checks the token and adds the tenant id as a header.
+ */
+@Component
+public class AuthenticationFilter implements GlobalFilter, Ordered {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
+
+    private final JwtUtil jwtUtil;
+
+    public AuthenticationFilter(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Override
+    public int getOrder() {
+        // smaller number = runs earlier.
+        // This must run before the rate limit filter, because that filter
+        // needs the tenant header that we add here.
+        return -2;
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        String path = exchange.getRequest().getPath().toString();
+
+        // health check is open, everything else needs a token
+        if (path.startsWith("/actuator")) {
+            return chain.filter(exchange);
+        }
+
+        String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.warn("Request without token: {}", path);
+            return sendError(exchange, HttpStatus.UNAUTHORIZED);
+        }
+
+        String token = authHeader.substring(7);
+        Claims claims = jwtUtil.getClaims(token);
+
+        if (claims == null) {
+            logger.warn("Invalid token for path: {}", path);
+            return sendError(exchange, HttpStatus.UNAUTHORIZED);
+        }
+
+        String tenantId = claims.get("tenantId", String.class);
+        String plan = claims.get("plan", String.class);
+
+        if (tenantId == null) {
+            logger.warn("Token has no tenantId");
+            return sendError(exchange, HttpStatus.UNAUTHORIZED);
+        }
+
+        if (plan == null) {
+            plan = "FREE";
+        }
+
+        // Add the headers. The other services trust these headers,
+        // so we must always overwrite them and never keep what the
+        // client sent, otherwise someone could fake a different tenant.
+        ServerHttpRequest newRequest = exchange.getRequest().mutate()
+                .header(AppConstants.HEADER_TENANT_ID, tenantId)
+                .header(AppConstants.HEADER_USER_ID, claims.getSubject())
+                .header(AppConstants.HEADER_PLAN, plan)
+                .build();
+
+        return chain.filter(exchange.mutate().request(newRequest).build());
+    }
+
+    private Mono<Void> sendError(ServerWebExchange exchange, HttpStatus status) {
+        exchange.getResponse().setStatusCode(status);
+        return exchange.getResponse().setComplete();
+    }
+}
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">Important security point</span>
+  <p>We always <strong>set</strong> the tenant header with <code class="i">.header(...)</code> from the token.
+  If we only added it when it was missing, a user could send
+  <code class="i">X-Tenant-Id: some-other-company</code> themselves and read another customer's
+  contracts.</p>
+</div>
+</section>
+
+<section class="ch" id="s-gw-rate" data-g="api-gateway" data-t="Rate limit filter">
+<div class="chead"><span class="num">07</span><h2>Rate limiting with Redis</h2></div>
+
+<p>AI calls cost money, so we limit how many requests each customer can send per minute. The limit
+depends on their plan.</p>
+
+<p>The idea is simple: we keep a counter in Redis. The key contains the current minute, so when the
+minute changes the key changes too and the count starts from zero again. We also set an expiry so
+old keys are deleted automatically.</p>
+
+<div class="code" data-lang="java" data-file="api-gateway/.../RateLimitFilter.java"><script type="text/plain">
+package com.clauseiq.gateway;
+
+import com.clauseiq.common.AppConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+
+@Component
+public class RateLimitFilter implements GlobalFilter, Ordered {
+
+    private static final Logger logger = LoggerFactory.getLogger(RateLimitFilter.class);
+
+    private final ReactiveStringRedisTemplate redisTemplate;
+
+    @Value("${app.rate-limit.free}")
+    private int freeLimit;
+
+    @Value("${app.rate-limit.pro}")
+    private int proLimit;
+
+    @Value("${app.rate-limit.enterprise}")
+    private int enterpriseLimit;
+
+    public RateLimitFilter(ReactiveStringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Override
+    public int getOrder() {
+        return -1;   // runs after AuthenticationFilter (-2)
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        String tenantId = exchange.getRequest().getHeaders()
+                .getFirst(AppConstants.HEADER_TENANT_ID);
+
+        // no tenant means it was a public path like /actuator, so skip
+        if (tenantId == null) {
+            return chain.filter(exchange);
+        }
+
+        String plan = exchange.getRequest().getHeaders()
+                .getFirst(AppConstants.HEADER_PLAN);
+
+        int limit = getLimitForPlan(plan);
+
+        // The key has the minute in it, so it changes automatically
+        // every minute and the counter starts again from 1.
+        String key = "rate:" + tenantId + ":" + LocalDateTime.now().getMinute();
+
+        return redisTemplate.opsForValue().increment(key)
+                .flatMap(count -> {
+
+                    // first request of this minute, so set expiry
+                    if (count == 1) {
+                        return redisTemplate.expire(key, Duration.ofMinutes(2))
+                                .thenReturn(count);
+                    }
+                    return Mono.just(count);
+                })
+                .flatMap(count -> {
+
+                    if (count > limit) {
+                        logger.warn("Rate limit reached. tenant={} plan={} count={} limit={}",
+                                tenantId, plan, count, limit);
+
+                        exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
+                        exchange.getResponse().getHeaders().add("Retry-After", "60");
+                        return exchange.getResponse().setComplete();
+                    }
+
+                    // tell the client how many they have left
+                    exchange.getResponse().getHeaders()
+                            .add("X-RateLimit-Remaining", String.valueOf(limit - count));
+
+                    return chain.filter(exchange);
+                });
+    }
+
+    private int getLimitForPlan(String plan) {
+        if (plan == null) {
+            return freeLimit;
+        }
+
+        switch (plan.toUpperCase()) {
+            case "ENTERPRISE":
+                return enterpriseLimit;
+            case "PRO":
+                return proLimit;
+            default:
+                return freeLimit;
+        }
+    }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Why Redis and not a variable in the class</span>
+  <p>If we counted requests in a normal Java variable, and we run two copies of the gateway, each
+  copy would have its own count and a customer could send double the limit. Redis is shared by all
+  copies, so the count is correct no matter how many gateways are running.</p>
+</div>
+</section>
+
+<!-- ============ CONTRACT SERVICE ============ -->
+<section class="ch" id="s-cs-setup" data-g="contract-service" data-t="pom.xml + application.yml">
+<div class="chead"><span class="num">08</span><h2>contract-service — setup</h2></div>
+
+<p>This service takes the analysis request, puts it on Kafka, and later gives back the result.</p>
+
+<div class="code" data-lang="xml" data-file="contract-service/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.clauseiq</groupId>
+        <artifactId>clauseiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>contract-service</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.clauseiq</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="contract-service/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8081
+
+spring:
+  application:
+    name: contract-service
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/clauseiq}
+    username: clauseiq
+    password: clauseiq
+
+  jpa:
+    hibernate:
+      ddl-auto: none        # tables are created by schema.sql
+    show-sql: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:localhost:9092}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all             # wait until Kafka confirms it saved the message
+
+    consumer:
+      group-id: contract-service
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # we must tell Jackson which package our event classes are in
+        spring.json.trusted.packages: com.clauseiq.common
+        spring.json.value.default.type: com.clauseiq.common.AnalysisProgressEvent
+</script></div>
+</section>
+
+<section class="ch" id="s-cs-entity" data-g="contract-service" data-t="Entities + repositories">
+<div class="chead"><span class="num">09</span><h2>Entities and repositories</h2></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../entity/AnalysisJob.java"><script type="text/plain">
+package com.clauseiq.contract.entity;
+
+import com.clauseiq.common.JobStatus;
+import com.clauseiq.common.RiskLevel;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "analysis_jobs")
+public class AnalysisJob {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
+    @Column(name = "document_id", nullable = false)
+    private UUID documentId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private JobStatus status;
+
+    @Column(name = "processed_clauses")
+    private int processedClauses;
+
+    @Column(name = "total_clauses")
+    private int totalClauses;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "overall_risk")
+    private RiskLevel overallRisk;
+
+    @Column(name = "total_tokens")
+    private int totalTokens;
+
+    @Column(name = "error_message")
+    private String errorMessage;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // runs automatically before the row is inserted
+    @PrePersist
+    public void beforeSave() {
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void beforeUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    // ----- getters and setters -----
+
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+
+    public String getTenantId() { return tenantId; }
+    public void setTenantId(String tenantId) { this.tenantId = tenantId; }
+
+    public UUID getDocumentId() { return documentId; }
+    public void setDocumentId(UUID documentId) { this.documentId = documentId; }
+
+    public JobStatus getStatus() { return status; }
+    public void setStatus(JobStatus status) { this.status = status; }
+
+    public int getProcessedClauses() { return processedClauses; }
+    public void setProcessedClauses(int processedClauses) { this.processedClauses = processedClauses; }
+
+    public int getTotalClauses() { return totalClauses; }
+    public void setTotalClauses(int totalClauses) { this.totalClauses = totalClauses; }
+
+    public RiskLevel getOverallRisk() { return overallRisk; }
+    public void setOverallRisk(RiskLevel overallRisk) { this.overallRisk = overallRisk; }
+
+    public int getTotalTokens() { return totalTokens; }
+    public void setTotalTokens(int totalTokens) { this.totalTokens = totalTokens; }
+
+    public String getErrorMessage() { return errorMessage; }
+    public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../entity/ClauseFinding.java"><script type="text/plain">
+package com.clauseiq.contract.entity;
+
+import com.clauseiq.common.ClauseType;
+import com.clauseiq.common.RiskLevel;
+import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "clause_findings")
+public class ClauseFinding {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "job_id", nullable = false)
+    private UUID jobId;
+
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
+    @Column(name = "clause_index")
+    private int clauseIndex;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "clause_type")
+    private ClauseType clauseType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "risk_level")
+    private RiskLevel riskLevel;
+
+    @Column(columnDefinition = "text")
+    private String summary;
+
+    @Column(name = "playbook_deviation", columnDefinition = "text")
+    private String playbookDeviation;
+
+    @Column(name = "suggested_redline", columnDefinition = "text")
+    private String suggestedRedline;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void beforeSave() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // ----- getters and setters -----
+
+    public UUID getId() { return id; }
+    public void setId(UUID id) { this.id = id; }
+
+    public UUID getJobId() { return jobId; }
+    public void setJobId(UUID jobId) { this.jobId = jobId; }
+
+    public String getTenantId() { return tenantId; }
+    public void setTenantId(String tenantId) { this.tenantId = tenantId; }
+
+    public int getClauseIndex() { return clauseIndex; }
+    public void setClauseIndex(int clauseIndex) { this.clauseIndex = clauseIndex; }
+
+    public ClauseType getClauseType() { return clauseType; }
+    public void setClauseType(ClauseType clauseType) { this.clauseType = clauseType; }
+
+    public RiskLevel getRiskLevel() { return riskLevel; }
+    public void setRiskLevel(RiskLevel riskLevel) { this.riskLevel = riskLevel; }
+
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
+
+    public String getPlaybookDeviation() { return playbookDeviation; }
+    public void setPlaybookDeviation(String playbookDeviation) { this.playbookDeviation = playbookDeviation; }
+
+    public String getSuggestedRedline() { return suggestedRedline; }
+    public void setSuggestedRedline(String suggestedRedline) { this.suggestedRedline = suggestedRedline; }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../repository/AnalysisJobRepository.java"><script type="text/plain">
+package com.clauseiq.contract.repository;
+
+import com.clauseiq.contract.entity.AnalysisJob;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+public interface AnalysisJobRepository extends JpaRepository<AnalysisJob, UUID> {
+
+    // We always search with the tenant id also, not only the job id.
+    // Otherwise one customer could read another customer's job by
+    // guessing the id.
+    Optional<AnalysisJob> findByIdAndTenantId(UUID id, String tenantId);
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../repository/ClauseFindingRepository.java"><script type="text/plain">
+package com.clauseiq.contract.repository;
+
+import com.clauseiq.contract.entity.ClauseFinding;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface ClauseFindingRepository extends JpaRepository<ClauseFinding, UUID> {
+
+    List<ClauseFinding> findByJobIdOrderByClauseIndexAsc(UUID jobId);
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../dto/JobResponse.java"><script type="text/plain">
+package com.clauseiq.contract.dto;
+
+import com.clauseiq.common.JobStatus;
+
+/**
+ * What we return when the client asks for the job status.
+ * We keep DTOs separate from entities so we do not send
+ * database columns directly to the outside.
+ */
+public class JobResponse {
+
+    private String jobId;
+    private JobStatus status;
+    private int processedClauses;
+    private int totalClauses;
+
+    public JobResponse(String jobId, JobStatus status,
+                       int processedClauses, int totalClauses) {
+        this.jobId = jobId;
+        this.status = status;
+        this.processedClauses = processedClauses;
+        this.totalClauses = totalClauses;
+    }
+
+    public String getJobId() { return jobId; }
+    public JobStatus getStatus() { return status; }
+    public int getProcessedClauses() { return processedClauses; }
+    public int getTotalClauses() { return totalClauses; }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-cs-service" data-g="contract-service" data-t="Service + Kafka producer">
+<div class="chead"><span class="num">10</span><h2>Taking the request and sending it to Kafka</h2></div>
+
+<p>This is the important part of the design. We do <strong>not</strong> call the AI here. We save a job
+row, send a message, and return. The whole method finishes in a few milliseconds.</p>
+
+<div class="code" data-lang="java" data-file="contract-service/.../service/AnalysisService.java"><script type="text/plain">
+package com.clauseiq.contract.service;
+
+import com.clauseiq.common.AnalysisRequestedEvent;
+import com.clauseiq.common.JobStatus;
+import com.clauseiq.contract.entity.AnalysisJob;
+import com.clauseiq.contract.entity.ClauseFinding;
+import com.clauseiq.contract.repository.AnalysisJobRepository;
+import com.clauseiq.contract.repository.ClauseFindingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class AnalysisService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisService.class);
+
+    private final AnalysisJobRepository jobRepository;
+    private final ClauseFindingRepository findingRepository;
+    private final KafkaProducerService kafkaProducer;
+
+    public AnalysisService(AnalysisJobRepository jobRepository,
+                           ClauseFindingRepository findingRepository,
+                           KafkaProducerService kafkaProducer) {
+        this.jobRepository = jobRepository;
+        this.findingRepository = findingRepository;
+        this.kafkaProducer = kafkaProducer;
+    }
+
+    /**
+     * Creates the job and sends it to Kafka.
+     * We save to the database FIRST and send to Kafka after.
+     * If we did it the other way around, a worker could pick up the
+     * message before the row exists and then it would not find the job.
+     */
+    public AnalysisJob startAnalysis(String tenantId, String userId, UUID documentId) {
+
+        AnalysisJob job = new AnalysisJob();
+        job.setTenantId(tenantId);
+        job.setDocumentId(documentId);
+        job.setStatus(JobStatus.QUEUED);
+
+        job = jobRepository.save(job);
+
+        AnalysisRequestedEvent event = new AnalysisRequestedEvent(
+                job.getId().toString(),
+                tenantId,
+                documentId.toString(),
+                userId);
+
+        kafkaProducer.sendAnalysisRequest(event);
+
+        logger.info("Created job {} for tenant {} and document {}",
+                job.getId(), tenantId, documentId);
+
+        return job;
+    }
+
+    public AnalysisJob getJob(UUID jobId, String tenantId) {
+        return jobRepository.findByIdAndTenantId(jobId, tenantId)
+                .orElseThrow(() -> new JobNotFoundException("Job not found: " + jobId));
+    }
+
+    public List<ClauseFinding> getFindings(UUID jobId, String tenantId) {
+        // check the job belongs to this tenant before returning the findings
+        getJob(jobId, tenantId);
+        return findingRepository.findByJobIdOrderByClauseIndexAsc(jobId);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../service/KafkaProducerService.java"><script type="text/plain">
+package com.clauseiq.contract.service;
+
+import com.clauseiq.common.AnalysisRequestedEvent;
+import com.clauseiq.common.AppConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+public class KafkaProducerService {
+
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducerService.class);
+
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    public KafkaProducerService(KafkaTemplate<String, Object> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    public void sendAnalysisRequest(AnalysisRequestedEvent event) {
+
+        // The second parameter is the key. We use the tenant id so that
+        // all messages from one customer go to the same partition and
+        // are processed in order. It also spreads different customers
+        // across partitions instead of putting everything in one place.
+        kafkaTemplate.send(
+                AppConstants.TOPIC_ANALYSIS_REQUESTED,
+                event.getTenantId(),
+                event);
+
+        logger.info("Sent job {} to Kafka topic {}",
+                event.getJobId(), AppConstants.TOPIC_ANALYSIS_REQUESTED);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../exception/JobNotFoundException.java"><script type="text/plain">
+package com.clauseiq.contract.service;
+
+public class JobNotFoundException extends RuntimeException {
+
+    public JobNotFoundException(String message) {
+        super(message);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../exception/GlobalExceptionHandler.java"><script type="text/plain">
+package com.clauseiq.contract.web;
+
+import com.clauseiq.contract.service.JobNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Catches exceptions from all controllers so we return a proper
+ * JSON error instead of a stack trace.
+ */
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(JobNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFound(JobNotFoundException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "not_found");
+        error.put("message", ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleOther(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "server_error");
+        error.put("message", "Something went wrong");
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-cs-api" data-g="contract-service" data-t="Controller + SSE stream">
+<div class="chead"><span class="num">11</span><h2>Controller: poll and stream</h2></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../web/ContractController.java"><script type="text/plain">
+package com.clauseiq.contract.web;
+
+import com.clauseiq.common.AppConstants;
+import com.clauseiq.contract.dto.JobResponse;
+import com.clauseiq.contract.entity.AnalysisJob;
+import com.clauseiq.contract.entity.ClauseFinding;
+import com.clauseiq.contract.service.AnalysisService;
+import com.clauseiq.contract.service.SseService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1")
+public class ContractController {
+
+    private final AnalysisService analysisService;
+    private final SseService sseService;
+
+    public ContractController(AnalysisService analysisService, SseService sseService) {
+        this.analysisService = analysisService;
+        this.sseService = sseService;
+    }
+
+    /**
+     * Start the analysis.
+     * We return 202 ACCEPTED, not 200 OK, because the work is not
+     * finished yet, we only accepted the request.
+     */
+    @PostMapping("/contracts/{documentId}/analyze")
+    public ResponseEntity<JobResponse> analyze(
+            @PathVariable UUID documentId,
+            @RequestHeader(AppConstants.HEADER_TENANT_ID) String tenantId,
+            @RequestHeader(AppConstants.HEADER_USER_ID) String userId) {
+
+        AnalysisJob job = analysisService.startAnalysis(tenantId, userId, documentId);
+
+        JobResponse response = new JobResponse(
+                job.getId().toString(),
+                job.getStatus(),
+                0,
+                job.getTotalClauses());
+
+        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+    }
+
+    /** The client calls this again and again to check if it is done. */
+    @GetMapping("/analysis/{jobId}")
+    public ResponseEntity<JobResponse> getStatus(
+            @PathVariable UUID jobId,
+            @RequestHeader(AppConstants.HEADER_TENANT_ID) String tenantId) {
+
+        AnalysisJob job = analysisService.getJob(jobId, tenantId);
+
+        JobResponse response = new JobResponse(
+                job.getId().toString(),
+                job.getStatus(),
+                job.getProcessedClauses(),
+                job.getTotalClauses());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /** The full report with all the findings. */
+    @GetMapping("/analysis/{jobId}/report")
+    public ResponseEntity<List<ClauseFinding>> getReport(
+            @PathVariable UUID jobId,
+            @RequestHeader(AppConstants.HEADER_TENANT_ID) String tenantId) {
+
+        return ResponseEntity.ok(analysisService.getFindings(jobId, tenantId));
+    }
+
+    /**
+     * Instead of calling again and again, the client can open this
+     * connection once and we push updates to it.
+     */
+    @GetMapping(value = "/analysis/{jobId}/stream", produces = "text/event-stream")
+    public SseEmitter stream(
+            @PathVariable UUID jobId,
+            @RequestHeader(AppConstants.HEADER_TENANT_ID) String tenantId) {
+
+        // make sure this job belongs to this tenant before we stream it
+        analysisService.getJob(jobId, tenantId);
+
+        return sseService.subscribe(jobId);
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../service/SseService.java"><script type="text/plain">
+package com.clauseiq.contract.service;
+
+import com.clauseiq.common.AnalysisProgressEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+/**
+ * Keeps the open SSE connections in a map.
+ *
+ * Key   = job id
+ * Value = list of open connections watching that job
+ *
+ * We use ConcurrentHashMap and CopyOnWriteArrayList because different
+ * threads add and remove from this at the same time.
+ */
+@Service
+public class SseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SseService.class);
+
+    private static final long TIMEOUT = 10 * 60 * 1000L;   // 10 minutes
+
+    private final Map<UUID, List<SseEmitter>> emitters = new ConcurrentHashMap<>();
+
+    public SseEmitter subscribe(UUID jobId) {
+
+        SseEmitter emitter = new SseEmitter(TIMEOUT);
+
+        emitters.computeIfAbsent(jobId, key -> new CopyOnWriteArrayList<>()).add(emitter);
+
+        // Always remove the emitter when it closes, otherwise the map
+        // keeps growing and we have a memory leak.
+        emitter.onCompletion(() -> remove(jobId, emitter));
+        emitter.onTimeout(() -> remove(jobId, emitter));
+        emitter.onError(error -> remove(jobId, emitter));
+
+        logger.info("Client subscribed to job {}", jobId);
+
+        return emitter;
+    }
+
+    /** Called when a progress message arrives from Redis. */
+    public void sendUpdate(AnalysisProgressEvent event) {
+
+        UUID jobId = UUID.fromString(event.getJobId());
+        List<SseEmitter> list = emitters.get(jobId);
+
+        if (list == null) {
+            return;   // nobody is watching this job on this server
+        }
+
+        for (SseEmitter emitter : list) {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("progress")
+                        .data(event));
+
+                // if the job is finished, close the connection
+                if (event.getStatus().isFinished()) {
+                    emitter.complete();
+                }
+
+            } catch (IOException e) {
+                // the client closed the browser tab, this is normal
+                remove(jobId, emitter);
+            }
+        }
+    }
+
+    private void remove(UUID jobId, SseEmitter emitter) {
+        List<SseEmitter> list = emitters.get(jobId);
+        if (list != null) {
+            list.remove(emitter);
+            if (list.isEmpty()) {
+                emitters.remove(jobId);
+            }
+        }
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../service/ProgressConsumer.java"><script type="text/plain">
+package com.clauseiq.contract.service;
+
+import com.clauseiq.common.AnalysisProgressEvent;
+import com.clauseiq.common.AppConstants;
+import com.clauseiq.contract.entity.AnalysisJob;
+import com.clauseiq.contract.repository.AnalysisJobRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
+
+/**
+ * Listens to the progress messages that the AI worker sends,
+ * and does two things with them:
+ *   1. updates the job row in the database
+ *   2. publishes to Redis so the SSE connections get the update
+ */
+@Service
+public class ProgressConsumer {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProgressConsumer.class);
+
+    private final AnalysisJobRepository jobRepository;
+    private final StringRedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper;
+
+    public ProgressConsumer(AnalysisJobRepository jobRepository,
+                            StringRedisTemplate redisTemplate,
+                            ObjectMapper objectMapper) {
+        this.jobRepository = jobRepository;
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+    }
+
+    @KafkaListener(
+            topics = AppConstants.TOPIC_ANALYSIS_PROGRESS,
+            groupId = "contract-service")
+    public void onProgress(AnalysisProgressEvent event) {
+
+        UUID jobId = UUID.fromString(event.getJobId());
+
+        Optional<AnalysisJob> optional = jobRepository.findByIdAndTenantId(
+                jobId, event.getTenantId());
+
+        if (optional.isEmpty()) {
+            logger.warn("Got progress for unknown job {}", jobId);
+            return;
+        }
+
+        AnalysisJob job = optional.get();
+        job.setStatus(event.getStatus());
+        job.setProcessedClauses(event.getProcessedClauses());
+        job.setTotalClauses(event.getTotalClauses());
+        job.setErrorMessage(event.getErrorMessage());
+        jobRepository.save(job);
+
+        // Send it to Redis. Every copy of contract-service is listening
+        // to this channel, so whichever one is holding the browser
+        // connection will receive it and push it to the client.
+        try {
+            String json = objectMapper.writeValueAsString(event);
+            redisTemplate.convertAndSend(AppConstants.REDIS_PROGRESS_CHANNEL, json);
+        } catch (Exception e) {
+            logger.error("Could not publish progress to Redis", e);
+        }
+
+        logger.debug("Job {} progress {}/{}", jobId,
+                event.getProcessedClauses(), event.getTotalClauses());
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="contract-service/.../config/RedisConfig.java"><script type="text/plain">
+package com.clauseiq.contract.config;
+
+import com.clauseiq.common.AnalysisProgressEvent;
+import com.clauseiq.common.AppConstants;
+import com.clauseiq.contract.service.SseService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+
+@Configuration
+public class RedisConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisConfig.class);
+
+    /**
+     * Listens to the Redis channel and gives every message to SseService.
+     *
+     * Why do we need Redis here at all?
+     * If we run 3 copies of contract-service, the browser is connected
+     * to only one of them, but the Kafka message may arrive at a
+     * different copy. Redis publish/subscribe sends the update to all
+     * three, and the one that has the browser connection uses it.
+     */
+    @Bean
+    public RedisMessageListenerContainer redisListener(RedisConnectionFactory connectionFactory,
+                                                       SseService sseService,
+                                                       ObjectMapper objectMapper) {
+
+        MessageListener listener = (message, pattern) -> {
+            try {
+                AnalysisProgressEvent event = objectMapper.readValue(
+                        message.getBody(), AnalysisProgressEvent.class);
+
+                sseService.sendUpdate(event);
+
+            } catch (Exception e) {
+                logger.error("Could not read Redis message", e);
+            }
+        };
+
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(listener,
+                new ChannelTopic(AppConstants.REDIS_PROGRESS_CHANNEL));
+
+        return container;
+    }
+}
+</script></div>
+</section>
+
+<!-- ============ INGESTION ============ -->
+<section class="ch" id="s-ing" data-g="ingestion-service" data-t="Upload + ETL to pgvector">
+<div class="chead"><span class="num">12</span><h2>ingestion-service — reading files into the vector database</h2></div>
+
+<p>Before we can analyse anything, the PDF has to be split into pieces and saved as embeddings.
+Spring AI calls this an ETL pipeline: <strong>read</strong> the file, <strong>split</strong> it into chunks,
+<strong>save</strong> it to the vector store.</p>
+
+<div class="flow">
+  <span class="n">PDF file</span><span class="ar">→</span>
+  <span class="n">PagePdfDocumentReader</span><span class="ar">→</span>
+  <span class="n hl">TokenTextSplitter</span><span class="ar">→</span>
+  <span class="n hl">add tenantId</span><span class="ar">→</span>
+  <span class="n">vectorStore.add()</span>
+</div>
+
+<div class="code" data-lang="xml" data-file="ingestion-service/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.clauseiq</groupId>
+        <artifactId>clauseiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>ingestion-service</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.clauseiq</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- gives us the embedding model -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+        </dependency>
+
+        <!-- gives us the VectorStore bean for PostgreSQL -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+        </dependency>
+
+        <!-- to read PDF files -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-pdf-document-reader</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="ingestion-service/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8082
+
+spring:
+  application:
+    name: ingestion-service
+
+  servlet:
+    multipart:
+      max-file-size: 20MB      # contracts can be big
+      max-request-size: 20MB
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/clauseiq}
+    username: clauseiq
+    password: clauseiq
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      embedding:
+        options:
+          model: text-embedding-3-small
+
+    vectorstore:
+      pgvector:
+        initialize-schema: false     # we created the table in schema.sql
+        dimensions: 1536
+        distance-type: COSINE_DISTANCE
+</script></div>
+
+<div class="code" data-lang="java" data-file="ingestion-service/.../service/IngestionService.java"><script type="text/plain">
+package com.clauseiq.ingestion.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class IngestionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(IngestionService.class);
+
+    private final VectorStore vectorStore;
+
+    public IngestionService(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
+
+    /**
+     * Reads the uploaded file and saves it into the vector database.
+     *
+     * @param kind  either "CONTRACT" or "PLAYBOOK"
+     * @return how many chunks were created
+     */
+    public IngestResult ingest(MultipartFile file, String tenantId, String kind)
+            throws IOException {
+
+        UUID documentId = UUID.randomUUID();
+
+        // Spring AI needs a Resource, so we wrap the uploaded bytes
+        Resource resource = new ByteArrayResource(file.getBytes()) {
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename();
+            }
+        };
+
+        // STEP 1 - read the PDF. One Document per page.
+        PagePdfDocumentReader reader = new PagePdfDocumentReader(resource);
+        List<Document> pages = reader.read();
+
+        // STEP 2 - split the pages into smaller chunks.
+        // 700 tokens is roughly the size of one clause. If we make it
+        // too small a clause gets cut in half, if we make it too big
+        // one chunk contains two different clauses.
+        TokenTextSplitter splitter = new TokenTextSplitter(
+                700,    // chunk size
+                350,    // minimum characters in a chunk
+                20,     // minimum length worth embedding
+                2000,   // maximum number of chunks
+                true);  // keep separators
+
+        List<Document> chunks = splitter.apply(pages);
+
+        // STEP 3 - add metadata to every chunk.
+        // This is the most important part for multi-tenancy: later we
+        // search with a filter on tenantId so one customer can never
+        // see another customer's documents.
+        for (int i = 0; i < chunks.size(); i++) {
+            Document chunk = chunks.get(i);
+            chunk.getMetadata().put("tenantId", tenantId);
+            chunk.getMetadata().put("documentId", documentId.toString());
+            chunk.getMetadata().put("kind", kind);
+            chunk.getMetadata().put("chunkIndex", i);
+        }
+
+        // STEP 4 - save. This calls the embedding model for every chunk
+        // and then writes the rows into pgvector.
+        vectorStore.add(chunks);
+
+        logger.info("Saved document {} for tenant {}. Pages: {}, chunks: {}",
+                documentId, tenantId, pages.size(), chunks.size());
+
+        return new IngestResult(documentId.toString(), chunks.size());
+    }
+
+    // small class just to return two values
+    public static class IngestResult {
+
+        private final String documentId;
+        private final int chunks;
+
+        public IngestResult(String documentId, int chunks) {
+            this.documentId = documentId;
+            this.chunks = chunks;
+        }
+
+        public String getDocumentId() { return documentId; }
+        public int getChunks() { return chunks; }
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ingestion-service/.../web/IngestionController.java"><script type="text/plain">
+package com.clauseiq.ingestion.web;
+
+import com.clauseiq.common.AppConstants;
+import com.clauseiq.ingestion.service.IngestionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@RestController
+@RequestMapping("/api/v1/ingestion")
+public class IngestionController {
+
+    private final IngestionService ingestionService;
+
+    public IngestionController(IngestionService ingestionService) {
+        this.ingestionService = ingestionService;
+    }
+
+    /** Upload a contract that we want to analyse later. */
+    @PostMapping("/contract")
+    public ResponseEntity<IngestionService.IngestResult> uploadContract(
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader(AppConstants.HEADER_TENANT_ID) String tenantId)
+            throws IOException {
+
+        IngestionService.IngestResult result =
+                ingestionService.ingest(file, tenantId, "CONTRACT");
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    /**
+     * Upload the company rules (playbook).
+     * This is normally done only once when the customer joins.
+     */
+    @PostMapping("/playbook")
+    public ResponseEntity<IngestionService.IngestResult> uploadPlaybook(
+            @RequestParam("file") MultipartFile file,
+            @RequestHeader(AppConstants.HEADER_TENANT_ID) String tenantId)
+            throws IOException {
+
+        IngestionService.IngestResult result =
+                ingestionService.ingest(file, tenantId, "PLAYBOOK");
+
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">Why we save the tenantId in the metadata</span>
+  <p>All customers share the same <code class="i">vector_store</code> table. The only thing that keeps
+  their data separate is this <code class="i">tenantId</code> in the metadata, which we use as a filter
+  when we search. If we forget to add it, the search would return other customers' documents.</p>
+</div>
+</section>
+
+<!-- ============ AI WORKER ============ -->
+<section class="ch" id="s-w-setup" data-g="ai-worker" data-t="pom.xml + application.yml">
+<div class="chead"><span class="num">13</span><h2>ai-worker — setup</h2></div>
+
+<p>This service has no controller. It only reads messages from Kafka and does the AI work. If we
+need to go faster we start more copies of it.</p>
+
+<div class="code" data-lang="xml" data-file="ai-worker/pom.xml"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.clauseiq</groupId>
+        <artifactId>clauseiq</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>ai-worker</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.clauseiq</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- the chat model -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+        </dependency>
+
+        <!-- to search the playbook -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+</project>
+</script></div>
+
+<div class="code" data-lang="yaml" data-file="ai-worker/src/main/resources/application.yml"><script type="text/plain">
+server:
+  port: 8083
+
+spring:
+  application:
+    name: ai-worker
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/clauseiq}
+    username: clauseiq
+    password: clauseiq
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: 6379
+
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:localhost:9092}
+
+    consumer:
+      group-id: ai-workers
+      auto-offset-reset: earliest      # do not skip jobs after a restart
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.clauseiq.common
+        spring.json.value.default.type: com.clauseiq.common.AnalysisRequestedEvent
+
+        # VERY IMPORTANT
+        # One contract can take several minutes. The default here is
+        # 5 minutes, and if our job takes longer Kafka thinks the
+        # consumer died and gives the message to another worker.
+        # Then two workers do the same job. So we increase it.
+        max.poll.interval.ms: 900000     # 15 minutes
+        max.poll.records: 1              # one contract at a time
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+          temperature: 0.2      # low value = same answer every time
+          max-tokens: 800
+      embedding:
+        options:
+          model: text-embedding-3-small
+
+    vectorstore:
+      pgvector:
+        initialize-schema: false
+        dimensions: 1536
+        distance-type: COSINE_DISTANCE
+
+app:
+  worker:
+    concurrency: ${WORKER_CONCURRENCY:3}   # how many jobs at the same time
+    playbook-top-k: 3                      # how many rules to send to the AI
+    cache-hours: 48
+</script></div>
+
+<div class="box warn">
+  <span class="lbl">The setting that caused a bug for me</span>
+  <p><code class="i">max.poll.interval.ms</code>. With the default of 5 minutes, long contracts made
+  Kafka think the worker had crashed. It gave the same message to another worker, so two workers
+  analysed the same contract and I paid twice. Setting it to 15 minutes fixed it.</p>
+</div>
+</section>
+
+<section class="ch" id="s-w-consumer" data-g="ai-worker" data-t="Kafka consumer + retry">
+<div class="chead"><span class="num">14</span><h2>The Kafka consumer</h2></div>
+
+<div class="code" data-lang="java" data-file="ai-worker/.../consumer/AnalysisConsumer.java"><script type="text/plain">
+package com.clauseiq.worker.consumer;
+
+import com.clauseiq.common.AnalysisRequestedEvent;
+import com.clauseiq.common.AppConstants;
+import com.clauseiq.worker.service.ContractAnalysisService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.kafka.annotation.DltHandler;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.stereotype.Component;
+
+@Component
+public class AnalysisConsumer {
+
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisConsumer.class);
+
+    private final ContractAnalysisService analysisService;
+
+    public AnalysisConsumer(ContractAnalysisService analysisService) {
+        this.analysisService = analysisService;
+    }
+
+    /**
+     * @RetryableTopic makes Spring create extra topics for retries.
+     * If the method throws an exception, the message goes to a retry
+     * topic and is tried again later. After 3 attempts it goes to the
+     * DLT (dead letter topic) and we stop trying.
+     *
+     * The good thing is that the retry happens on a different topic,
+     * so the failing message does not block the other messages behind it.
+     */
+    @RetryableTopic(
+            attempts = "3",
+            backoff = @Backoff(delay = 5000, multiplier = 2.0)
+    )
+    @KafkaListener(
+            topics = AppConstants.TOPIC_ANALYSIS_REQUESTED,
+            groupId = AppConstants.GROUP_AI_WORKERS,
+            concurrency = "${app.worker.concurrency:3}"
+    )
+    public void handleAnalysisRequest(AnalysisRequestedEvent event) {
+
+        logger.info("Received job {} for tenant {}",
+                event.getJobId(), event.getTenantId());
+
+        analysisService.analyzeContract(event);
+    }
+
+    /**
+     * Runs when all retries have failed.
+     * We mark the job as FAILED so the user does not wait forever.
+     */
+    @DltHandler
+    public void handleFailed(AnalysisRequestedEvent event,
+                             @Header(KafkaHeaders.EXCEPTION_MESSAGE) String errorMessage) {
+
+        logger.error("Job {} failed after all retries. Reason: {}",
+                event.getJobId(), errorMessage);
+
+        analysisService.markAsFailed(event, errorMessage);
+    }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-w-ai" data-g="ai-worker" data-t="Spring AI config + prompts">
+<div class="chead"><span class="num">15</span><h2>Spring AI configuration and the result class</h2></div>
+
+<div class="code" data-lang="java" data-file="ai-worker/.../config/AiConfig.java"><script type="text/plain">
+package com.clauseiq.worker.config;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AiConfig {
+
+    /**
+     * Spring AI gives us a ChatClient.Builder bean automatically,
+     * and we call build() on it to create the ChatClient.
+     *
+     * We do not add a chat memory advisor here because every clause
+     * is analysed on its own. Memory would only add extra tokens
+     * and could make one clause affect the next one.
+     */
+    @Bean
+    public ChatClient chatClient(ChatClient.Builder builder) {
+        return builder.build();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-worker/.../model/ClauseAnalysis.java"><script type="text/plain">
+package com.clauseiq.worker.model;
+
+import com.clauseiq.common.ClauseType;
+import com.clauseiq.common.RiskLevel;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+
+/**
+ * This is what we want back from the AI.
+ *
+ * Instead of getting a String and trying to read it ourselves,
+ * we give this class to Spring AI using .entity(ClauseAnalysis.class).
+ * Spring AI creates a JSON structure from this class, adds it to the
+ * prompt, and converts the answer back into this object.
+ *
+ * The @JsonPropertyDescription text is not only a comment. It is sent
+ * to the AI as part of the instructions, so writing it clearly really
+ * improves the answers.
+ */
+public class ClauseAnalysis {
+
+    @JsonPropertyDescription("The type of this clause. Choose exactly one.")
+    private ClauseType clauseType;
+
+    @JsonPropertyDescription("How risky this clause is: NONE, LOW, MEDIUM, HIGH or CRITICAL")
+    private RiskLevel riskLevel;
+
+    @JsonPropertyDescription("One or two sentences explaining what this clause does")
+    private String summary;
+
+    @JsonPropertyDescription("How this clause breaks the company rules. Empty text if it is fine.")
+    private String playbookDeviation;
+
+    @JsonPropertyDescription("Suggested new wording for the clause. Empty text if no change needed.")
+    private String suggestedRedline;
+
+    public ClauseAnalysis() {
+    }
+
+    public ClauseType getClauseType() { return clauseType; }
+    public void setClauseType(ClauseType clauseType) { this.clauseType = clauseType; }
+
+    public RiskLevel getRiskLevel() { return riskLevel; }
+    public void setRiskLevel(RiskLevel riskLevel) { this.riskLevel = riskLevel; }
+
+    public String getSummary() { return summary; }
+    public void setSummary(String summary) { this.summary = summary; }
+
+    public String getPlaybookDeviation() { return playbookDeviation; }
+    public void setPlaybookDeviation(String playbookDeviation) { this.playbookDeviation = playbookDeviation; }
+
+    public String getSuggestedRedline() { return suggestedRedline; }
+    public void setSuggestedRedline(String suggestedRedline) { this.suggestedRedline = suggestedRedline; }
+}
+</script></div>
+
+<div class="code" data-lang="text" data-file="ai-worker/src/main/resources/prompts/system-prompt.st"><script type="text/plain">
+You are a contract review assistant. You check one clause at a time and
+say how risky it is for the company that is reading the contract.
+
+Rules you must follow:
+- Only use the text of the clause. Do not invent anything that is not written.
+- Use the company rules below to decide the risk.
+- If the clause breaks one of the company rules, the risk is HIGH or CRITICAL.
+- If no rule matches, decide the risk yourself and leave playbookDeviation empty.
+- Use CRITICAL only for unlimited liability, unlimited indemnity, or when the
+  other side can cancel the contract at any time without a reason.
+- suggestedRedline must be real contract wording, not advice.
+
+COMPANY RULES:
+{playbookRules}
+</script></div>
+
+<div class="code" data-lang="text" data-file="ai-worker/src/main/resources/prompts/user-prompt.st"><script type="text/plain">
+Please analyse this clause:
+
+{clauseText}
+</script></div>
+</section>
+
+<section class="ch" id="s-w-core" data-g="ai-worker" data-t="Analysis service (main logic)">
+<div class="chead"><span class="num">16</span><h2>The main analysis logic</h2></div>
+
+<p>This is the part in the middle of the diagram: <strong>Redis + RAG + AI Client</strong>. For every
+clause we check the cache, search the playbook, and then call the AI.</p>
+
+<div class="code" data-lang="java" data-file="ai-worker/.../service/ContractAnalysisService.java"><script type="text/plain">
+package com.clauseiq.worker.service;
+
+import com.clauseiq.common.*;
+import com.clauseiq.worker.entity.AnalysisJob;
+import com.clauseiq.worker.entity.ClauseFinding;
+import com.clauseiq.worker.model.ClauseAnalysis;
+import com.clauseiq.worker.repository.AnalysisJobRepository;
+import com.clauseiq.worker.repository.ClauseFindingRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.document.Document;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+public class ContractAnalysisService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ContractAnalysisService.class);
+
+    private final ChatClient chatClient;
+    private final DocumentService documentService;
+    private final PlaybookService playbookService;
+    private final CacheService cacheService;
+    private final AnalysisJobRepository jobRepository;
+    private final ClauseFindingRepository findingRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Value("classpath:prompts/system-prompt.st")
+    private Resource systemPrompt;
+
+    @Value("classpath:prompts/user-prompt.st")
+    private Resource userPrompt;
+
+    public ContractAnalysisService(ChatClient chatClient,
+                                   DocumentService documentService,
+                                   PlaybookService playbookService,
+                                   CacheService cacheService,
+                                   AnalysisJobRepository jobRepository,
+                                   ClauseFindingRepository findingRepository,
+                                   KafkaTemplate<String, Object> kafkaTemplate) {
+        this.chatClient = chatClient;
+        this.documentService = documentService;
+        this.playbookService = playbookService;
+        this.cacheService = cacheService;
+        this.jobRepository = jobRepository;
+        this.findingRepository = findingRepository;
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    public void analyzeContract(AnalysisRequestedEvent event) {
+
+        UUID jobId = UUID.fromString(event.getJobId());
+
+        Optional<AnalysisJob> optional = jobRepository.findById(jobId);
+        if (optional.isEmpty()) {
+            logger.warn("Job {} not found in database, skipping", jobId);
+            return;
+        }
+
+        AnalysisJob job = optional.get();
+
+        // Kafka can deliver the same message twice (for example if the
+        // worker restarted before saying "done"). So we check first
+        // if this job is already finished, otherwise we would pay twice.
+        if (job.getStatus().isFinished()) {
+            logger.info("Job {} is already {}, skipping", jobId, job.getStatus());
+            return;
+        }
+
+        // get all the clauses of this contract from the vector database
+        List<Document> clauses = documentService.getContractClauses(
+                event.getTenantId(), event.getDocumentId());
+
+        if (clauses.isEmpty()) {
+            markAsFailed(event, "No clauses found for this document");
+            return;
+        }
+
+        int total = clauses.size();
+        logger.info("Starting job {} with {} clauses", jobId, total);
+
+        sendProgress(event, JobStatus.PROCESSING, 0, total);
+
+        List<ClauseFinding> findings = new ArrayList<>();
+        RiskLevel highestRisk = RiskLevel.NONE;
+        int totalTokens = 0;
+        int cacheHits = 0;
+
+        for (int i = 0; i < total; i++) {
+
+            String clauseText = clauses.get(i).getText();
+
+            // ---------- 1. check the cache first ----------
+            ClauseAnalysis analysis = cacheService.get(event.getTenantId(), clauseText);
+
+            if (analysis != null) {
+                cacheHits++;
+            } else {
+                // ---------- 2. RAG: find the company rules for this clause ----------
+                String rules = playbookService.findRules(event.getTenantId(), clauseText);
+
+                // ---------- 3. call the AI ----------
+                analysis = callAi(clauseText, rules);
+
+                totalTokens += lastCallTokens;
+
+                cacheService.save(event.getTenantId(), clauseText, analysis);
+            }
+
+            findings.add(createFinding(jobId, event.getTenantId(), i, analysis));
+
+            // keep the highest risk we have seen so far.
+            // ordinal() works because the enum is ordered from NONE to CRITICAL.
+            if (analysis.getRiskLevel().ordinal() > highestRisk.ordinal()) {
+                highestRisk = analysis.getRiskLevel();
+            }
+
+            // send progress every 5 clauses, not every single one,
+            // otherwise we send too many small messages to Kafka
+            if ((i + 1) % 5 == 0 || i == total - 1) {
+                sendProgress(event, JobStatus.PROCESSING, i + 1, total);
+            }
+        }
+
+        // ---------- 4. save everything ----------
+        findingRepository.saveAll(findings);
+
+        job.setStatus(JobStatus.COMPLETED);
+        job.setProcessedClauses(total);
+        job.setTotalClauses(total);
+        job.setOverallRisk(highestRisk);
+        job.setTotalTokens(totalTokens);
+        jobRepository.save(job);
+
+        sendProgress(event, JobStatus.COMPLETED, total, total);
+
+        logger.info("Finished job {}. Clauses: {}, risk: {}, tokens: {}, cache hits: {}",
+                jobId, total, highestRisk, totalTokens, cacheHits);
+    }
+
+    // remembers how many tokens the last AI call used
+    private int lastCallTokens = 0;
+
+    /**
+     * Calls the AI for one clause.
+     *
+     * We use responseEntity() instead of entity() because it gives us
+     * both the converted object AND the response details, so we can
+     * read how many tokens were used.
+     */
+    private ClauseAnalysis callAi(String clauseText, String playbookRules) {
+
+        if (playbookRules.isEmpty()) {
+            playbookRules = "(no company rule matched this clause)";
+        }
+
+        var result = chatClient.prompt()
+                .system(s -> s.text(systemPrompt).param("playbookRules", playbookRules))
+                .user(u -> u.text(userPrompt).param("clauseText", clauseText))
+                .call()
+                .responseEntity(ClauseAnalysis.class);
+
+        ChatResponse response = result.getResponse();
+        this.lastCallTokens = response.getMetadata().getUsage().getTotalTokens();
+
+        return result.getEntity();
+    }
+
+    private ClauseFinding createFinding(UUID jobId, String tenantId,
+                                        int index, ClauseAnalysis analysis) {
+        ClauseFinding finding = new ClauseFinding();
+        finding.setJobId(jobId);
+        finding.setTenantId(tenantId);
+        finding.setClauseIndex(index);
+        finding.setClauseType(analysis.getClauseType());
+        finding.setRiskLevel(analysis.getRiskLevel());
+        finding.setSummary(analysis.getSummary());
+        finding.setPlaybookDeviation(analysis.getPlaybookDeviation());
+        finding.setSuggestedRedline(analysis.getSuggestedRedline());
+        return finding;
+    }
+
+    private void sendProgress(AnalysisRequestedEvent event, JobStatus status,
+                              int processed, int total) {
+
+        AnalysisProgressEvent progress = new AnalysisProgressEvent(
+                event.getJobId(), event.getTenantId(), status, processed, total);
+
+        kafkaTemplate.send(AppConstants.TOPIC_ANALYSIS_PROGRESS,
+                event.getTenantId(), progress);
+    }
+
+    public void markAsFailed(AnalysisRequestedEvent event, String reason) {
+
+        UUID jobId = UUID.fromString(event.getJobId());
+
+        jobRepository.findById(jobId).ifPresent(job -> {
+            job.setStatus(JobStatus.FAILED);
+            job.setErrorMessage(reason);
+            jobRepository.save(job);
+        });
+
+        AnalysisProgressEvent progress = new AnalysisProgressEvent(
+                event.getJobId(), event.getTenantId(), JobStatus.FAILED, 0, 0);
+        progress.setErrorMessage(reason);
+
+        kafkaTemplate.send(AppConstants.TOPIC_ANALYSIS_PROGRESS,
+                event.getTenantId(), progress);
+    }
+}
+</script></div>
+</section>
+
+<section class="ch" id="s-w-rag" data-g="ai-worker" data-t="RAG + Redis cache">
+<div class="chead"><span class="num">17</span><h2>Searching the playbook (RAG) and the cache</h2></div>
+
+<div class="code" data-lang="java" data-file="ai-worker/.../service/PlaybookService.java"><script type="text/plain">
+package com.clauseiq.worker.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * This is the "R" in RAG (Retrieval).
+ *
+ * We take the text of one clause and search the vector database for
+ * the company rules that are about the same topic.
+ */
+@Service
+public class PlaybookService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlaybookService.class);
+
+    private final VectorStore vectorStore;
+
+    @Value("${app.worker.playbook-top-k:3}")
+    private int topK;
+
+    public PlaybookService(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
+
+    public String findRules(String tenantId, String clauseText) {
+
+        // The filter expression is the important part.
+        // It makes sure we only search inside THIS tenant's playbook.
+        // Without it we would get other customers' rules.
+        String filter = "tenantId == '" + tenantId + "' && kind == 'PLAYBOOK'";
+
+        SearchRequest request = SearchRequest.builder()
+                .query(clauseText)
+                .topK(topK)              // only the 3 closest rules
+                .similarityThreshold(0.5)
+                .filterExpression(filter)
+                .build();
+
+        List<Document> rules = vectorStore.similaritySearch(request);
+
+        if (rules == null || rules.isEmpty()) {
+            logger.debug("No playbook rules found for tenant {}", tenantId);
+            return "";
+        }
+
+        // put them together as a simple list for the prompt
+        StringBuilder sb = new StringBuilder();
+        for (Document rule : rules) {
+            sb.append("- ").append(rule.getText().replace("\n", " ").trim()).append("\n");
+        }
+
+        return sb.toString();
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-worker/.../service/DocumentService.java"><script type="text/plain">
+package com.clauseiq.worker.service;
+
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.stereotype.Service;
+
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * Loads all the chunks of one contract.
+ *
+ * Here we do not really want a similarity search, we want everything.
+ * So we set topK very high and the threshold to 0, and then sort the
+ * results by the chunkIndex we saved during upload, because the vector
+ * store returns them in order of similarity and not in page order.
+ */
+@Service
+public class DocumentService {
+
+    private static final int MAX_CLAUSES = 2000;
+
+    private final VectorStore vectorStore;
+
+    public DocumentService(VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
+
+    public List<Document> getContractClauses(String tenantId, String documentId) {
+
+        String filter = "tenantId == '" + tenantId + "' && documentId == '" + documentId + "'";
+
+        SearchRequest request = SearchRequest.builder()
+                .query("contract clause")
+                .topK(MAX_CLAUSES)
+                .similarityThreshold(0.0)
+                .filterExpression(filter)
+                .build();
+
+        List<Document> chunks = vectorStore.similaritySearch(request);
+
+        chunks.sort(Comparator.comparingInt(doc ->
+                Integer.parseInt(doc.getMetadata().get("chunkIndex").toString())));
+
+        return chunks;
+    }
+}
+</script></div>
+
+<div class="code" data-lang="java" data-file="ai-worker/.../service/CacheService.java"><script type="text/plain">
+package com.clauseiq.worker.service;
+
+import com.clauseiq.worker.model.ClauseAnalysis;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.Duration;
+
+/**
+ * Saves the analysis of one clause in Redis.
+ *
+ * Many contracts contain the same standard clauses (governing law,
+ * notices, confidentiality). Without the cache we would pay the AI
+ * again and again for the exact same text.
+ */
+@Service
+public class CacheService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CacheService.class);
+
+    private final StringRedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper;
+
+    @Value("${app.worker.cache-hours:48}")
+    private int cacheHours;
+
+    public CacheService(StringRedisTemplate redisTemplate, ObjectMapper objectMapper) {
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
+    }
+
+    public ClauseAnalysis get(String tenantId, String clauseText) {
+        try {
+            String json = redisTemplate.opsForValue().get(buildKey(tenantId, clauseText));
+
+            if (json == null) {
+                return null;
+            }
+            return objectMapper.readValue(json, ClauseAnalysis.class);
+
+        } catch (Exception e) {
+            // if the cache has a problem we just treat it as "not found"
+            // and call the AI. The job must not fail because of the cache.
+            logger.warn("Could not read from cache", e);
+            return null;
+        }
+    }
+
+    public void save(String tenantId, String clauseText, ClauseAnalysis analysis) {
+        try {
+            String json = objectMapper.writeValueAsString(analysis);
+
+            redisTemplate.opsForValue().set(
+                    buildKey(tenantId, clauseText),
+                    json,
+                    Duration.ofHours(cacheHours));
+
+        } catch (Exception e) {
+            logger.warn("Could not write to cache", e);
+        }
+    }
+
+    /**
+     * The key includes the tenant id, because the same clause can be
+     * fine for one company and a problem for another, depending on
+     * their rules.
+     *
+     * We hash the text because clause text is too long to use as a
+     * Redis key directly.
+     */
+    private String buildKey(String tenantId, String clauseText) {
+        String cleaned = clauseText.replaceAll("\\s+", " ").trim().toLowerCase();
+        return "clause:" + tenantId + ":" + hash(cleaned);
+    }
+
+    private String hash(String text) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Could not create hash", e);
+        }
+    }
+}
+</script></div>
+
+<div class="box key">
+  <span class="lbl">What the cache saved me</span>
+  <p>Standard clauses repeat a lot between contracts. In my testing about a third of the clauses
+  were already in the cache, which means a third fewer AI calls. It is the easiest way to reduce
+  the cost.</p>
+</div>
+</section>
+
+<!-- ============ RUN ============ -->
+<section class="ch" id="s-run" data-g="Running it" data-t="Parent pom + how to run">
+<div class="chead"><span class="num">18</span><h2>Parent pom and running the project</h2></div>
+
+<div class="code" data-lang="xml" data-file="pom.xml (parent)"><script type="text/plain">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.clauseiq</groupId>
+    <artifactId>clauseiq</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.5</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <java.version>21</java.version>
+        <spring-ai.version>1.0.0</spring-ai.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
+    </properties>
+
+    <modules>
+        <module>common</module>
+        <module>api-gateway</module>
+        <module>contract-service</module>
+        <module>ingestion-service</module>
+        <module>ai-worker</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
+</script></div>
+
+<div class="code" data-lang="bash" data-file="how to run"><script type="text/plain">
+# 1. set the keys
+export OPENAI_API_KEY=sk-...
+export JWT_SECRET=my-secret-key-must-be-at-least-32-characters
+
+# 2. start postgres, redis and kafka
+docker compose up -d
+
+# 3. build everything
+mvn clean install -DskipTests
+
+# 4. start the services (each one in its own terminal)
+cd api-gateway       && mvn spring-boot:run
+cd contract-service  && mvn spring-boot:run
+cd ingestion-service && mvn spring-boot:run
+cd ai-worker         && mvn spring-boot:run
+</script></div>
+
+<h3>Testing that the buffer really works</h3>
+
+<div class="code" data-lang="bash" data-file="send many requests at once"><script type="text/plain">
+# Send 30 requests at the same time.
+# Nothing fails and nothing times out. The messages just wait
+# in the Kafka topic and the workers process them one by one.
+for i in $(seq 1 30); do
+  curl -s -o /dev/null -X POST \
+    http://localhost:8080/api/v1/contracts/$DOC_ID/analyze \
+    -H "Authorization: Bearer $TOKEN" &
+done
+wait
+
+# see how many messages are still waiting
+docker exec clauseiq-kafka kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 \
+  --group ai-workers --describe
+</script></div>
+
+<h3>What happens when something breaks</h3>
+<table>
+<tr><th>Problem</th><th>What happens</th></tr>
+<tr><td>OpenAI is down</td>
+    <td>The listener throws an exception, so Kafka retries the message after 5s, then 10s, then 20s.
+        If it still fails it goes to the DLT and the job is marked FAILED.</td></tr>
+<tr><td>The worker restarts in the middle</td>
+    <td>Kafka sends the message again. We check the job status first, and the cache means the
+        clauses we already did are almost free the second time.</td></tr>
+<tr><td>Redis is down</td>
+    <td>The cache returns null every time so we call the AI more often. Slower and more expensive,
+        but the job still works.</td></tr>
+<tr><td>Kafka is down</td>
+    <td>The job row is saved with status QUEUED but the message is not sent. The user sees QUEUED
+        forever. A scheduled job that re-sends old QUEUED jobs would fix this.</td></tr>
+</table>
+
+<h3>Things I would add next</h3>
+<ul>
+  <li>An <code class="i">Idempotency-Key</code> header so that if the user clicks the button twice we do
+      not create two jobs.</li>
+  <li>A scheduled task that finds jobs stuck in QUEUED and sends them to Kafka again.</li>
+  <li>Unit tests for the analysis service using a mock <code class="i">ChatClient</code>.</li>
+  <li>A circuit breaker on the AI call, so when OpenAI is down we stop trying immediately instead of
+      waiting for a timeout every time.</li>
+</ul>
+</section>
+
+</div><!-- /inner -->
+</main>
+</div><!-- /wrap -->
+
+<script>
+(function(){
+  const KW = new Set(("public private protected class interface enum record extends implements new return void "+
+    "static final import package if else for while do try catch finally throw throws this super null true false "+
+    "var instanceof synchronized abstract default break continue switch case yield transient volatile assert "+
+    "const let function async await export from of in typeof delete not and or nil local then end elseif "+
+    "select insert update delete create table alter drop index primary key references on extension exists using").split(" "));
+
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function sp(cls,txt){return '<span class="'+cls+'">'+esc(txt)+"</span>";}
+
+  function hiCode(src,lang){
+    const lineCmt = (lang==="lua"||lang==="sql") ? "--" : "//";
+    let out="", i=0; const n=src.length;
+    while(i<n){
+      const two = src.substr(i,2), ch = src[i];
+      if(two===lineCmt || two==="//"){
+        let j=src.indexOf("\n",i); if(j<0) j=n;
+        out+=sp("c",src.slice(i,j)); i=j; continue;
+      }
+      if(two==="/*"){
+        let j=src.indexOf("*/",i+2); j=(j<0)?n:j+2;
+        out+=sp("c",src.slice(i,j)); i=j; continue;
+      }
+      if(ch==="#" && (i===0 || /\s/.test(src[i-1]))){
+        let j=src.indexOf("\n",i); if(j<0) j=n;
+        out+=sp("c",src.slice(i,j)); i=j; continue;
+      }
+      if(ch==='"' || ch==="'" || ch==="`"){
+        let j=i+1;
+        while(j<n){
+          if(src[j]==="\\"){ j+=2; continue; }
+          if(src[j]===ch){ j++; break; }
+          if(ch!=="`" && src[j]==="\n") break;
+          j++;
+        }
+        j=Math.min(j,n);
+        out+=sp("s",src.slice(i,j)); i=j; continue;
+      }
+      if(ch==="@" && /[A-Za-z]/.test(src[i+1]||"")){
+        let j=i+1; while(j<n && /[\w.]/.test(src[j])) j++;
+        out+=sp("a",src.slice(i,j)); i=j; continue;
+      }
+      if(/[A-Za-z_$]/.test(ch)){
+        let j=i; while(j<n && /[\w$]/.test(src[j])) j++;
+        const w=src.slice(i,j);
+        let k=j; while(k<n && (src[k]===" "||src[k]==="\t")) k++;
+        if(KW.has(w))             out+=sp("k",w);
+        else if(/^[A-Z]/.test(w)) out+=sp("t",w);
+        else if(src[k]==="(")     out+=sp("f",w);
+        else                      out+=esc(w);
+        i=j; continue;
+      }
+      out+=esc(ch); i++;
+    }
+    return out;
+  }
+
+  function hiXml(src){
+    let out="", i=0; const n=src.length;
+    while(i<n){
+      if(src.startsWith("<!--",i)){
+        let j=src.indexOf("-->",i); j=(j<0)?n:j+3;
+        out+=sp("c",src.slice(i,j)); i=j; continue;
+      }
+      if(src[i]==="<"){
+        let j=src.indexOf(">",i); j=(j<0)?n:j+1;
+        let tag=esc(src.slice(i,j));
+        tag=tag.replace(/^(&lt;[\/?]?)([\w.:-]+)/,function(m,a,b){return a+'<span class="t">'+b+"</span>";});
+        tag=tag.replace(/([\w.:-]+)=("[^"]*")/g,function(m,a,b){
+          return '<span class="nm">'+a+'</span>=<span class="s">'+b+"</span>";});
+        out+=tag; i=j; continue;
+      }
+      out+=esc(src[i]); i++;
+    }
+    return out;
+  }
+
+  function hiConf(src){
+    return src.split("\n").map(function(line){
+      if(line.trim().indexOf("#")===0) return sp("c",line);
+      const m=line.match(/^([\s\-]*)([A-Za-z0-9_.\[\]$-]+)(\s*[:=])([\s\S]*)$/);
+      if(!m) return esc(line);
+      const val=esc(m[4]).replace(/(\$\{[^}]*\})/g,'<span class="a">$1</span>');
+      return esc(m[1])+'<span class="nm">'+esc(m[2])+"</span>"+esc(m[3])+val;
+    }).join("\n");
+  }
+
+  function hi(src,lang){
+    if(lang==="xml")  return hiXml(src);
+    if(lang==="yaml"||lang==="properties") return hiConf(src);
+    if(lang==="tree"||lang==="text")       return esc(src);
+    return hiCode(src,lang);
+  }
+
+  document.querySelectorAll(".code").forEach(function(box){
+    const holder=box.querySelector('script[type="text/plain"]');
+    if(!holder) return;
+    const raw=holder.textContent.replace(/^\n/,"").replace(/\s+$/,"");
+    const lang=box.dataset.lang||"java";
+    const file=box.dataset.file||lang;
+    holder.remove();
+    box.insertAdjacentHTML("afterbegin",
+      '<div class="bar"><span class="fn">'+esc(file)+'</span><button class="cp">copy</button></div>'+
+      "<pre><code>"+hi(raw,lang)+"</code></pre>");
+    box.querySelector(".cp").addEventListener("click",function(){
+      navigator.clipboard.writeText(raw);
+      const b=this; b.textContent="copied"; setTimeout(function(){b.textContent="copy";},1200);
+    });
+  });
+
+  const toc=document.getElementById("toc");
+  const secs=[].slice.call(document.querySelectorAll("section.ch"));
+  let lastGroup=null;
+  secs.forEach(function(s){
+    if(s.dataset.g!==lastGroup){
+      lastGroup=s.dataset.g;
+      const g=document.createElement("li");
+      g.className="grp"; g.textContent=lastGroup;
+      toc.appendChild(g);
+    }
+    const li=document.createElement("li");
+    li.innerHTML='<a href="#'+s.id+'"><span class="f">'+s.dataset.t+"</span></a>";
+    toc.appendChild(li);
+  });
+
+  document.getElementById("q").addEventListener("input",function(e){
+    const v=e.target.value.toLowerCase();
+    [].slice.call(toc.children).forEach(function(li){
+      if(li.className==="grp"){ li.style.display = v ? "none" : ""; return; }
+      li.style.display = li.textContent.toLowerCase().indexOf(v)>-1 ? "" : "none";
+    });
+  });
+
+  const links=[].slice.call(toc.querySelectorAll("a"));
+  const io=new IntersectionObserver(function(es){
+    es.forEach(function(en){
+      if(!en.isIntersecting) return;
+      links.forEach(function(a){a.classList.remove("on");});
+      const a=links.filter(function(x){return x.getAttribute("href")==="#"+en.target.id;})[0];
+      if(a){ a.classList.add("on"); a.scrollIntoView({block:"nearest"}); }
+    });
+  },{rootMargin:"-12% 0px -78% 0px"});
+  secs.forEach(function(s){io.observe(s);});
+})();
+</script>
+</body>
+</html>
