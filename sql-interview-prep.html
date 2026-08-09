@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Interview Preparation — Notes &amp; 113 Q&amp;A</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --bg-alt: #111823;
+    --card: #141b26;
+    --card-border: #22303f;
+    --text: #dbe4ee;
+    --text-dim: #8ea0b3;
+    --accent: #4fd1c5;
+    --accent2: #f6ad55;
+    --accent3: #90cdf4;
+    --danger: #fc8181;
+    --code-bg: #0d1319;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at top left, #0f1720, #060a0f 65%);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: var(--accent3); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header.hero {
+    padding: 56px 24px 40px;
+    text-align: center;
+    border-bottom: 1px solid var(--card-border);
+    background: linear-gradient(180deg, rgba(79,209,197,0.08), transparent);
+  }
+  .nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--accent3);
+    text-decoration: none;
+    font-size: 0.92rem;
+    margin: 0 24px 20px;
+  }
+  .nav-back:hover { color: var(--accent); }
+  header.hero h1 {
+    font-size: 2.2rem;
+    margin: 0 0 10px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header.hero p { color: var(--text-dim); max-width: 720px; margin: 0 auto; }
+  .badges { margin-top: 18px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    background: var(--card); border: 1px solid var(--card-border);
+    padding: 6px 14px; border-radius: 999px; font-size: 0.85rem; color: var(--accent);
+  }
+
+  nav.top-nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11,15,20,0.92); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 10px 20px; display: flex; gap: 18px; justify-content: center; flex-wrap: wrap;
+  }
+  nav.top-nav a { color: var(--text-dim); font-size: 0.92rem; font-weight: 600; }
+  nav.top-nav a:hover { color: var(--accent); text-decoration: none; }
+
+  .container { max-width: 980px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  h2.section-title {
+    font-size: 1.6rem; color: var(--accent); margin: 50px 0 20px;
+    border-left: 4px solid var(--accent); padding-left: 14px;
+  }
+  p.section-sub { color: var(--text-dim); margin-top: -10px; margin-bottom: 24px; }
+
+  /* roadmap phases */
+  .phase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 30px; }
+  .phase-box { background: var(--card); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px 16px; }
+  .phase-box h4 { margin: 0 0 8px; color: var(--accent2); font-size: 0.95rem; }
+  .phase-box ul { margin: 0; padding-left: 18px; color: var(--text-dim); font-size: 0.85rem; }
+  .phase-box li { margin-bottom: 4px; }
+
+  table.cmp-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+  table.cmp-table th, table.cmp-table td { border: 1px solid var(--card-border); padding: 8px 12px; text-align: left; }
+  table.cmp-table th { background: var(--bg-alt); color: var(--accent); }
+  table.cmp-table td.stars { color: var(--accent2); letter-spacing: 2px; }
+
+  /* notes nav pills */
+  .notes-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+  .nav-link {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 8px;
+    padding: 6px 12px; font-size: 0.82rem; color: var(--text-dim);
+  }
+  .nav-link:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
+
+  .note-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 14px;
+    padding: 22px 26px; margin-bottom: 22px; scroll-margin-top: 70px;
+  }
+  .note-card.highlight { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .note-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+  .note-head h3 { margin: 0; color: var(--accent3); font-size: 1.15rem; }
+  .tag { background: var(--bg-alt); color: var(--accent2); font-size: 0.72rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--card-border); white-space: nowrap; }
+  .note-body p { color: var(--text); }
+  .note-body ul { color: var(--text); padding-left: 22px; }
+  .note-body li { margin-bottom: 4px; }
+
+  .callout {
+    background: rgba(79,209,197,0.08); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 6px; margin: 14px 0; font-size: 0.92rem;
+  }
+
+  .codebox { background: var(--code-bg); border: 1px solid var(--card-border); border-radius: 8px; margin: 12px 0; overflow-x: auto; }
+  .codebox pre { margin: 0; padding: 14px 18px; }
+  code { font-family: 'Fira Code', Consolas, monospace; font-size: 0.86rem; color: #b8f5d0; }
+  .note-body code, .qa-content code, p code { background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px; color: var(--accent2); }
+  .codebox code { background: none; padding: 0; color: #a3e6c4; }
+
+  /* Q&A section */
+  .qa-toolbar { display:flex; justify-content: space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:18px; }
+  .qa-count { color: var(--text-dim); font-size: 0.9rem; }
+  #qa-search {
+    width: 100%; max-width: 340px; padding: 10px 14px; border-radius: 8px;
+    border: 1px solid var(--card-border); background: var(--bg-alt); color: var(--text); font-size: 0.9rem;
+  }
+  #qa-search:focus { outline: none; border-color: var(--accent); }
+
+  .cat-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+  .cat-pill { background: var(--bg-alt); border: 1px solid var(--card-border); border-radius: 999px; padding: 5px 12px; font-size: 0.78rem; color: var(--text-dim); }
+  .cat-pill span { color: var(--accent); font-weight: 700; margin-left: 4px; }
+  .cat-pill:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+
+  h3.cat-heading { color: var(--accent2); border-bottom: 1px dashed var(--card-border); padding-bottom: 6px; margin: 40px 0 14px; scroll-margin-top: 70px; }
+
+  details.qa-card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 10px;
+    margin-bottom: 10px; padding: 4px 18px;
+  }
+  details.qa-card[open] { border-color: var(--accent); }
+  details.qa-card summary {
+    cursor: pointer; padding: 14px 0; font-weight: 600; color: var(--text);
+    list-style: none; display: flex; gap: 10px; align-items: baseline;
+  }
+  details.qa-card summary::-webkit-details-marker { display: none; }
+  details.qa-card summary::before { content: '▸'; color: var(--accent); transition: transform .15s ease; flex-shrink:0; }
+  details.qa-card[open] summary::before { transform: rotate(90deg); }
+  .qnum { color: var(--accent); font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+  .qa-content { padding: 0 0 16px 24px; color: var(--text-dim); animation: fade .2s ease; }
+  .qa-content .answer { color: var(--text); }
+  .qa-content .exp { font-size: 0.9rem; margin-top: 8px; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+  footer { text-align: center; padding: 30px; color: var(--text-dim); font-size: 0.82rem; border-top: 1px solid var(--card-border); }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    header.hero h1 { font-size: 1.6rem; }
+    .note-card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>🔥 SQL Interview Preparation</h1>
+  <p>Complete notes across 18 topics, phased roadmap, priority ranking, and 113 interview-level questions with answers &amp; explanations — tailored for Java / Spring Boot backend interviews.</p>
+  <div class="badges">
+    <span class="badge">18 Topics</span>
+    <span class="badge">113 Q&amp;A</span>
+    <span class="badge">PostgreSQL-focused</span>
+    <span class="badge">Java / Spring Boot ready</span>
+  </div>
+</header>
+
+<a class="nav-back" href="index.html">← Back to Hub</a>
+
+<nav class="top-nav">
+  <a href="#roadmap">Roadmap</a>
+  <a href="#priority">Priority</a>
+  <a href="#notes">Notes</a>
+  <a href="#qa">100 Q&amp;A</a>
+</nav>
+
+<div class="container">
+
+  <h2 class="section-title" id="roadmap">🧠 Preparation Roadmap</h2>
+  <p class="section-sub">Follow this order if you're preparing specifically for Java / Spring Boot backend interviews.</p>
+  <div class="phase-grid">
+    <div class="phase-box"><h4>Phase 1</h4><ul><li>SELECT / WHERE</li><li>ORDER BY</li><li>GROUP BY / HAVING</li><li>Aggregate Functions</li></ul></div><div class="phase-box"><h4>Phase 2</h4><ul><li>INNER JOIN</li><li>LEFT JOIN</li><li>RIGHT JOIN</li><li>SELF JOIN</li><li>Subqueries</li></ul></div><div class="phase-box"><h4>Phase 3</h4><ul><li>CASE</li><li>UNION</li><li>CTE</li><li>EXISTS</li></ul></div><div class="phase-box"><h4>Phase 4</h4><ul><li>ROW_NUMBER</li><li>RANK</li><li>DENSE_RANK</li><li>LAG / LEAD</li><li>Window Functions</li></ul></div><div class="phase-box"><h4>Phase 5</h4><ul><li>Keys</li><li>Constraints</li><li>Normalization</li><li>Relationships</li></ul></div><div class="phase-box"><h4>Phase 6</h4><ul><li>Transactions</li><li>ACID</li><li>Isolation Levels</li><li>Locks</li></ul></div><div class="phase-box"><h4>Phase 7</h4><ul><li>Indexes</li><li>EXPLAIN</li><li>Query Optimization</li></ul></div><div class="phase-box"><h4>Phase 8</h4><ul><li>Views</li><li>Stored Procedures</li><li>Triggers</li><li>Advanced PostgreSQL</li></ul></div>
+  </div>
+
+  <h2 class="section-title" id="priority">⭐ Topic Priority</h2>
+  <p class="section-sub">Ranked for a Java Backend + Spring Boot interview track.</p>
+  <table class="cmp-table">
+    <tr><th>Topic</th><th>Priority</th></tr>
+    <tr><td>SELECT / WHERE</td><td class="stars">★★★★★</td></tr><tr><td>GROUP BY / HAVING</td><td class="stars">★★★★★</td></tr><tr><td>JOINs</td><td class="stars">★★★★★</td></tr><tr><td>Subqueries</td><td class="stars">★★★★★</td></tr><tr><td>Window Functions</td><td class="stars">★★★★★</td></tr><tr><td>CTE</td><td class="stars">★★★★☆</td></tr><tr><td>Indexes</td><td class="stars">★★★★★</td></tr><tr><td>Transactions / ACID</td><td class="stars">★★★★★</td></tr><tr><td>Normalization</td><td class="stars">★★★★☆</td></tr><tr><td>Keys / Constraints</td><td class="stars">★★★★☆</td></tr><tr><td>Query Optimization</td><td class="stars">★★★★☆</td></tr><tr><td>Views</td><td class="stars">★★★☆☆</td></tr><tr><td>Procedures / Triggers</td><td class="stars">★★☆☆☆</td></tr>
+  </table>
+
+  <h2 class="section-title" id="notes">📘 Notes — All 18 Topics</h2>
+  <p class="section-sub">Click any topic below to jump straight to it.</p>
+  <div class="notes-nav">
+    <a href="#basics" class="nav-link">1. SQL Basics</a>
+<a href="#aggregate" class="nav-link">2. Aggregate Functions &amp; GROUP BY</a>
+<a href="#joins" class="nav-link">3. JOINs</a>
+<a href="#subqueries" class="nav-link">4. Subqueries</a>
+<a href="#constraints" class="nav-link">5. Constraints</a>
+<a href="#keys" class="nav-link">6. Keys</a>
+<a href="#functions" class="nav-link">7. SQL Functions</a>
+<a href="#case" class="nav-link">8. CASE Expressions</a>
+<a href="#setops" class="nav-link">9. Set Operations</a>
+<a href="#cte" class="nav-link">10. CTE (Common Table Expressions)</a>
+<a href="#window" class="nav-link">11. Window Functions</a>
+<a href="#normalization" class="nav-link">12. Normalization</a>
+<a href="#transactions" class="nav-link">13. Transactions</a>
+<a href="#indexes" class="nav-link">14. Indexes</a>
+<a href="#views" class="nav-link">15. Views</a>
+<a href="#procs" class="nav-link">16. Stored Procedures / Functions / Triggers</a>
+<a href="#optimization" class="nav-link">17. Query Optimization</a>
+<a href="#design" class="nav-link">18. Database Design</a>
+  </div>
+  
+<section class="note-card" id="basics">
+  <div class="note-head">
+    <h3>1. SQL Basics</h3>
+    <span class="tag">Foundation</span>
+  </div>
+  <div class="note-body">
+<p>Every SQL interview starts here. Make sure these are second nature:</p>
+<ul>
+  <li><b>Database, Table, Row, Column</b> — the basic building blocks of a relational database.</li>
+  <li><b>Primary Key</b> — uniquely identifies a row, cannot be NULL, one per table.</li>
+  <li><b>Foreign Key</b> — a column referencing another table's primary key, enforcing referential integrity.</li>
+  <li><b>DDL</b> (structure): <code>CREATE</code>, <code>ALTER</code>, <code>DROP</code>, <code>TRUNCATE</code></li>
+  <li><b>DML</b> (data): <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>SELECT</code></li>
+  <li>Filtering: <code>WHERE</code>, <code>DISTINCT</code>, <code>AND/OR/NOT</code>, <code>IN</code>, <code>BETWEEN</code>, <code>LIKE</code>, <code>IS NULL</code></li>
+  <li>Sorting/limiting: <code>ORDER BY</code>, <code>LIMIT</code></li>
+</ul>
+<div class="codebox"><pre><code>SELECT name, salary
+FROM employee
+WHERE salary > 50000
+ORDER BY salary DESC;</code></pre></div>
+<div class="callout">
+  <strong>⭐ Logical execution order</strong> (a favorite interview question):<br>
+  <code>FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → DISTINCT → ORDER BY → LIMIT</code>
+</div>
+</div>
+</section>
+
+<section class="note-card" id="aggregate">
+  <div class="note-head">
+    <h3>2. Aggregate Functions &amp; GROUP BY</h3>
+    <span class="tag">Core</span>
+  </div>
+  <div class="note-body">
+<p>Master <code>COUNT()</code>, <code>SUM()</code>, <code>AVG()</code>, <code>MIN()</code>, <code>MAX()</code> — and remember that all of them (except <code>COUNT(*)</code>) ignore NULLs.</p>
+<div class="codebox"><pre><code>SELECT department, AVG(salary)
+FROM employee
+GROUP BY department
+HAVING AVG(salary) > 50000;</code></pre></div>
+<div class="callout">
+  <strong>⭐ WHERE vs HAVING</strong><br>
+  <code>WHERE</code> filters rows <em>before</em> grouping.<br>
+  <code>HAVING</code> filters groups <em>after</em> <code>GROUP BY</code> — this is why aggregate functions can't go in WHERE.
+</div>
+</div>
+</section>
+
+<section class="note-card" id="joins">
+  <div class="note-head">
+    <h3>3. JOINs</h3>
+    <span class="tag">Most Important</span>
+  </div>
+  <div class="note-body">
+<p>One of the most heavily tested topics. Master <code>INNER</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>FULL OUTER</code>, <code>SELF</code>, and <code>CROSS</code> joins.</p>
+<div class="codebox"><pre><code>SELECT e.name, d.department_name
+FROM employee e
+INNER JOIN department d
+ON e.department_id = d.id;</code></pre></div>
+<p><b>Classic problem — employees with no department:</b></p>
+<div class="codebox"><pre><code>SELECT e.*
+FROM employee e
+LEFT JOIN department d
+ON e.department_id = d.id
+WHERE d.id IS NULL;</code></pre></div>
+<div class="callout">
+  <strong>⭐ Gotcha:</strong> filtering the right-hand table of a LEFT JOIN in <code>WHERE</code> silently turns it into an INNER JOIN. Put that condition in the <code>ON</code> clause instead if you want to keep unmatched rows.
+</div>
+</div>
+</section>
+
+<section class="note-card" id="subqueries">
+  <div class="note-head">
+    <h3>4. Subqueries</h3>
+    <span class="tag">Core</span>
+  </div>
+  <div class="note-body">
+<ul>
+  <li><b>Scalar subquery</b> — returns exactly one value.</li>
+  <li><b><code>IN</code></b> — matches against a list from a subquery.</li>
+  <li><b><code>EXISTS</code></b> — tests for existence; usually faster and NULL-safe compared to <code>NOT IN</code>.</li>
+  <li><b>Correlated subquery</b> — references the outer query, re-runs per row.</li>
+</ul>
+<div class="codebox"><pre><code>SELECT *
+FROM employee
+WHERE salary > (SELECT AVG(salary) FROM employee);
+
+SELECT *
+FROM employee e
+WHERE EXISTS (
+  SELECT 1 FROM department d WHERE d.id = e.department_id
+);</code></pre></div>
+<div class="callout"><strong>⭐ Gotcha:</strong> <code>NOT IN (subquery)</code> returns zero rows if the subquery result contains any NULL. Use <code>NOT EXISTS</code> instead.</div>
+</div>
+</section>
+
+<section class="note-card" id="constraints">
+  <div class="note-head">
+    <h3>5. Constraints</h3>
+    <span class="tag">Core</span>
+  </div>
+  <div class="note-body">
+<p><code>PRIMARY KEY</code>, <code>FOREIGN KEY</code>, <code>UNIQUE</code>, <code>NOT NULL</code>, <code>CHECK</code>, <code>DEFAULT</code>.</p>
+<p>Know the classic distinctions: Primary Key vs Unique Key, Primary Key vs Foreign Key, and that a table can have only one primary key (though it can be composite).</p>
+</div>
+</section>
+
+<section class="note-card" id="keys">
+  <div class="note-head">
+    <h3>6. Keys</h3>
+    <span class="tag">Core</span>
+  </div>
+  <div class="note-body">
+<p>Primary, Foreign, Candidate, Super, Composite, Alternate keys.</p>
+<div class="callout"><strong>Super Key</strong> ⊇ <strong>Candidate Key</strong> (minimal super key) → one candidate key becomes the <strong>Primary Key</strong>, the rest are <strong>Alternate Keys</strong>. A <strong>Composite Key</strong> spans multiple columns.</div>
+</div>
+</section>
+
+<section class="note-card" id="functions">
+  <div class="note-head">
+    <h3>7. SQL Functions</h3>
+    <span class="tag">Practical</span>
+  </div>
+  <div class="note-body">
+<p><b>String:</b> <code>UPPER()</code>, <code>LOWER()</code>, <code>LENGTH()</code>, <code>CONCAT()</code>, <code>SUBSTRING()</code>, <code>TRIM()</code>, <code>REPLACE()</code></p>
+<p><b>Date:</b> <code>CURRENT_DATE</code>, <code>CURRENT_TIMESTAMP</code>, <code>EXTRACT()</code>, <code>DATE_TRUNC()</code></p>
+<p><b>Numeric:</b> <code>ROUND()</code>, <code>CEIL()</code>, <code>FLOOR()</code>, <code>ABS()</code></p>
+<div class="callout">Exact syntax varies between PostgreSQL / MySQL / Oracle — always confirm the dialect in an interview before writing date functions.</div>
+</div>
+</section>
+
+<section class="note-card" id="case">
+  <div class="note-head">
+    <h3>8. CASE Expressions</h3>
+    <span class="tag">Practical</span>
+  </div>
+  <div class="note-body">
+<div class="codebox"><pre><code>SELECT name, salary,
+       CASE
+           WHEN salary >= 100000 THEN 'High'
+           WHEN salary >= 50000 THEN 'Medium'
+           ELSE 'Low'
+       END AS salary_category
+FROM employee;</code></pre></div>
+<p>Also useful inside aggregates for <b>conditional aggregation / pivoting</b>:</p>
+<div class="codebox"><pre><code>SELECT department_id,
+  SUM(CASE WHEN gender='F' THEN 1 ELSE 0 END) AS female_count
+FROM employee GROUP BY department_id;</code></pre></div>
+</div>
+</section>
+
+<section class="note-card" id="setops">
+  <div class="note-head">
+    <h3>9. Set Operations</h3>
+    <span class="tag">Core</span>
+  </div>
+  <div class="note-body">
+<p><code>UNION</code>, <code>UNION ALL</code>, <code>INTERSECT</code>, <code>EXCEPT</code></p>
+<div class="callout"><strong>⭐ UNION vs UNION ALL:</strong> <code>UNION</code> removes duplicates (sorts/dedupes → slower). <code>UNION ALL</code> keeps everything and is faster.</div>
+</div>
+</section>
+
+<section class="note-card" id="cte">
+  <div class="note-head">
+    <h3>10. CTE (Common Table Expressions)</h3>
+    <span class="tag">Modern SQL</span>
+  </div>
+  <div class="note-body">
+<div class="codebox"><pre><code>WITH high_salary AS (
+    SELECT * FROM employee WHERE salary > 100000
+)
+SELECT * FROM high_salary;</code></pre></div>
+<p><b>Recursive CTE</b> for hierarchical data (org charts, category trees):</p>
+<div class="codebox"><pre><code>WITH RECURSIVE org_chart AS (
+  SELECT id, name, manager_id, 1 AS level
+  FROM employee WHERE manager_id IS NULL
+  UNION ALL
+  SELECT e.id, e.name, e.manager_id, oc.level + 1
+  FROM employee e JOIN org_chart oc ON e.manager_id = oc.id
+)
+SELECT * FROM org_chart;</code></pre></div>
+</div>
+</section>
+
+<section class="note-card highlight" id="window">
+  <div class="note-head">
+    <h3>11. Window Functions</h3>
+    <span class="tag">⭐ Interview-level</span>
+  </div>
+  <div class="note-body">
+<p>This is where preparation becomes <b>interview-level</b>. Master <code>ROW_NUMBER()</code>, <code>RANK()</code>, <code>DENSE_RANK()</code>, <code>PARTITION BY</code>, <code>LAG()</code>, <code>LEAD()</code>, <code>FIRST_VALUE()</code>, <code>LAST_VALUE()</code>, and running <code>SUM()</code>/<code>AVG()</code>.</p>
+<div class="codebox"><pre><code>SELECT name, department, salary,
+       RANK() OVER (
+           PARTITION BY department
+           ORDER BY salary DESC
+       ) AS rank
+FROM employee;</code></pre></div>
+<div class="callout"><strong>⭐ Classic:</strong> "Find the second-highest salary in each department" is almost always solved with <code>DENSE_RANK()</code> + <code>PARTITION BY</code> — see Q42 in the practice set.</div>
+<table class="cmp-table">
+<tr><th>Function</th><th>Behavior on ties</th></tr>
+<tr><td>ROW_NUMBER()</td><td>Always unique (1,2,3,4)</td></tr>
+<tr><td>RANK()</td><td>Ties share rank, gaps after (1,2,2,4)</td></tr>
+<tr><td>DENSE_RANK()</td><td>Ties share rank, no gaps (1,2,2,3)</td></tr>
+</table>
+</div>
+</section>
+
+<section class="note-card" id="normalization">
+  <div class="note-head">
+    <h3>12. Normalization</h3>
+    <span class="tag">Design</span>
+  </div>
+  <div class="note-body">
+<p>1NF → 2NF → 3NF → BCNF → Denormalization. Don't memorize definitions blindly — understand <b>why</b> normalization exists: eliminating redundancy and update/insert/delete anomalies.</p>
+<p><b>Example:</b> instead of storing <code>department_name</code> and <code>department_manager</code> directly on every Employee row (a transitive dependency), split into separate <code>Employee</code> and <code>Department</code> tables.</p>
+</div>
+</section>
+
+<section class="note-card highlight" id="transactions">
+  <div class="note-head">
+    <h3>13. Transactions</h3>
+    <span class="tag">⭐ Backend-critical</span>
+  </div>
+  <div class="note-body">
+<p><b>ACID:</b> Atomicity, Consistency, Isolation, Durability.</p>
+<p><b>Control:</b> <code>COMMIT</code>, <code>ROLLBACK</code>, <code>SAVEPOINT</code></p>
+<p><b>Isolation levels (weakest → strongest):</b> Read Uncommitted → Read Committed → Repeatable Read → Serializable</p>
+<table class="cmp-table">
+<tr><th>Anomaly</th><th>Description</th><th>Prevented from</th></tr>
+<tr><td>Dirty Read</td><td>Reads uncommitted data</td><td>Read Committed+</td></tr>
+<tr><td>Non-repeatable Read</td><td>Same row changes between reads</td><td>Repeatable Read+</td></tr>
+<tr><td>Phantom Read</td><td>New rows appear on re-query</td><td>Serializable</td></tr>
+</table>
+<p>This connects directly to Spring:</p>
+<div class="codebox"><pre><code>@Transactional(isolation = Isolation.READ_COMMITTED)
+public void transferFunds(...) { ... }</code></pre></div>
+</div>
+</section>
+
+<section class="note-card highlight" id="indexes">
+  <div class="note-head">
+    <h3>14. Indexes</h3>
+    <span class="tag">⭐ Backend-critical</span>
+  </div>
+  <div class="note-body">
+<p>Extremely important for backend interviews.</p>
+<ul>
+  <li>An index is a B-Tree (usually) mapping values → row locations for fast lookups.</li>
+  <li>Speeds up SELECT, but slows down INSERT/UPDATE/DELETE (index maintenance overhead).</li>
+  <li><b>Clustered</b> index defines physical row order (one per table); <b>non-clustered</b> is a separate lookup structure (many per table).</li>
+  <li><b>Composite index</b> — order matters! Only a leftmost prefix is usable.</li>
+  <li><b>Covering index</b> — contains every column the query needs → index-only scan.</li>
+  <li><b>Selectivity</b> — high-selectivity columns benefit most from indexing.</li>
+</ul>
+<div class="codebox"><pre><code>CREATE INDEX idx_employee_email
+ON employee(email);</code></pre></div>
+</div>
+</section>
+
+<section class="note-card" id="views">
+  <div class="note-head">
+    <h3>15. Views</h3>
+    <span class="tag">Practical</span>
+  </div>
+  <div class="note-body">
+<div class="codebox"><pre><code>CREATE VIEW employee_details AS
+SELECT e.name, d.department_name
+FROM employee e JOIN department d ON e.department_id = d.id;</code></pre></div>
+<p><b>View</b> — virtual, recomputed each query. <b>Materialized View</b> — physically stored, faster reads, needs refreshing.</p>
+</div>
+</section>
+
+<section class="note-card" id="procs">
+  <div class="note-head">
+    <h3>16. Stored Procedures / Functions / Triggers</h3>
+    <span class="tag">Lower priority</span>
+  </div>
+  <div class="note-body">
+<p>Lower priority for Java backend interviews, but know the basics: Stored Procedure, SQL Function, Trigger, Cursor.</p>
+<div class="codebox"><pre><code>CREATE TRIGGER trg_audit_salary
+AFTER UPDATE OF salary ON employee
+FOR EACH ROW
+EXECUTE FUNCTION log_salary_change();</code></pre></div>
+</div>
+</section>
+
+<section class="note-card highlight" id="optimization">
+  <div class="note-head">
+    <h3>17. Query Optimization</h3>
+    <span class="tag">⭐ Backend-critical</span>
+  </div>
+  <div class="note-body">
+<p>Especially useful since you work with <b>PostgreSQL</b>.</p>
+<ul>
+  <li><code>EXPLAIN</code> / <code>EXPLAIN ANALYZE</code> — shows the planned (or actual) execution strategy.</li>
+  <li><b>Sequential Scan</b> vs <b>Index Scan</b> — full table read vs targeted lookup.</li>
+  <li><b>Nested Loop</b> vs <b>Hash Join</b> — row-by-row lookup vs in-memory hash probing.</li>
+  <li><b>Cost</b> and <b>Cardinality</b> — the optimizer's internal estimate of resource usage and row counts, used to choose the cheapest plan.</li>
+</ul>
+</div>
+</section>
+
+<section class="note-card" id="design">
+  <div class="note-head">
+    <h3>18. Database Design</h3>
+    <span class="tag">Design</span>
+  </div>
+  <div class="note-body">
+<p><b>One-to-One</b>, <b>One-to-Many</b>, <b>Many-to-Many</b> relationships. Many-to-Many always needs a <b>junction/bridge table</b>.</p>
+<div class="codebox"><pre><code>Student ──Many-to-Many── Course
+
+  →  student
+     course
+     student_course   (junction table)</code></pre></div>
+<p>Also know: foreign keys, cascading (<code>ON DELETE CASCADE / SET NULL / RESTRICT</code>), and referential integrity.</p>
+</div>
+</section>
+
+
+  <h2 class="section-title" id="qa">❓ 113 SQL Interview Questions &amp; Answers</h2>
+  <p class="section-sub">Grouped by topic, matching the roadmap above. Click a question to expand its answer, explanation, and code example.</p>
+
+  <div class="qa-toolbar">
+    <input type="text" id="qa-search" placeholder="🔍 Search questions... (e.g. 'index', 'join', 'salary')" onkeyup="filterQA()">
+    <span class="qa-count" id="qa-count">113 questions</span>
+  </div>
+
+  <div class="cat-nav">
+    <a href="#cat-sql-basics" class="cat-pill">SQL Basics <span>10</span></a><a href="#cat-aggregate-functions" class="cat-pill">Aggregate Functions <span>8</span></a><a href="#cat-joins" class="cat-pill">Joins <span>13</span></a><a href="#cat-subqueries" class="cat-pill">Subqueries <span>8</span></a><a href="#cat-constraints-and-keys" class="cat-pill">Constraints &amp; Keys <span>8</span></a><a href="#cat-sql-functions" class="cat-pill">SQL Functions <span>6</span></a><a href="#cat-case-expressions" class="cat-pill">CASE Expressions <span>3</span></a><a href="#cat-set-operations" class="cat-pill">Set Operations <span>4</span></a><a href="#cat-cte" class="cat-pill">CTE <span>5</span></a><a href="#cat-window-functions" class="cat-pill">Window Functions <span>12</span></a><a href="#cat-normalization" class="cat-pill">Normalization <span>5</span></a><a href="#cat-transactions" class="cat-pill">Transactions <span>8</span></a><a href="#cat-indexes" class="cat-pill">Indexes <span>8</span></a><a href="#cat-views" class="cat-pill">Views <span>3</span></a><a href="#cat-procedures-and-triggers" class="cat-pill">Procedures &amp; Triggers <span>2</span></a><a href="#cat-query-optimization" class="cat-pill">Query Optimization <span>5</span></a><a href="#cat-database-design" class="cat-pill">Database Design <span>5</span></a>
+  </div>
+
+  <div id="qa-list">
+    <h3 class="cat-heading" id="cat-sql-basics">SQL Basics</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q1</span> What is the difference between a Primary Key and a Unique Key?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Primary Key uniquely identifies each row and does not allow NULLs; a table can have only one. A Unique Key also enforces uniqueness but allows one NULL (in most RDBMS) and a table can have multiple Unique Keys.</p>
+    <p class="exp"><b>Why / details:</b> Primary Key = uniqueness + NOT NULL + one per table (usually clustered index). Unique Key = uniqueness only, multiple allowed, can accept a NULL.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q2</span> What is the difference between DELETE, TRUNCATE and DROP?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> DELETE removes rows (can use WHERE, is logged, can be rolled back), TRUNCATE removes all rows quickly (minimal logging, resets identity, hard/impossible to roll back in some DBs), DROP removes the entire table structure and data.</p>
+    <p class="exp"><b>Why / details:</b> Interviewers want you to mention: DDL vs DML, rollback behavior, triggers (DELETE fires them, TRUNCATE usually doesn't), and speed (TRUNCATE is fastest since it deallocates data pages instead of logging row by row).</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q3</span> Difference between WHERE and HAVING?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> WHERE filters individual rows before grouping/aggregation; HAVING filters groups after GROUP BY has been applied.</p>
+    <p class="exp"><b>Why / details:</b> You cannot use an aggregate function like AVG(salary) inside WHERE because grouping hasn't happened yet — that's exactly why HAVING exists.</p>
+    <div class="codebox"><pre><code>SELECT department, AVG(salary)
+FROM employee
+GROUP BY department
+HAVING AVG(salary) &gt; 50000;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q4</span> What does the DISTINCT keyword do, and what is its performance cost?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> DISTINCT removes duplicate rows from the result set. It typically requires a sort or hash operation internally, which adds CPU/memory cost, especially on large unindexed columns.</p>
+    <p class="exp"><b>Why / details:</b> In interviews, mention that DISTINCT across many columns can be expensive and sometimes GROUP BY or EXISTS achieves the same result more efficiently.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q5</span> What is the difference between CHAR and VARCHAR?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> CHAR is fixed-length and pads with spaces to the declared length; VARCHAR is variable-length and only stores the actual characters (plus a small length prefix).</p>
+    <p class="exp"><b>Why / details:</b> CHAR can be marginally faster for fixed-size data (like a 2-letter state code) because rows are predictable in size; VARCHAR saves space when lengths vary a lot.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q6</span> What is a NULL value and how does it behave in comparisons?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> NULL represents an unknown/missing value. Any comparison with NULL using =, <>, etc. returns UNKNOWN (not TRUE or FALSE), so you must use IS NULL / IS NOT NULL.</p>
+    <p class="exp"><b>Why / details:</b> A common trap: `WHERE column <> NULL` never matches anything — this is a classic interview gotcha question.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q7</span> What is the order of execution of a SQL query (logical query processing order)?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → DISTINCT → ORDER BY → LIMIT/OFFSET.</p>
+    <p class="exp"><b>Why / details:</b> This is one of the most asked conceptual questions — it explains why you can't use a SELECT alias in WHERE, but you can in ORDER BY.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q8</span> What is the difference between UNION and JOIN?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> JOIN combines columns from two or more tables horizontally based on a related column. UNION stacks the result sets of two queries vertically, requiring the same number and compatible types of columns.</p>
+    <p class="exp"><b>Why / details:</b> JOIN increases the number of columns per row; UNION increases the number of rows.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q9</span> What is an alias and why is it used?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> An alias is a temporary name given to a table or column (using AS) to make queries more readable or to disambiguate columns from multiple tables, especially in self-joins.</p>
+    
+    <div class="codebox"><pre><code>SELECT e.name AS employee_name, m.name AS manager_name
+FROM employee e
+JOIN employee m ON e.manager_id = m.id;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q10</span> What&#x27;s the difference between LIKE &#x27;%abc%&#x27; and LIKE &#x27;abc%&#x27;?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> '%abc%' matches 'abc' anywhere in the string (leading wildcard, cannot use an index efficiently). 'abc%' matches strings starting with 'abc' and CAN use a B-Tree index (index seek).</p>
+    <p class="exp"><b>Why / details:</b> This is an important index-usage question — leading wildcards force a full scan in most databases.</p>
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-aggregate-functions">Aggregate Functions</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q11</span> Do aggregate functions ignore NULLs?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Yes. COUNT(column), SUM, AVG, MIN, MAX all ignore NULL values, except COUNT(*) which counts all rows regardless of NULLs.</p>
+    <p class="exp"><b>Why / details:</b> COUNT(column) vs COUNT(*) is a very common trick question.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q12</span> Find departments having more than 5 employees.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Group employees by department and filter groups with HAVING COUNT(*) > 5.</p>
+    
+    <div class="codebox"><pre><code>SELECT department_id, COUNT(*) AS emp_count
+FROM employee
+GROUP BY department_id
+HAVING COUNT(*) &gt; 5;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q13</span> Find the second-highest salary (without window functions).</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Use a subquery that excludes the maximum salary and take the max of the remainder, or use LIMIT/OFFSET.</p>
+    <p class="exp"><b>Why / details:</b> This classic works everywhere, including MySQL/PostgreSQL/Oracle without window function support.</p>
+    <div class="codebox"><pre><code>SELECT MAX(salary) AS second_highest
+FROM employee
+WHERE salary &lt; (SELECT MAX(salary) FROM employee);
+
+-- Alternative (Postgres/MySQL):
+SELECT DISTINCT salary
+FROM employee
+ORDER BY salary DESC
+LIMIT 1 OFFSET 1;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q14</span> Find the Nth-highest salary generically.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Use DISTINCT + ORDER BY DESC + LIMIT 1 OFFSET (N-1), or DENSE_RANK() for a version that handles ties correctly.</p>
+    <p class="exp"><b>Why / details:</b> OFFSET-based solutions don't handle salary ties well (two people with the same top salary count as one rank) — mention DENSE_RANK as the more correct interview answer.</p>
+    <div class="codebox"><pre><code>SELECT salary FROM (
+  SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+  FROM employee
+) t
+WHERE rnk = :N;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q15</span> Find the highest salary in each department.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> GROUP BY department_id and take MAX(salary) per group.</p>
+    
+    <div class="codebox"><pre><code>SELECT department_id, MAX(salary)
+FROM employee
+GROUP BY department_id;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q16</span> Find employees whose salary is above the company average.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Compare each employee's salary to a scalar subquery computing the overall AVG(salary).</p>
+    
+    <div class="codebox"><pre><code>SELECT * FROM employee
+WHERE salary &gt; (SELECT AVG(salary) FROM employee);</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q17</span> Why can&#x27;t you filter on an aggregate result using WHERE?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Because WHERE is evaluated before GROUP BY/aggregation happens in the logical execution order, so the aggregate value doesn't exist yet at that stage — you must use HAVING.</p>
+    <p class="exp"><b>Why / details:</b> Ties back to the logical query-processing order question.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q18</span> Find customers who placed more than 3 orders.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Group orders by customer_id and filter with HAVING COUNT(*) > 3.</p>
+    
+    <div class="codebox"><pre><code>SELECT customer_id, COUNT(*) AS order_count
+FROM orders
+GROUP BY customer_id
+HAVING COUNT(*) &gt; 3;</code></pre></div>
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-joins">Joins</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q19</span> Explain INNER JOIN vs LEFT JOIN vs RIGHT JOIN vs FULL OUTER JOIN.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> INNER JOIN returns only matching rows from both tables. LEFT JOIN returns all rows from the left table plus matches from the right (NULLs where no match). RIGHT JOIN is the mirror of LEFT. FULL OUTER JOIN returns all rows from both sides, matched where possible, NULLs elsewhere.</p>
+    <p class="exp"><b>Why / details:</b> Draw this as a Venn diagram mentally when explaining in an interview — it shows you understand the visual intuition.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q20</span> What is a self join and when would you use one?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A self join joins a table to itself, typically to compare rows within the same table — e.g., finding employees and their managers who live in the same 'employee' table.</p>
+    
+    <div class="codebox"><pre><code>SELECT e.name AS employee, m.name AS manager
+FROM employee e
+JOIN employee m ON e.manager_id = m.id;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q21</span> Find employees who don&#x27;t belong to any department.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> LEFT JOIN employee to department and filter where the department's key is NULL.</p>
+    
+    <div class="codebox"><pre><code>SELECT e.*
+FROM employee e
+LEFT JOIN department d ON e.department_id = d.id
+WHERE d.id IS NULL;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q22</span> Find employees earning more than their manager.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Self-join employee to itself on manager_id, then compare the two salary columns.</p>
+    
+    <div class="codebox"><pre><code>SELECT e.name AS employee, e.salary, m.name AS manager, m.salary AS manager_salary
+FROM employee e
+JOIN employee m ON e.manager_id = m.id
+WHERE e.salary &gt; m.salary;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q23</span> What is a CROSS JOIN?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A CROSS JOIN produces the Cartesian product of two tables — every row from table A paired with every row from table B, with no join condition.</p>
+    <p class="exp"><b>Why / details:</b> Useful for generating combinations (e.g., all product/size pairs), but dangerous if used accidentally since it can explode row counts.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q24</span> What is the difference between an implicit join (comma syntax) and explicit JOIN syntax?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Implicit joins list tables in FROM separated by commas and put the join condition in WHERE; explicit joins use the JOIN...ON syntax. They're logically equivalent but explicit JOIN is preferred for readability and to avoid accidentally forgetting the WHERE condition (which creates a CROSS JOIN).</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q25</span> Can you JOIN on a condition other than equality?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Yes — a non-equi join uses operators like <, >, BETWEEN instead of =, e.g., joining a sales table to a tax-bracket table where sale_amount BETWEEN low AND high.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q26</span> How does a LEFT JOIN with a WHERE clause on the right table behave differently from a WHERE clause vs. putting the condition in the ON clause?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Putting a filter on the right table in WHERE effectively turns the LEFT JOIN into an INNER JOIN (because NULL rows fail the WHERE condition), whereas putting the same filter in ON preserves the LEFT JOIN's unmatched rows.</p>
+    <p class="exp"><b>Why / details:</b> This is a very common 'gotcha' interview question testing deep JOIN understanding.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q27</span> What is the difference between JOIN and subquery-based filtering (e.g., IN vs JOIN)?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A JOIN combines and returns columns from both tables and can produce duplicate rows if the relationship is one-to-many; a subquery with IN/EXISTS just filters rows from one table and never duplicates rows. Optimizers often rewrite IN/EXISTS into semi-joins internally, so performance can be similar.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q28</span> How would you find duplicate records in a table?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Group by the columns that define a duplicate and filter groups with HAVING COUNT(*) > 1.</p>
+    
+    <div class="codebox"><pre><code>SELECT email, COUNT(*)
+FROM employee
+GROUP BY email
+HAVING COUNT(*) &gt; 1;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q29</span> How would you delete duplicate records, keeping only one copy?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Use a window function to rank duplicates and delete all but rank 1, or use a CTE with ROW_NUMBER().</p>
+    
+    <div class="codebox"><pre><code>WITH ranked AS (
+  SELECT ctid, ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) AS rn
+  FROM employee
+)
+DELETE FROM employee
+WHERE ctid IN (SELECT ctid FROM ranked WHERE rn &gt; 1);</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q30</span> Find duplicate emails in a users table.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Group by email and filter for counts greater than one.</p>
+    
+    <div class="codebox"><pre><code>SELECT email, COUNT(*) AS cnt
+FROM users
+GROUP BY email
+HAVING COUNT(*) &gt; 1;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q31</span> What happens if you JOIN two tables and forget the ON condition?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Without an ON condition, most databases either throw a syntax error (for explicit JOIN) or, with implicit comma-syntax, silently produce a CROSS JOIN — a Cartesian product of every row combination, which can be extremely large and slow.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-subqueries">Subqueries</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q32</span> What is a correlated subquery, and how is it different from a regular subquery?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A correlated subquery references a column from the outer query, so it re-executes once per outer row. A regular (non-correlated) subquery runs independently, once, and its result is reused.</p>
+    <p class="exp"><b>Why / details:</b> Correlated subqueries can be slow on large tables because of repeated execution — window functions or JOINs are often a faster alternative.</p>
+    <div class="codebox"><pre><code>SELECT e.name FROM employee e
+WHERE salary &gt; (
+  SELECT AVG(salary) FROM employee e2 WHERE e2.department_id = e.department_id
+);</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q33</span> Difference between EXISTS and IN?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> EXISTS checks whether a subquery returns any rows and stops at the first match (often faster with correlated subqueries and handles NULLs safely); IN compares a value against a list of subquery results and can behave unexpectedly if the subquery returns NULLs.</p>
+    <p class="exp"><b>Why / details:</b> A key gotcha: `WHERE x NOT IN (subquery)` returns no rows at all if the subquery result contains a NULL — NOT EXISTS doesn't have this problem.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q34</span> What is a scalar subquery?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A subquery that returns exactly one row and one column, usable anywhere a single value is expected (e.g., in SELECT, WHERE, or comparisons).</p>
+    
+    <div class="codebox"><pre><code>SELECT name, salary,
+  (SELECT AVG(salary) FROM employee) AS company_avg
+FROM employee;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q35</span> Can a subquery be used in the SELECT clause?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Yes — a scalar subquery can appear in SELECT to compute a per-row derived value, though it runs once per outer row unless the optimizer caches it, so it can be slower than an equivalent JOIN.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q36</span> What&#x27;s the difference between a subquery and a CTE?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Functionally they can be equivalent, but a CTE (WITH clause) is named and more readable, can be referenced multiple times in the same query without repeating the SQL, and (in some databases) can be recursive. A subquery is inline and single-use.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q37</span> Find employees who earn the maximum salary in their department using a correlated subquery.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Compare each employee's salary to the MAX(salary) of employees in the same department.</p>
+    
+    <div class="codebox"><pre><code>SELECT * FROM employee e
+WHERE salary = (
+  SELECT MAX(salary) FROM employee e2 WHERE e2.department_id = e.department_id
+);</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q38</span> What is a derived table (inline view)?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A subquery used in the FROM clause, treated as a temporary, unnamed (or aliased) table for the duration of the query.</p>
+    
+    <div class="codebox"><pre><code>SELECT dept_avg.department_id, dept_avg.avg_sal
+FROM (
+  SELECT department_id, AVG(salary) AS avg_sal
+  FROM employee GROUP BY department_id
+) dept_avg
+WHERE dept_avg.avg_sal &gt; 50000;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q39</span> When would you prefer a JOIN over a subquery, or vice versa?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Prefer a JOIN when you need columns from both tables in the result and the optimizer can use indexes efficiently on the join keys. Prefer EXISTS/subqueries when you only need to test for existence and don't need columns from the second table — it avoids row duplication and can be clearer.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-constraints-and-keys">Constraints &amp; Keys</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q40</span> What is a Foreign Key and what does it enforce?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Foreign Key is a column (or set of columns) that references the Primary Key of another table, enforcing referential integrity so you can't insert a value that doesn't exist in the parent table (or, depending on rules, delete a parent row that's still referenced).</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q41</span> Can a table have multiple primary keys?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> No — a table can have only one PRIMARY KEY constraint, but that key can be composite (made up of multiple columns).</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q42</span> What is a composite key?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A key made up of two or more columns that together uniquely identify a row, used when no single column is unique on its own — common in junction/bridge tables for many-to-many relationships.</p>
+    
+    <div class="codebox"><pre><code>CREATE TABLE student_course (
+  student_id INT,
+  course_id INT,
+  PRIMARY KEY (student_id, course_id)
+);</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q43</span> What is a candidate key vs a super key?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A super key is any set of columns that uniquely identifies a row (may include extra, redundant columns). A candidate key is a minimal super key — no column can be removed without losing uniqueness. One candidate key is chosen as the primary key; the rest become alternate keys.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q44</span> What does the CHECK constraint do?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> It enforces a boolean condition on column values at insert/update time, rejecting rows that violate it — e.g., ensuring salary > 0.</p>
+    
+    <div class="codebox"><pre><code>ALTER TABLE employee ADD CONSTRAINT chk_salary CHECK (salary &gt; 0);</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q45</span> What is the difference between ON DELETE CASCADE, SET NULL, and RESTRICT?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> CASCADE automatically deletes child rows when the parent is deleted. SET NULL sets the foreign key column to NULL on the children instead of deleting them. RESTRICT (or NO ACTION) blocks the delete of the parent entirely if children still reference it.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q46</span> What is referential integrity?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A guarantee that relationships between tables remain consistent — every foreign key value must correspond to an existing primary key value in the referenced table (or be NULL, if allowed).</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q47</span> What&#x27;s the difference between NOT NULL and DEFAULT constraints?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> NOT NULL simply forbids storing a NULL value in the column. DEFAULT supplies an automatic value when no value is explicitly provided on INSERT — a column can have both.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-sql-functions">SQL Functions</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q48</span> How do you extract the year from a date column?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Use EXTRACT(YEAR FROM date_column) in PostgreSQL/Oracle, or YEAR(date_column) in MySQL.</p>
+    <p class="exp"><b>Why / details:</b> Dialect differences are a common practical question — always mention which database you're referring to.</p>
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q49</span> How do you concatenate strings in SQL?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Use the CONCAT() function, or the || operator in PostgreSQL/Oracle/SQLite (MySQL supports CONCAT() but not || by default).</p>
+    
+    <div class="codebox"><pre><code>SELECT CONCAT(first_name, &#x27; &#x27;, last_name) AS full_name FROM employee;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q50</span> Difference between CAST and CONVERT?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> CAST is ANSI-standard SQL and works across most databases; CONVERT is more feature-rich in SQL Server (supports style codes for formatting) but is less portable.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q51</span> What does COALESCE() do?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> It returns the first non-NULL value from a list of expressions — commonly used to substitute a default value when a column might be NULL.</p>
+    
+    <div class="codebox"><pre><code>SELECT COALESCE(phone, &#x27;N/A&#x27;) FROM employee;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q52</span> Find employees who joined in the last 6 months.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Filter join_date against the current date minus a 6-month interval.</p>
+    
+    <div class="codebox"><pre><code>SELECT * FROM employee
+WHERE join_date &gt;= CURRENT_DATE - INTERVAL &#x27;6 months&#x27;;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q53</span> What&#x27;s the difference between ROUND(), FLOOR(), and CEIL()?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> ROUND rounds to the nearest specified decimal place (standard rounding rules). FLOOR always rounds down to the nearest integer. CEIL always rounds up to the nearest integer.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-case-expressions">CASE Expressions</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q54</span> How does a CASE expression work in SQL?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> CASE evaluates conditions in order and returns the value tied to the first TRUE condition, falling back to ELSE (or NULL if no ELSE is given) if none match. It works in SELECT, WHERE, ORDER BY, and GROUP BY.</p>
+    
+    <div class="codebox"><pre><code>SELECT name,
+  CASE WHEN salary &gt;= 100000 THEN &#x27;High&#x27;
+       WHEN salary &gt;= 50000 THEN &#x27;Medium&#x27;
+       ELSE &#x27;Low&#x27; END AS salary_band
+FROM employee;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q55</span> Can CASE be used inside an aggregate function? Give an example.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Yes — this is a common technique called conditional aggregation, useful for pivoting data.</p>
+    
+    <div class="codebox"><pre><code>SELECT department_id,
+  SUM(CASE WHEN gender = &#x27;F&#x27; THEN 1 ELSE 0 END) AS female_count,
+  SUM(CASE WHEN gender = &#x27;M&#x27; THEN 1 ELSE 0 END) AS male_count
+FROM employee
+GROUP BY department_id;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q56</span> What&#x27;s the difference between simple CASE and searched CASE syntax?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Simple CASE compares one expression against multiple values (CASE column WHEN val1 THEN...). Searched CASE evaluates independent boolean conditions (CASE WHEN condition1 THEN...), giving more flexibility (e.g., ranges, multiple columns).</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-set-operations">Set Operations</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q57</span> Difference between UNION and UNION ALL?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> UNION merges two result sets and removes duplicate rows (requires a sort/dedup step); UNION ALL merges them and keeps all rows including duplicates, so it's generally faster.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q58</span> What is INTERSECT and how does it differ from an INNER JOIN?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> INTERSECT returns rows that appear in both result sets (matching on entire rows, not just a key column), whereas an INNER JOIN combines columns from two tables based on a join key. INTERSECT is a set operation; JOIN is a relational combination.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q59</span> What rules must both queries follow to use UNION?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Both SELECT statements must return the same number of columns, in a compatible order, with compatible (implicitly convertible) data types.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q60</span> What does EXCEPT (or MINUS in Oracle) do?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> It returns rows present in the first query's result but not in the second — essentially a set difference.</p>
+    
+    <div class="codebox"><pre><code>SELECT customer_id FROM customers
+EXCEPT
+SELECT customer_id FROM churned_customers;</code></pre></div>
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-cte">CTE</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q61</span> What is a CTE and why use it over a subquery?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Common Table Expression (WITH clause) is a named, temporary result set scoped to a single query. It improves readability, allows reuse of the same result multiple times within the query, and supports recursion — subqueries can't be reused by name.</p>
+    
+    <div class="codebox"><pre><code>WITH high_earners AS (
+  SELECT * FROM employee WHERE salary &gt; 100000
+)
+SELECT department_id, COUNT(*) FROM high_earners GROUP BY department_id;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q62</span> What is a recursive CTE and when would you use one?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A CTE that references itself to process hierarchical or graph-like data, such as an org chart or category tree, by starting with a base case and repeatedly joining to build up results.</p>
+    
+    <div class="codebox"><pre><code>WITH RECURSIVE org_chart AS (
+  SELECT id, name, manager_id, 1 AS level
+  FROM employee WHERE manager_id IS NULL
+  UNION ALL
+  SELECT e.id, e.name, e.manager_id, oc.level + 1
+  FROM employee e
+  JOIN org_chart oc ON e.manager_id = oc.id
+)
+SELECT * FROM org_chart;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q63</span> Are CTEs materialized (computed once) or inlined by the optimizer?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> It depends on the database: PostgreSQL (pre-12) always materialized CTEs, PostgreSQL 12+ can inline them like subqueries unless marked MATERIALIZED, while SQL Server typically inlines/optimizes CTEs like views. Always check your specific engine's behavior for performance-critical queries.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q64</span> Can you use multiple CTEs in a single query?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Yes, by separating them with commas in a single WITH clause; later CTEs can even reference earlier ones.</p>
+    
+    <div class="codebox"><pre><code>WITH dept_avg AS (
+  SELECT department_id, AVG(salary) avg_sal FROM employee GROUP BY department_id
+), high_dept AS (
+  SELECT * FROM dept_avg WHERE avg_sal &gt; 60000
+)
+SELECT * FROM high_dept;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q65</span> What is the main limitation of a CTE compared to a temporary table or a view?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A CTE only exists for the duration of the single statement it's attached to — it can't be indexed, and it's re-evaluated each time it's referenced (unless the engine materializes and caches it), unlike a temp table which persists and can be indexed for the session.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-window-functions">Window Functions</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q66</span> Difference between ROW_NUMBER(), RANK(), and DENSE_RANK()?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> ROW_NUMBER() assigns a unique sequential number to every row, even for ties. RANK() gives the same rank to ties but skips subsequent numbers (1,2,2,4). DENSE_RANK() gives the same rank to ties without skipping (1,2,2,3).</p>
+    
+    <div class="codebox"><pre><code>SELECT name, salary,
+  RANK() OVER (ORDER BY salary DESC) AS rnk
+FROM employee;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q67</span> Find the second-highest salary in each department using window functions.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Use DENSE_RANK() partitioned by department, ordered by salary descending, then filter for rank = 2.</p>
+    
+    <div class="codebox"><pre><code>SELECT * FROM (
+  SELECT name, department_id, salary,
+    DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS rnk
+  FROM employee
+) t
+WHERE rnk = 2;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q68</span> What does PARTITION BY do inside an OVER() clause?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> It divides the result set into groups (partitions), and the window function is computed independently within each partition, resetting for each new group — analogous to GROUP BY but without collapsing rows.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q69</span> What is the difference between a window function and GROUP BY?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> GROUP BY collapses multiple rows into one row per group, losing row-level detail. A window function computes an aggregate/ranking value per row while still returning every individual row, letting you see both detail and aggregate together.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q70</span> Explain LAG() and LEAD() with an example use case.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> LAG() accesses a value from a previous row and LEAD() from a following row within the same result set/partition, without a self-join — useful for computing differences between consecutive rows, like month-over-month change.</p>
+    
+    <div class="codebox"><pre><code>SELECT name, salary,
+  salary - LAG(salary) OVER (ORDER BY review_date) AS salary_change
+FROM salary_history;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q71</span> How do you calculate a running total using window functions?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Use SUM() as a window function ordered by the relevant column, without a PARTITION BY (or with one, for a per-group running total) — the default frame accumulates all preceding rows.</p>
+    
+    <div class="codebox"><pre><code>SELECT order_date, amount,
+  SUM(amount) OVER (ORDER BY order_date) AS running_total
+FROM orders;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q72</span> Find the top 3 salaries in each department.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Partition by department, rank by salary descending using DENSE_RANK or ROW_NUMBER, and keep rows with rank <= 3.</p>
+    
+    <div class="codebox"><pre><code>SELECT * FROM (
+  SELECT name, department_id, salary,
+    DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS rnk
+  FROM employee
+) t
+WHERE rnk &lt;= 3;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q73</span> What is a window frame, and what does &#x27;ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW&#x27; mean?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A window frame defines which rows within a partition are included in the calculation for the current row. That specific clause means: include every row from the start of the partition up to and including the current row — the classic definition for a running total.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q74</span> What do FIRST_VALUE() and LAST_VALUE() do?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> FIRST_VALUE() returns the value of an expression from the first row of the window frame; LAST_VALUE() returns it from the last row of the frame. Note LAST_VALUE often needs an explicit frame clause (ROWS BETWEEN ... AND UNBOUNDED FOLLOWING) to behave as expected, since the default frame ends at the current row.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q75</span> Can you use a window function&#x27;s result directly in a WHERE clause?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> No — window functions are evaluated after WHERE and GROUP BY in the logical processing order, so you must wrap the query in a subquery or CTE and filter in the outer query.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q76</span> Find the highest salary in each department using RANK().</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Rank employees by salary within each department partition and keep rank = 1 (note: RANK can return ties for the top spot, unlike ROW_NUMBER).</p>
+    
+    <div class="codebox"><pre><code>SELECT * FROM (
+  SELECT name, department_id, salary,
+    RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS rnk
+  FROM employee
+) t
+WHERE rnk = 1;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q77</span> What is the practical difference between using ROW_NUMBER() vs RANK() to find &#x27;the top earner per department&#x27; when there&#x27;s a tie?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> ROW_NUMBER() arbitrarily picks just one employee as rank 1 even if two people tie on salary, potentially hiding a tie. RANK() correctly returns both tied employees as rank 1, which is usually the more business-correct answer.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-normalization">Normalization</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q78</span> What problem does normalization solve?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> It reduces data redundancy and prevents update/insert/delete anomalies by organizing columns and tables so each fact is stored in only one place.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q79</span> Briefly explain 1NF, 2NF, and 3NF.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> 1NF: each column holds atomic (indivisible) values, no repeating groups. 2NF: 1NF plus every non-key column depends on the whole primary key (no partial dependency on part of a composite key). 3NF: 2NF plus no transitive dependency — non-key columns depend only on the key, not on other non-key columns.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q80</span> What is denormalization and when would you use it?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Denormalization intentionally introduces redundancy (e.g., duplicating a column across tables) to reduce the number of joins needed, trading some write complexity/storage for faster reads — common in reporting/analytics or read-heavy systems.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q81</span> What is BCNF (Boyce-Codd Normal Form) and how does it differ from 3NF?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> BCNF is a stricter version of 3NF: for every functional dependency X → Y, X must be a super key. It resolves rare anomalies that can still exist in 3NF when a table has multiple overlapping candidate keys.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q82</span> Give a practical example of removing a transitive dependency to reach 3NF.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> If an Employee table stores department_name and department_manager directly (which depend on department_id, not on employee_id), that's a transitive dependency — split it into a separate Department table and reference it via a foreign key.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-transactions">Transactions</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q83</span> Explain ACID properties.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Atomicity: a transaction is all-or-nothing. Consistency: a transaction moves the database from one valid state to another, respecting constraints. Isolation: concurrent transactions don't interfere with each other's intermediate state. Durability: once committed, changes survive crashes.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q84</span> What&#x27;s the difference between COMMIT and ROLLBACK?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> COMMIT permanently saves all changes made in the current transaction. ROLLBACK undoes all changes made since the last COMMIT (or since the transaction began), restoring the prior state.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q85</span> What is a SAVEPOINT?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A named point within a transaction that you can roll back to without undoing the entire transaction — useful for partial recovery from an error mid-transaction.</p>
+    
+    <div class="codebox"><pre><code>BEGIN;
+UPDATE account SET balance = balance - 100 WHERE id = 1;
+SAVEPOINT sp1;
+UPDATE account SET balance = balance + 100 WHERE id = 2;
+-- if something goes wrong:
+ROLLBACK TO sp1;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q86</span> Explain the four transaction isolation levels.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Read Uncommitted: can see other transactions' uncommitted changes (dirty reads possible). Read Committed: only sees committed data, but repeated reads can differ (non-repeatable reads). Repeatable Read: same rows return the same values across the transaction, but new rows can appear (phantom reads). Serializable: fully isolated, transactions behave as if executed one after another — safest but slowest.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q87</span> What is a dirty read, a non-repeatable read, and a phantom read?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Dirty read: reading uncommitted data from another transaction that might later be rolled back. Non-repeatable read: re-reading the same row within a transaction and getting a different value because another transaction committed a change in between. Phantom read: re-running the same query and getting a different set of rows because another transaction inserted/deleted matching rows.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q88</span> How does @Transactional in Spring relate to SQL transactions?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> It wraps a method's database operations in a single transaction managed by Spring's PlatformTransactionManager — commits automatically if the method completes normally and rolls back on an unchecked exception (by default), letting you control isolation level and propagation declaratively instead of manually issuing BEGIN/COMMIT/ROLLBACK.</p>
+    
+    <div class="codebox"><pre><code>@Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+public void transferFunds(Long fromId, Long toId, BigDecimal amount) { ... }</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q89</span> What is a deadlock and how can it be avoided?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A deadlock occurs when two or more transactions each hold a lock the other needs, so neither can proceed. It can be mitigated by always acquiring locks in a consistent order across transactions, keeping transactions short, and using appropriate timeouts so the database can detect and abort one transaction.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q90</span> What is optimistic locking vs pessimistic locking?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Pessimistic locking acquires a lock on a row up front (e.g., SELECT ... FOR UPDATE) and blocks other transactions from touching it until released. Optimistic locking assumes conflicts are rare — it doesn't lock, but checks a version/timestamp column at commit time and fails the update if the row changed since it was read.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-indexes">Indexes</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q91</span> What is an index and why does it speed up SELECT queries?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> An index is a separate, ordered data structure (usually a B-Tree) that maps column values to row locations, letting the database jump directly to matching rows instead of scanning the entire table sequentially.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q92</span> Why can indexes slow down INSERT/UPDATE/DELETE?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Every write that touches an indexed column must also update the index structure(s), so more indexes on a table mean more work per write operation — it's a classic read-speed vs write-speed tradeoff.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q93</span> Difference between a clustered and non-clustered index?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A clustered index determines the physical order in which data rows are stored on disk — a table can have only one. A non-clustered index is a separate structure that stores pointers back to the actual rows, and a table can have several.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q94</span> What is a composite (multi-column) index and how does column order matter?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A composite index is built on multiple columns together. Column order matters because the index can only be used efficiently (as a seek) for queries filtering on a leftmost prefix of those columns — an index on (a, b, c) helps queries filtering on 'a', 'a,b', or 'a,b,c', but not on 'b' alone.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q95</span> What is a covering index?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> An index that contains all the columns a query needs (in its key or included columns), so the database can answer the query entirely from the index without touching the actual table rows — this is called an index-only scan.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q96</span> What is index selectivity, and why does it matter?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Selectivity is the ratio of distinct values to total rows in a column. High-selectivity columns (like email) benefit greatly from indexing since an index seek narrows results to very few rows; low-selectivity columns (like a boolean 'is_active' flag) benefit little, since the index still returns a large fraction of the table.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q97</span> When would you NOT want to create an index?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> On small tables (a full scan is already fast), on columns rarely used in WHERE/JOIN/ORDER BY, on low-selectivity columns, or on tables with very heavy write traffic where the write overhead of maintaining the index outweighs the read benefit.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q98</span> How would an index on department_id help this query: WHERE department_id = ?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Instead of scanning every row in the table (sequential scan), the database can navigate the B-Tree index directly to the matching department_id value and retrieve only those row pointers — an index scan/seek, which is much faster on large tables.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-views">Views</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q99</span> What is a View and how is it different from a Table?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A View is a stored, named SELECT query that behaves like a virtual table — it has no data of its own (except materialized views) and is recomputed each time it's queried. A Table physically stores data on disk.</p>
+    
+    <div class="codebox"><pre><code>CREATE VIEW employee_details AS
+SELECT e.name, d.department_name
+FROM employee e JOIN department d ON e.department_id = d.id;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q100</span> What is a Materialized View and how does it differ from a regular View?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Materialized View physically stores (caches) the query result on disk and must be periodically refreshed, trading storage and staleness for much faster read performance compared to a regular view, which re-runs its query every time.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q101</span> Give a scenario where you&#x27;d use a View.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> To simplify a complex, frequently reused JOIN/aggregation for reporting, or to restrict which columns/rows certain users can see (security through column/row-level abstraction) without exposing the underlying table structure directly.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-procedures-and-triggers">Procedures &amp; Triggers</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q102</span> What is the difference between a Stored Procedure and a Function in SQL?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Function must return a value and can be used inline within a SELECT statement (typically can't modify data in most databases); a Stored Procedure may or may not return a value, can perform DML/DDL, and is invoked with CALL/EXEC rather than embedded in a query.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q103</span> What is a Trigger, and give an example use case?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Trigger is a piece of code that automatically executes in response to an INSERT/UPDATE/DELETE event on a table — e.g., automatically logging changes to an audit table whenever a row in 'employee' is updated.</p>
+    
+    <div class="codebox"><pre><code>CREATE TRIGGER trg_audit_salary
+AFTER UPDATE OF salary ON employee
+FOR EACH ROW
+EXECUTE FUNCTION log_salary_change();</code></pre></div>
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-query-optimization">Query Optimization</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q104</span> What does EXPLAIN (or EXPLAIN ANALYZE) show you?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> EXPLAIN shows the database's planned execution strategy for a query — which scans, joins, and sorts it will use and their estimated cost — without running it. EXPLAIN ANALYZE actually executes the query and shows real timing/row counts alongside the plan, letting you compare estimates to reality.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q105</span> Difference between a Sequential Scan and an Index Scan in an execution plan?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Sequential Scan reads every row in the table in physical order — O(n), used when there's no useful index or the optimizer expects to need most of the rows. An Index Scan uses an index to jump directly to matching rows, much faster when selectivity is high (few matching rows relative to table size).</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q106</span> What is a Nested Loop Join vs a Hash Join?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> A Nested Loop Join iterates the outer table row by row and, for each row, searches the inner table (efficient with a good index on the inner table and a small outer set). A Hash Join builds an in-memory hash table from one input and probes it with the other — generally faster for large, unindexed equi-joins but requires more memory.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q107</span> What do &#x27;cost&#x27; and &#x27;cardinality&#x27; mean in a query execution plan?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Cardinality is the estimated (or actual) number of rows a step will produce/process. Cost is the optimizer's internal unit measuring the estimated resources (I/O + CPU) a step will take — the optimizer picks the plan with the lowest total estimated cost, which depends heavily on accurate cardinality estimates from table statistics.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q108</span> Why might a query be slow even though the right index exists?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Common reasons: outdated table statistics leading the optimizer to pick a bad plan, a function applied to the indexed column in WHERE (e.g., UPPER(email) = ...) which prevents index usage, low selectivity making a scan cheaper anyway, implicit type conversion, or the query fetching so many rows that an index scan is no faster than a sequential scan.</p>
+    
+    
+  </div>
+</details>
+<h3 class="cat-heading" id="cat-database-design">Database Design</h3>
+<details class="qa-card">
+  <summary><span class="qnum">Q109</span> How do you model a One-to-Many relationship?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Put a foreign key on the 'many' side referencing the primary key of the 'one' side — e.g., each employee row has a department_id pointing to one department, but a department can have many employees.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q110</span> How do you model a Many-to-Many relationship?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Introduce a junction/bridge table containing foreign keys to both related tables (often with a composite primary key), since neither table can directly hold a variable-length list of the other's keys.</p>
+    
+    <div class="codebox"><pre><code>CREATE TABLE student_course (
+  student_id INT REFERENCES student(id),
+  course_id INT REFERENCES course(id),
+  PRIMARY KEY (student_id, course_id)
+);</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q111</span> What is a One-to-One relationship and when is it used?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Each row in table A corresponds to exactly one row in table B, usually implemented with a foreign key that is also unique (or shares the same primary key). Used to split a table for security (isolating sensitive columns) or to keep rarely-used columns out of a hot table.</p>
+    
+    
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q112</span> Find departments with no employees.</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> LEFT JOIN department to employee and filter where the employee side is NULL.</p>
+    
+    <div class="codebox"><pre><code>SELECT d.*
+FROM department d
+LEFT JOIN employee e ON d.id = e.department_id
+WHERE e.id IS NULL;</code></pre></div>
+  </div>
+</details>
+
+<details class="qa-card">
+  <summary><span class="qnum">Q113</span> What does &#x27;cascading&#x27; mean in database design, and what&#x27;s a risk of ON DELETE CASCADE?</summary>
+  <div class="qa-content">
+    <p class="answer"><b>Answer:</b> Cascading means an action on a parent row automatically propagates to related child rows (e.g., deleting a customer also deletes their orders). The risk is unintended data loss — a single delete can silently ripple through many related tables if the cascade chain isn't well understood.</p>
+    
+    
+  </div>
+</details>
+
+  </div>
+
+</div>
+
+<footer>
+  Built for Aryan's SQL interview prep · 113 questions across 17 categories · Notes cover all 18 roadmap topics
+</footer>
+
+<script>
+function filterQA() {
+  const term = document.getElementById('qa-search').value.toLowerCase();
+  const cards = document.querySelectorAll('.qa-card');
+  const headings = document.querySelectorAll('.cat-heading');
+  let visibleCount = 0;
+
+  cards.forEach(card => {
+    const text = card.innerText.toLowerCase();
+    if (text.includes(term)) {
+      card.classList.remove('hidden');
+      visibleCount++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  headings.forEach(h => {
+    let sibling = h.nextElementSibling;
+    let anyVisible = false;
+    while (sibling && !sibling.classList.contains('cat-heading')) {
+      if (sibling.classList.contains('qa-card') && !sibling.classList.contains('hidden')) {
+        anyVisible = true;
+      }
+      sibling = sibling.nextElementSibling;
+    }
+    h.classList.toggle('hidden', !anyVisible);
+  });
+
+  document.getElementById('qa-count').innerText = visibleCount + ' questions';
+}
+</script>
+
+</body>
+</html>
