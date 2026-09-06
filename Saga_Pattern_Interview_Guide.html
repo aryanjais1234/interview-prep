@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Saga Pattern — Sample Project, Both Types &amp; Interview Guide</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#161a23; --panel2:#1b2030; --border:#2a3040;
+    --text:#e6e9f0; --muted:#9aa4b8; --accent:#6dd3a8; --accent2:#7aa2f7;
+    --warn:#f2b866; --danger:#e37f7f; --code-bg:#0b0e14; --pill:#22283a;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg); color:var(--text); font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif; margin:0; line-height:1.65;}
+  .wrap{max-width:1000px; margin:0 auto; padding:32px 20px 80px;}
+  h1{font-size:2.1em; margin-bottom:4px;}
+  .subtitle{color:var(--muted); margin-bottom:28px; font-size:1.05em;}
+  .toc{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin-bottom:36px;}
+  .toc h3{margin-top:0; color:var(--accent2);}
+  .toc a{color:var(--text); text-decoration:none; display:block; padding:4px 0;}
+  .toc a:hover{color:var(--accent);}
+  section{margin-bottom:56px;}
+  h2{font-size:1.6em; border-left:4px solid var(--accent2); padding-left:14px; margin-top:0; color:#fff;}
+  h3{color:var(--accent2); font-size:1.15em; margin-bottom:8px;}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin:16px 0;}
+  .card.internal{border-left:4px solid var(--warn);}
+  .card.usecase{border-left:4px solid var(--accent);}
+  .card.project{border-left:4px solid var(--accent2);}
+  .card.compare{border-left:4px solid var(--danger);}
+  .label{display:inline-block; font-weight:700; font-size:.78em; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:10px;}
+  pre{background:var(--code-bg); border:1px solid var(--border); border-radius:8px; padding:16px; overflow-x:auto; font-size:.85em;}
+  code{font-family:'Fira Code',Consolas,Monaco,monospace;}
+  p code, li code, td code{background:var(--code-bg); padding:1px 6px; border-radius:4px; color:var(--accent);}
+  ul{padding-left:22px;} li{margin-bottom:6px;}
+  .flow{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0;}
+  .flow span{background:var(--pill); border:1px solid var(--border); padding:6px 12px; border-radius:8px; font-size:.85em; white-space:nowrap;}
+  .flow .arrow{color:var(--muted); font-weight:bold;}
+  .step{display:flex; gap:14px; margin:16px 0; align-items:flex-start;}
+  .step .n{background:var(--accent2); color:#0f1117; font-weight:800; width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .qa{background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:14px;}
+  .qa .q{font-weight:700; color:var(--accent2); margin-bottom:8px;}
+  .qa .q .num{color:var(--accent); margin-right:8px;}
+  table{width:100%; border-collapse:collapse; margin:14px 0; font-size:.92em;}
+  th,td{border:1px solid var(--border); padding:8px 12px; text-align:left;}
+  th{background:var(--pill); color:var(--accent2);}
+  .impress{background:var(--pill); border-left:3px solid var(--accent); padding:8px 14px; margin-top:8px; font-size:.9em; color:var(--muted); border-radius:0 6px 6px 0;}
+  .hub-link{color:var(--accent2); text-decoration:none;}
+  .hub-link:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Saga Pattern — Sample Project, Both Types &amp; Interview Guide</h1>
+  <div class="subtitle">Order → Payment → Inventory → Shipping, built two ways (choreography &amp; orchestration), plus 10 interview-ready answers</div>
+
+  <div class="toc">
+    <h3>Contents</h3>
+    <a href="#recap">1. The problem, quickly recapped</a>
+    <a href="#project">2. Sample project — the scenario</a>
+    <a href="#choreography">3. Type 1: Choreography-based Saga (full code)</a>
+    <a href="#orchestration">4. Type 2: Orchestration-based Saga (full code)</a>
+    <a href="#deepdive">5. Deep dive — compensations, idempotency, ordering, state</a>
+    <a href="#compare">6. Choreography vs Orchestration — when to pick which</a>
+    <a href="#qa">7. 10 Interview Q&amp;A designed to impress</a>
+  </div>
+
+  <section id="recap">
+    <h2>1. The problem, quickly recapped</h2>
+    <p>In a monolith, a multi-step business operation sits inside one <code>@Transactional</code> boundary — if any statement fails, the database rolls everything back atomically. Once you split into microservices, each with its own database, that single ACID transaction is gone: <b>Order Service</b>, <b>Payment Service</b>, <b>Inventory Service</b>, and <b>Shipping Service</b> each commit to their own local database. If Order and Payment succeed but Inventory fails, you're left with a paid, unfulfillable order — the system is in an inconsistent state, and there's no distributed rollback to fall back on (2PC/XA transactions don't scale and most modern datastores don't even support them well).</p>
+    <p>The <b>Saga pattern</b> solves this by replacing one big atomic transaction with a <b>sequence of local transactions</b>, one per service, where every step that changed something also defines an explicit <b>compensating transaction</b> to undo it if a later step fails. There's no "rollback" — there's "run the opposite operation."</p>
+  </section>
+
+  <section id="project">
+    <h2>2. Sample project — the scenario</h2>
+    <p>Four Spring Boot microservices, each with its own DB, communicating over <b>Kafka</b>:</p>
+    <table>
+      <tr><th>Service</th><th>Local transaction</th><th>Compensating transaction</th></tr>
+      <tr><td><b>order-service</b></td><td>Create order (status=CREATED)</td><td>Cancel order (status=CANCELLED)</td></tr>
+      <tr><td><b>payment-service</b></td><td>Deduct customer's money</td><td>Refund money</td></tr>
+      <tr><td><b>inventory-service</b></td><td>Reserve stock for the product</td><td>Release reserved stock</td></tr>
+      <tr><td><b>shipping-service</b></td><td>Create a shipment</td><td>Cancel shipment (rarely fails — last step)</td></tr>
+    </table>
+    <p>We'll build the <i>same</i> business flow two ways so you can compare them directly in an interview.</p>
+  </section>
+
+  <section id="choreography">
+    <h2>3. Type 1: Choreography-based Saga</h2>
+    <h3>Concept</h3>
+    <p>No central controller. Each service publishes an event when its local transaction completes, and listens for events from other services to know when to act — like dancers who each know their own steps and react to their partner's moves, with no conductor.</p>
+
+    <div class="card internal">
+      <span class="label">Internal working</span>
+      <div class="flow">
+        <span>order-service: create order</span><span class="arrow">→</span>
+        <span>publish OrderCreated</span>
+      </div>
+      <div class="flow">
+        <span>payment-service listens OrderCreated</span><span class="arrow">→</span>
+        <span>deduct money</span><span class="arrow">→</span>
+        <span>publish PaymentCompleted <i>(or PaymentFailed)</i></span>
+      </div>
+      <div class="flow">
+        <span>inventory-service listens PaymentCompleted</span><span class="arrow">→</span>
+        <span>reserve stock</span><span class="arrow">→</span>
+        <span>publish InventoryReserved <i>(or InventoryFailed)</i></span>
+      </div>
+      <div class="flow">
+        <span>shipping-service listens InventoryReserved</span><span class="arrow">→</span>
+        <span>create shipment</span><span class="arrow">→</span>
+        <span>publish ShipmentCreated</span>
+      </div>
+      <p><b>Failure path:</b> if <code>InventoryFailed</code> is published, <code>payment-service</code> (which is listening for it) triggers its own compensating action and publishes <code>PaymentRefunded</code>; <code>order-service</code> listens for that and cancels the order. Each service only needs to know which events to react to — never who else exists.</p>
+    </div>
+
+    <pre><code>// ---- Shared event contracts (common module) ----
+public record OrderCreatedEvent(String orderId, String productId, int qty, double amount) {}
+public record PaymentCompletedEvent(String orderId, double amount) {}
+public record PaymentFailedEvent(String orderId, String reason) {}
+public record InventoryReservedEvent(String orderId, String productId) {}
+public record InventoryFailedEvent(String orderId, String reason) {}
+public record PaymentRefundedEvent(String orderId) {}
+
+// ---- order-service ----
+@Service
+class OrderService {
+    private final OrderRepository repo;
+    private final KafkaTemplate&lt;String, Object&gt; kafka;
+
+    void createOrder(CreateOrderRequest req) {
+        Order order = repo.save(new Order(req.productId(), req.qty(), req.amount(), "CREATED"));
+        kafka.send("order-created", new OrderCreatedEvent(order.getId(), req.productId(), req.qty(), req.amount()));
+    }
+
+    @KafkaListener(topics = "payment-refunded")
+    void onPaymentRefunded(PaymentRefundedEvent event) {
+        repo.updateStatus(event.orderId(), "CANCELLED");   // compensating action
+    }
+}
+
+// ---- payment-service ----
+@Service
+class PaymentService {
+    private final PaymentRepository repo;
+    private final KafkaTemplate&lt;String, Object&gt; kafka;
+
+    @KafkaListener(topics = "order-created")
+    void onOrderCreated(OrderCreatedEvent event) {
+        try {
+            repo.deduct(event.orderId(), event.amount());   // local transaction
+            kafka.send("payment-completed", new PaymentCompletedEvent(event.orderId(), event.amount()));
+        } catch (InsufficientBalanceException e) {
+            kafka.send("payment-failed", new PaymentFailedEvent(event.orderId(), e.getMessage()));
+        }
+    }
+
+    @KafkaListener(topics = "inventory-failed")
+    void onInventoryFailed(InventoryFailedEvent event) {
+        repo.refund(event.orderId());                        // compensating transaction
+        kafka.send("payment-refunded", new PaymentRefundedEvent(event.orderId()));
+    }
+}
+
+// ---- inventory-service ----
+@Service
+class InventoryService {
+    private final InventoryRepository repo;
+    private final KafkaTemplate&lt;String, Object&gt; kafka;
+
+    @KafkaListener(topics = "payment-completed")
+    void onPaymentCompleted(PaymentCompletedEvent event) {
+        boolean reserved = repo.reserveStock(event.orderId());
+        if (reserved) {
+            kafka.send("inventory-reserved", new InventoryReservedEvent(event.orderId(), null));
+        } else {
+            kafka.send("inventory-failed", new InventoryFailedEvent(event.orderId(), "Out of stock"));
+        }
+    }
+}
+
+// ---- shipping-service ----
+@Service
+class ShippingService {
+    @KafkaListener(topics = "inventory-reserved")
+    void onInventoryReserved(InventoryReservedEvent event) {
+        // create shipment - final happy-path step
+    }
+}</code></pre>
+    <p>Notice: nobody orchestrates anybody. Every service only knows its own topics — add a fifth service (say, <code>notification-service</code>) and it just subscribes to whichever events it cares about, with zero changes to the existing four.</p>
+  </section>
+
+  <section id="orchestration">
+    <h2>4. Type 2: Orchestration-based Saga</h2>
+    <h3>Concept</h3>
+    <p>A dedicated <b>Saga Orchestrator</b> service owns the entire workflow as an explicit state machine. It issues commands to each participant one at a time and decides — based on each response — whether to move forward or trigger compensations backward. Participants become "dumb" — they just do what they're told and reply.</p>
+
+    <div class="card internal">
+      <span class="label">Internal working</span>
+      <div class="flow">
+        <span>OrderSagaOrchestrator</span><span class="arrow">→</span>
+        <span>command: CreateOrder</span><span class="arrow">→</span>
+        <span>order-service replies OrderCreated</span>
+      </div>
+      <div class="flow">
+        <span>Orchestrator</span><span class="arrow">→</span>
+        <span>command: DeductPayment</span><span class="arrow">→</span>
+        <span>payment-service replies Success/Failure</span>
+      </div>
+      <div class="flow">
+        <span>Orchestrator</span><span class="arrow">→</span>
+        <span>command: ReserveInventory</span><span class="arrow">→</span>
+        <span>inventory-service replies Success/Failure</span>
+      </div>
+      <p>If any reply is a failure, the orchestrator walks <i>backward</i> through the already-completed steps, issuing explicit compensating commands (<code>RefundPayment</code>, <code>CancelOrder</code>) in reverse order — it has full visibility of saga state at every point, usually persisted in its own DB so a crash mid-saga can resume where it left off.</p>
+    </div>
+
+    <pre><code>enum SagaStep { ORDER_CREATED, PAYMENT_DONE, INVENTORY_DONE, SHIPPED, FAILED, COMPENSATED }
+
+@Entity
+class SagaState {
+    @Id String sagaId;
+    String orderId;
+    @Enumerated(EnumType.STRING) SagaStep currentStep;
+    // ... amount, productId etc for compensations
+}
+
+@Service
+class OrderSagaOrchestrator {
+    private final SagaStateRepository sagaRepo;
+    private final KafkaTemplate&lt;String, Object&gt; kafka;
+
+    void startSaga(CreateOrderRequest req) {
+        String sagaId = UUID.randomUUID().toString();
+        sagaRepo.save(new SagaState(sagaId, null, SagaStep.ORDER_CREATED));
+        kafka.send("order.create.cmd", new CreateOrderCommand(sagaId, req));
+    }
+
+    @KafkaListener(topics = "order.create.reply")
+    void onOrderCreated(OrderCreatedReply reply) {
+        SagaState saga = sagaRepo.findById(reply.sagaId()).orElseThrow();
+        if (reply.success()) {
+            saga.setCurrentStep(SagaStep.ORDER_CREATED);
+            sagaRepo.save(saga);
+            kafka.send("payment.deduct.cmd", new DeductPaymentCommand(reply.sagaId(), reply.amount()));
+        } else {
+            failSaga(saga);   // nothing to compensate yet, first step
+        }
+    }
+
+    @KafkaListener(topics = "payment.deduct.reply")
+    void onPaymentReply(PaymentReply reply) {
+        SagaState saga = sagaRepo.findById(reply.sagaId()).orElseThrow();
+        if (reply.success()) {
+            saga.setCurrentStep(SagaStep.PAYMENT_DONE);
+            sagaRepo.save(saga);
+            kafka.send("inventory.reserve.cmd", new ReserveInventoryCommand(reply.sagaId()));
+        } else {
+            compensate(saga, SagaStep.PAYMENT_DONE);   // walk backward: cancel order
+        }
+    }
+
+    @KafkaListener(topics = "inventory.reserve.reply")
+    void onInventoryReply(InventoryReply reply) {
+        SagaState saga = sagaRepo.findById(reply.sagaId()).orElseThrow();
+        if (reply.success()) {
+            saga.setCurrentStep(SagaStep.INVENTORY_DONE);
+            sagaRepo.save(saga);
+            kafka.send("shipping.create.cmd", new CreateShipmentCommand(reply.sagaId()));
+        } else {
+            compensate(saga, SagaStep.INVENTORY_DONE);  // walk backward: refund + cancel order
+        }
+    }
+
+    private void compensate(SagaState saga, SagaStep failedAt) {
+        if (failedAt == SagaStep.INVENTORY_DONE) {
+            kafka.send("payment.refund.cmd", new RefundPaymentCommand(saga.getSagaId()));
+        }
+        kafka.send("order.cancel.cmd", new CancelOrderCommand(saga.getSagaId()));
+        saga.setCurrentStep(SagaStep.COMPENSATED);
+        sagaRepo.save(saga);
+    }
+
+    private void failSaga(SagaState saga) {
+        saga.setCurrentStep(SagaStep.FAILED);
+        sagaRepo.save(saga);
+    }
+}
+
+// participants become simple command-handlers, e.g.:
+@Service
+class PaymentCommandHandler {
+    @KafkaListener(topics = "payment.deduct.cmd")
+    void handle(DeductPaymentCommand cmd) {
+        boolean ok = paymentRepo.tryDeduct(cmd.sagaId(), cmd.amount());
+        kafka.send("payment.deduct.reply", new PaymentReply(cmd.sagaId(), ok));
+    }
+
+    @KafkaListener(topics = "payment.refund.cmd")
+    void handleRefund(RefundPaymentCommand cmd) {
+        paymentRepo.refund(cmd.sagaId());
+    }
+}</code></pre>
+    <p>The orchestrator is the single source of truth for "where is this saga right now" — you can query <code>SagaState</code> at any time to see exactly which step an order is stuck at, which is much harder in choreography where the "state" is implicit, scattered across everyone's event logs.</p>
+  </section>
+
+  <section id="deepdive">
+    <h2>5. Deep dive — compensations, idempotency, ordering, state</h2>
+
+    <div class="card usecase">
+      <span class="label">Compensating transactions aren't a mirror-image rollback</span>
+      <p>A compensating transaction is a new, independent business operation, not an automatic reversal — "refund payment" is its own transaction with its own audit trail, not SQL's <code>ROLLBACK</code>. This matters because some steps are genuinely <b>not compensatable</b> — you can't un-send an email. For steps like that, sagas either place them last in the sequence (so nothing after them can fail and force a compensation) or design a "best-effort" compensation (e.g. sending a follow-up "please ignore the previous email" notice).</p>
+    </div>
+
+    <div class="card usecase">
+      <span class="label">Idempotency is non-negotiable</span>
+      <p>Kafka (and most brokers) guarantee at-least-once delivery — a consumer can receive the same event twice (retry after a crash, rebalance, etc). Every command/event handler in a saga must be idempotent: e.g. <code>payment-service</code> should track a processed <code>sagaId</code>/<code>orderId</code> and skip re-deducting money if it sees the same command twice. Without this, a network blip can silently double-charge a customer.</p>
+    </div>
+
+    <div class="card usecase">
+      <span class="label">Event ordering</span>
+      <p>In choreography especially, you must guarantee a service processes events for the same <code>orderId</code> in order — otherwise <code>InventoryFailed</code> could theoretically be processed before <code>PaymentCompleted</code> if events race. Kafka gives ordering guarantees per-partition, so partitioning topics by <code>orderId</code> (as the message key) ensures all events for one order land on the same partition and are consumed in order.</p>
+    </div>
+
+    <div class="card usecase">
+      <span class="label">Where does saga "state" live?</span>
+      <p>Choreography has no explicit saga state — the current status of an order is implicitly derivable only by replaying/aggregating events, which makes debugging "why is this order stuck" harder. Orchestration persists explicit state (like the <code>SagaState</code> entity above), so the orchestrator can resume a crashed saga from exactly where it left off, and ops teams can query "show me all sagas stuck at PAYMENT_DONE."</p>
+    </div>
+  </section>
+
+  <section id="compare">
+    <h2>6. Choreography vs Orchestration — when to pick which</h2>
+    <table>
+      <tr><th></th><th>Choreography</th><th>Orchestration</th></tr>
+      <tr><td><b>Control</b></td><td>Decentralized — no single owner</td><td>Centralized — one orchestrator owns the flow</td></tr>
+      <tr><td><b>Coupling</b></td><td>Loosely coupled — services don't know each other</td><td>Orchestrator knows about every participant</td></tr>
+      <tr><td><b>Adding a new step</b></td><td>Easy — new service just subscribes to an event</td><td>Requires updating the orchestrator's logic</td></tr>
+      <tr><td><b>Debuggability / visibility</b></td><td>Hard — must trace across many services' logs</td><td>Easy — orchestrator's state machine shows exact status</td></tr>
+      <tr><td><b>Best for</b></td><td>Simple flows, few steps (2-4), teams wanting max autonomy</td><td>Complex flows, many steps, conditional branching, need for auditability</td></tr>
+      <tr><td><b>Common risk</b></td><td>"Event soup" — implicit, undocumented coupling; cyclic event dependencies</td><td>Orchestrator becomes a god-service/single point of failure if not made highly available</td></tr>
+    </table>
+    <p>A practical rule interviewers like: <i>start with choreography for 2-3 step flows; move to orchestration once you have 4+ steps, branching logic, or need a clear operational view of "where is this transaction right now."</i></p>
+  </section>
+
+  <section id="qa">
+    <h2>7. 10 Interview Questions &amp; Answers — designed to impress</h2>
+
+    <div class="qa"><div class="q"><span class="num">1.</span>Why can't you just use a distributed transaction (2PC) across microservices instead of Saga?</div>
+    <div class="a">Two-Phase Commit requires a coordinator to hold locks across all participating databases until every participant votes commit, which blocks resources for the duration and doesn't scale under microservice-style high concurrency; it also assumes all participants support XA transactions, which most modern NoSQL/cloud-managed databases and message brokers don't. Saga trades strict ACID atomicity for eventual consistency achieved via compensations, which fits distributed, independently-deployed services far better.</div>
+    <div class="impress">Impress factor: naming 2PC/XA explicitly and explaining *why* it doesn't scale (blocking locks) shows you understand the alternative being rejected, not just the pattern being used.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">2.</span>What exactly is a "compensating transaction," and how is it different from a rollback?</div>
+    <div class="a">A rollback undoes a transaction before it commits, using the database's own log — it's automatic and free. A compensating transaction is a deliberate, separate business operation that semantically reverses an already-committed transaction's effect — e.g. "refund" instead of "un-deduct." It has its own transaction, its own audit trail, and must be explicitly written by the developer for every step that has side effects.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">3.</span>Why must every saga participant be idempotent?</div>
+    <div class="a">Because message brokers like Kafka guarantee at-least-once delivery, not exactly-once, so a consumer can receive and process the same command/event twice (e.g. after a rebalance or a retry). Without idempotency — usually implemented by tracking a unique operation/saga ID and skipping already-processed ones — a duplicate delivery could double-deduct payment or double-reserve stock, silently corrupting state.</div>
+    <div class="impress">Impress factor: this is the #1 follow-up interviewers ask after "explain saga" — bringing it up unprompted signals production experience, not just textbook knowledge.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">4.</span>How do you guarantee event ordering in a choreography-based saga using Kafka?</div>
+    <div class="a">Partition the topic by a key that groups all events for one business transaction together — typically <code>orderId</code> — since Kafka only guarantees ordering within a single partition, not across the whole topic. All events for the same order then land on the same partition and are consumed strictly in the order they were produced.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">5.</span>What happens if the orchestrator itself crashes mid-saga in the orchestration approach?</div>
+    <div class="a">Because saga state is persisted (not held only in memory), the orchestrator can reload the last known <code>SagaState</code> for in-flight sagas on restart and resume issuing commands from that step — this is why orchestration typically requires its own durable state store, unlike choreography where "state" is implicit across event logs.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">6.</span>Is Saga strongly consistent or eventually consistent, and what does that mean practically for users?</div>
+    <div class="a">Eventually consistent — there's a window where, say, an order shows as CREATED before payment/inventory steps resolve, and if a later step fails, the system briefly shows a state (like "paid") that later gets compensated (refunded). Practically, this means UX needs to communicate transient states honestly ("processing your order") rather than assuming an instant, all-or-nothing result like a monolithic transaction would give.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">7.</span>What's a scenario where a step genuinely cannot be compensated, and how do you design around it?</div>
+    <div class="a">Sending a confirmation email or SMS can't be "un-sent." The standard mitigation is to sequence non-compensatable steps last in the saga, after all compensatable/reversible steps have already succeeded, so a later failure never needs to undo them — e.g. shipping notification goes out only after payment and inventory are both confirmed, minimizing the chance it needs to be walked back.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">8.</span>How would you monitor and debug a stuck saga in production?</div>
+    <div class="a">With orchestration, query the persisted <code>SagaState</code> table directly for sagas stuck at a given step past some time threshold, and alert on them. With choreography, since there's no central state, you typically need distributed tracing (correlation/saga ID propagated through every event and log line) plus a saga "read model" built by consuming all the events into a dashboard, since there's no single source of truth to query.</div>
+    <div class="impress">Impress factor: contrasting the operational cost of choreography's lack of centralized visibility shows real-world judgment, not just pattern memorization.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">9.</span>Can you mix choreography and orchestration in the same system?</div>
+    <div class="a">Yes — it's common in larger systems to orchestrate the high-level, critical multi-step business workflow (e.g. order fulfillment) explicitly, while individual services internally react to fine-grained events choreography-style for secondary concerns like analytics, notifications, or audit logging that don't need to affect the saga's success/failure path.</div></div>
+
+    <div class="qa"><div class="q"><span class="num">10.</span>How does Saga relate to the Transactional Outbox pattern, and why are they often used together?</div>
+    <div class="a">A service's local transaction (e.g. "create order" + "insert an OrderCreated row into an outbox table") happens atomically in the same DB transaction; a separate poller/CDC process then reliably publishes that outbox row to Kafka. This solves the "dual write" problem — without it, a service could commit its DB change but crash before publishing the event (or vice versa), silently breaking the saga. Transactional Outbox guarantees the event is published if and only if the local transaction committed, which is exactly the reliability guarantee a saga step depends on.</div>
+    <div class="impress">Impress factor: this is the single most senior-sounding answer you can give on Saga — it shows you know the pattern isn't safe in isolation without solving the dual-write problem underneath it, and directly matches what you've already rehearsed for your HealthWatch narrative.</div></div>
+
+  </section>
+
+  <div class="card" style="text-align:center; color:var(--muted); font-size:.9em;">
+    Saga Pattern reference — choreography &amp; orchestration with Kafka, Spring Boot microservices context.
+    <br><a class="hub-link" href="index.html">← Back to JavaPrep Hub</a>
+  </div>
+
+</div>
+</body>
+</html>
